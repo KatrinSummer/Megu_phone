@@ -1,23 +1,36 @@
-# Megu on the phone
+# Megu — Japanese flashcards for the phone
 
-The same 808 Japanese words as Megu on the computer, with sound and with a
-review schedule. Installs as a home-screen icon; works with no internet.
+**Open on your phone: https://katrinsummer.github.io/Megu/**
+Then: Share → *Add to Home Screen*. It runs full screen, like an app, and
+works with no internet.
 
-## Put it on the phone
+808 Japanese words, every one of them spoken aloud, with a review schedule
+that shows a word again just before it would be forgotten.
 
-Open the site in Safari -> Share -> "Add to Home Screen". Then open the menu
-(the ☰ button) once and press "Download all the sound" - after that the phone
-needs no network at all.
+- The Japanese word is **spoken as it appears** — hearing it is part of the question.
+- Tap to see the reading, the kanji and the meaning.
+- Three answers — *Forgot / Knew it / Easy* — and each says up front when the
+  word will come back: tomorrow, in 4 days, in 2 months.
+- Bookmark anything worth coming back to.
+- Open the menu (☰) once and press **Download all the sound** — after that the
+  phone needs no network at all.
 
-## Where the contents come from
+## Your progress
 
-Built by Megu: `npm run pwa` reads `portable/library` and the generated audio,
-and writes `deck.json` and `audio/` here. The only hand-written files are
-`index.html`, `app.js` and `sw.js`.
+Kept on the phone, and tied to the **word**, not to the deck — so words can be
+added, moved between decks, and decks renamed, without losing any history. It
+remembers the interval, the ease, how many times you slipped, and the bookmark.
 
-## Progress
+Two backups on top of that: a Cloudflare worker that keeps a daily snapshot,
+and a *Save progress to a file* button. Two phones merge cleanly — for each
+word, the more recent review wins.
 
-Lives on the phone. A copy goes to the cloud (see `../worker`), and there is a
-"Save progress to a file" button as well. It is tied to the WORD, not to the
-deck, so words can be added, moved between decks, and decks renamed, and the
-history still follows the word.
+## Where the words come from
+
+Built by **Megu on the computer**, which is where the vocabulary actually lives:
+lessons come in, words get filed into decks, and the deck is exported.
+`npm run pwa` over there writes `deck.json` and `audio/` into this repository.
+Sound is generated once per word (edge-tts, voice `ja-JP-NanamiNeural`).
+
+The only hand-written files here are `index.html`, `app.js` and `sw.js` — no
+framework, no build step.
