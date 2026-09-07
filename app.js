@@ -65,10 +65,11 @@ function play() {
 function render() {
   const t = today(), all = pool();
   const left = queue.length;
-  // Short enough that it never crowds the buttons next to it.
+  // Short enough to survive any font: the buttons beside it must not be pushed.
   $('counts').innerHTML = left
-    ? `осталось <b>${left}</b> · готово <b>${doneToday}</b>`
-    : `на сегодня всё · <b>${all.length}</b> слов`;
+    ? `<b>${left}</b> осталось · <b>${doneToday}</b> ✓`
+    : `на сегодня всё`;
+  $('counts').title = left ? `осталось ${left}, сегодня сделано ${doneToday}` : `слов всего ${all.length}`;
   $('star').textContent = current && progress[current.f]?.star ? '★' : '☆';
   $('star').className = 'icon' + (current && progress[current.f]?.star ? ' starred' : '');
 

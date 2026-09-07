@@ -19,8 +19,10 @@ self.addEventListener('fetch', (e) => {
   e.respondWith((async () => {
     const hit = await caches.match(e.request);
     if (hit) {
-      // The deck may have grown; refresh it in the background, serve the old one now.
-      if (url.pathname.endsWith('deck.json')) e.waitUntil(refresh(e.request));
+      // Serve the cached copy at once, but fetch a fresh one behind her back so
+      // the next launch has it. Without this an updated app.js would never
+      // reach the phone. Sound files never change, so they are left alone.
+      if (!url.pathname.startsWith('/audio/')) e.waitUntil(refresh(e.request).catch(() => {}));
       return hit;
     }
     return refresh(e.request).catch(() => hit ?? Response.error());
