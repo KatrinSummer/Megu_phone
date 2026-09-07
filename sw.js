@@ -22,7 +22,7 @@ self.addEventListener('fetch', (e) => {
       // Serve the cached copy at once, but fetch a fresh one behind her back so
       // the next launch has it. Without this an updated app.js would never
       // reach the phone. Sound files never change, so they are left alone.
-      if (!url.pathname.startsWith('/audio/')) e.waitUntil(refresh(e.request).catch(() => {}));
+      if (!url.pathname.includes('/audio/')) e.waitUntil(refresh(e.request).catch(() => {}));
       return hit;
     }
     return refresh(e.request).catch(() => hit ?? Response.error());

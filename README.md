@@ -1,6 +1,6 @@
 # Megu — Japanese flashcards for the phone
 
-**Open on your phone: https://katrinsummer.github.io/Megu/**
+**Open on your phone: https://katrinsummer.github.io/Megu_phone/**
 
 It is a web page, so any phone works — iPhone, Android, or a computer. To keep
 it on the home screen and run it full screen, like an app:
@@ -33,7 +33,7 @@ word, the more recent review wins.
 
 ## Where the words come from
 
-Built by [**Megu on the computer**](https://github.com/KatrinSummer/Megu-desktop),
+Built by [**Megu on the computer**](https://github.com/KatrinSummer/Megu),
 which is where the vocabulary actually lives:
 lessons come in, words get filed into decks, and the deck is exported.
 `npm run pwa` over there writes `deck.json` and `audio/` into this repository.
