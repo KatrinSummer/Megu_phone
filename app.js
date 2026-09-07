@@ -10,11 +10,11 @@ const S_KEY = 'megu.settings.v1';
 const load = (k, fallback) => { try { return JSON.parse(localStorage.getItem(k)) ?? fallback; } catch { return fallback; } };
 
 let progress = load(P_KEY, {});        // Front -> {due, iv, ease, reps, lapses, star, seen}
-let settings = { deck: 'all', perDay: 20, autoPlay: true, cloud: '', key: '', ...load(S_KEY, {}) };
+let settings = { deck: 'all', perDay: 20, autoPlay: true, ...load(S_KEY, {}) };
 let deck = { cards: [], decks: [] };
 let queue = [], current = null, shown = false, doneToday = 0;
 
-const saveProgress = () => { localStorage.setItem(P_KEY, JSON.stringify(progress)); scheduleSync(); };
+const saveProgress = () => localStorage.setItem(P_KEY, JSON.stringify(progress));
 const saveSettings = () => localStorage.setItem(S_KEY, JSON.stringify(settings));
 
 // ---------------------------------------------------------------- schedule
@@ -137,12 +137,6 @@ function nextIn(grade) {
 const esc = (s) => String(s ?? '').replace(/[<>&"]/g, (m) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[m]));
 
 // ---------------------------------------------------------------- backup
-let syncTimer = null;
-function scheduleSync() {
-  if (!settings.cloud) return;
-  clearTimeout(syncTimer);
-  syncTimer = setTimeout(() => sync().catch(() => {}), 4000);   // after she stops tapping
-}
 
 /** Newer record per word wins, so two phones never overwrite each other. */
 function merge(a, b) {
@@ -153,28 +147,23 @@ function merge(a, b) {
   return out;
 }
 
-async function sync() {
-  if (!settings.cloud) return 'no cloud set up yet';
-  const url = settings.cloud.replace(/\/$/, '');
-  const head = { 'content-type': 'application/json', 'x-megu-key': settings.key };
-  const got = await fetch(url, { headers: head });
-  if (got.ok) {
-    const remote = await got.json().catch(() => ({}));
-    progress = merge(progress, remote.progress ?? {});
-    localStorage.setItem(P_KEY, JSON.stringify(progress));
+// On the home screen iOS gives a web app no download bar, so the share sheet is
+// the only way the file reaches Files. Everywhere else the link still works.
+async function saveFile(say) {
+  const name = `megu-progress-${new Date().toISOString().slice(0, 10)}.json`;
+  const body = JSON.stringify({ progress }, null, 1);
+  const file = new File([body], name, { type: 'application/json' });
+  if (navigator.canShare?.({ files: [file] })) {
+    try { await navigator.share({ files: [file] }); say('now pick Save to Files'); }
+    catch { /* she closed the sheet */ }
+    return;
   }
-  const put = await fetch(url, { method: 'PUT', headers: head, body: JSON.stringify({ progress }) });
-  if (!put.ok) throw new Error(`the server said ${put.status}`);
-  return `backed up ${Object.keys(progress).length} words`;
-}
-
-function saveFile() {
-  const blob = new Blob([JSON.stringify({ progress }, null, 1)], { type: 'application/json' });
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `megu-progress-${new Date().toISOString().slice(0, 10)}.json`;
+  a.href = URL.createObjectURL(new Blob([body], { type: 'application/json' }));
+  a.download = name;
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  say(`${Object.keys(progress).length} words saved`);
 }
 
 function loadFile(file, say) {
@@ -215,10 +204,6 @@ function openMenu() {
     </select>
     <label>New words at a time</label>
     <input id="per" type="number" min="0" max="100" value="${settings.perDay}">
-    <label>Cloud backup (address and key)</label>
-    <input id="cloud" placeholder="https://…workers.dev" value="${esc(settings.cloud)}">
-    <input id="key" placeholder="key" value="${esc(settings.key)}" style="margin-top:6px">
-    <button class="wide" id="now">Back up to the cloud now</button>
     <button class="wide" id="grab">Download all the sound</button>
     <button class="wide" id="file">Save progress to a file</button>
     <button class="wide" id="pickfile">Restore from a file</button>
@@ -228,10 +213,6 @@ function openMenu() {
   $('pick').value = settings.deck;
   const say = (m) => { $('note').textContent = m; };
 
-  $('now').addEventListener('click', async () => {
-    say('backing up…');
-    try { say(await sync()); } catch (e) { say(`did not work: ${e.message}`); }
-  });
   $('grab').addEventListener('click', async () => {
     const files = deck.cards.filter((c) => c.a).map((c) => `audio/${c.a}.m4a`);
     const cache = await caches.open('megu-v1');
@@ -242,14 +223,12 @@ function openMenu() {
     }
     say(`sound is on the phone: ${files.length} words, no internet needed`);
   });
-  $('file').addEventListener('click', saveFile);
+  $('file').addEventListener('click', () => saveFile(say));
   $('pickfile').addEventListener('click', () => $('hidden').click());
   $('hidden').addEventListener('change', (e) => e.target.files[0] && loadFile(e.target.files[0], say));
   $('close').addEventListener('click', () => {
     settings.deck = $('pick').value;
     settings.perDay = Math.max(0, Number($('per').value) || 0);
-    settings.cloud = $('cloud').value.trim();
-    settings.key = $('key').value.trim();
     saveSettings();
     $('sheet').close();
     buildQueue(); render();
@@ -274,7 +253,6 @@ fetch('deck.json').then((r) => r.json()).then((d) => {
   deck = d;
   buildQueue();
   render();
-  if (settings.cloud) sync().then(() => { buildQueue(); render(); }).catch(() => {});
 });
 
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});

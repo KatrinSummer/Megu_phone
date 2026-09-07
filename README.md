@@ -27,9 +27,11 @@ Kept on the phone, and tied to the **word**, not to the deck — so words can be
 added, moved between decks, and decks renamed, without losing any history. It
 remembers the interval, the ease, how many times you slipped, and the bookmark.
 
-Two backups on top of that: a Cloudflare worker that keeps a daily snapshot,
-and a *Save progress to a file* button. Two phones merge cleanly — for each
-word, the more recent review wins.
+Nothing is sent anywhere. To keep a copy off the app, open the menu and press
+*Save progress to a file* — the share sheet appears, choose *Save to Files*
+(iCloud Drive if you want it off the phone). *Restore from a file* reads it
+back, and merges rather than overwrites: for each word the more recent review
+wins, so restoring an old file never loses newer work.
 
 ## Where the words come from
 
