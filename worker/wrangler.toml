@@ -1,0 +1,9 @@
+name = "megu-progress"
+main = "worker.js"
+compatibility_date = "2026-01-01"
+
+# Created with:  npx wrangler kv namespace create MEGU
+# Paste the id it prints below.
+[[kv_namespaces]]
+binding = "MEGU"
+id = "ЗАМЕНИ_НА_ID_ИЗ_КОМАНДЫ_ВЫШЕ"
