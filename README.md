@@ -1,8 +1,14 @@
 # Megu — Japanese flashcards for the phone
 
 **Open on your phone: https://katrinsummer.github.io/Megu/**
-Then: Share → *Add to Home Screen*. It runs full screen, like an app, and
-works with no internet.
+
+It is a web page, so any phone works — iPhone, Android, or a computer. To keep
+it on the home screen and run it full screen, like an app:
+
+- **iPhone** (Safari): Share → *Add to Home Screen*
+- **Android** (Chrome): ⋮ → *Add to Home screen* / *Install app*
+
+Nothing is installed from a store, and once opened it works with no internet.
 
 808 Japanese words, every one of them spoken aloud, with a review schedule
 that shows a word again just before it would be forgotten.
