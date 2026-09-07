@@ -71,10 +71,8 @@ function render() {
   const t = today(), all = pool();
   const left = queue.length;
   // Short enough to survive any font: the buttons beside it must not be pushed.
-  $('counts').innerHTML = left
-    ? `<b>${left}</b> осталось · <b>${doneToday}</b> ✓`
-    : `на сегодня всё`;
-  $('counts').title = left ? `осталось ${left}, сегодня сделано ${doneToday}` : `слов всего ${all.length}`;
+  $('counts').innerHTML = left ? `<b>${left}</b> to go · <b>${doneToday}</b> ✓` : `done for today`;
+  $('counts').title = left ? `${left} left, ${doneToday} done today` : `${all.length} words in all`;
   $('star').textContent = current && progress[current.f]?.star ? '★' : '☆';
   $('star').className = 'icon' + (current && progress[current.f]?.star ? ' starred' : '');
 
@@ -82,9 +80,9 @@ function render() {
     current = null;
     const later = all.filter((c) => progress[c.f]?.due > t).length;
     const news = all.filter((c) => !progress[c.f]).length;
-    $('main').innerHTML = `<div class="done"><h2>На сегодня всё</h2>
-      <div>${later} слов ждут своего дня, ${news} ещё ни разу не показывались.</div>
-      <button class="wide" id="more">Показать ещё ${Math.min(settings.perDay, news)} новых</button></div>`;
+    $('main').innerHTML = `<div class="done"><h2>Done for today</h2>
+      <div>${later} words are waiting for their day, ${news} have never been shown.</div>
+      <button class="wide" id="more">Show ${Math.min(settings.perDay, news)} more new words</button></div>`;
     $('more')?.addEventListener('click', () => {
       queue = all.filter((c) => !progress[c.f])
         .sort((a, b) => (b.when || '').localeCompare(a.when || '')).slice(0, settings.perDay);
@@ -102,7 +100,7 @@ function render() {
 function draw() {
   const c = current;
   const p = progress[c.f];
-  const seen = p ? `повторов ${p.reps}${p.lapses ? ` · ошибок ${p.lapses}` : ''}` : 'новое слово';
+  const seen = p ? `${p.reps} reviews${p.lapses ? ` · ${p.lapses} slips` : ''}` : 'new word';
   $('main').innerHTML = `
     <div class="card" id="face">
       <div class="kana">${esc(c.f)}</div>
@@ -111,14 +109,14 @@ function draw() {
         ${c.k ? `<div class="kanji">${esc(c.k)}</div>` : ''}
       </div>
       <div class="english ${shown ? '' : 'hidden'}">${esc(c.e)}</div>
-      ${shown ? `<div class="meta">${seen}</div>` : '<div class="tap">нажми, чтобы увидеть</div>'}
+      ${shown ? `<div class="meta">${seen}</div>` : '<div class="tap">tap to see</div>'}
     </div>
     ${shown ? `<div class="row">
-        <button id="again">Забыла<span class="s">заново</span></button>
-        <button id="good">Помню<span class="s">${nextIn('good')}</span></button>
-        <button id="easy">Легко<span class="s">${nextIn('easy')}</span></button>
+        <button id="again">Forgot<span class="s">again</span></button>
+        <button id="good">Knew it<span class="s">${nextIn('good')}</span></button>
+        <button id="easy">Easy<span class="s">${nextIn('easy')}</span></button>
       </div>`
-      : '<button id="reveal">Показать</button>'}`;
+      : '<button id="reveal">Show</button>'}`;
 
   const reveal = () => { if (!shown) { shown = true; draw(); } };
   $('face').addEventListener('click', reveal);
@@ -133,7 +131,7 @@ function nextIn(grade) {
   const p = progress[current.f] ?? { iv: 0, ease: 2.5, reps: 0 };
   let iv = p.reps === 0 ? 1 : p.reps === 1 ? 3 : Math.round(p.iv * (p.ease + (grade === 'easy' ? 0.15 : 0)));
   if (grade === 'easy') iv = Math.max(2, Math.round(iv * 1.5));
-  return iv === 1 ? 'завтра' : iv < 30 ? `через ${iv} дн.` : `через ${Math.round(iv / 30)} мес.`;
+  return iv === 1 ? 'tomorrow' : iv < 30 ? `in ${iv} days` : `in ${Math.round(iv / 30)} months`;
 }
 
 const esc = (s) => String(s ?? '').replace(/[<>&"]/g, (m) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[m]));
@@ -156,7 +154,7 @@ function merge(a, b) {
 }
 
 async function sync() {
-  if (!settings.cloud) return 'облако не настроено';
+  if (!settings.cloud) return 'no cloud set up yet';
   const url = settings.cloud.replace(/\/$/, '');
   const head = { 'content-type': 'application/json', 'x-megu-key': settings.key };
   const got = await fetch(url, { headers: head });
@@ -166,8 +164,8 @@ async function sync() {
     localStorage.setItem(P_KEY, JSON.stringify(progress));
   }
   const put = await fetch(url, { method: 'PUT', headers: head, body: JSON.stringify({ progress }) });
-  if (!put.ok) throw new Error(`сервер ответил ${put.status}`);
-  return `сохранено ${Object.keys(progress).length} слов`;
+  if (!put.ok) throw new Error(`the server said ${put.status}`);
+  return `backed up ${Object.keys(progress).length} words`;
 }
 
 function saveFile() {
@@ -187,9 +185,9 @@ function loadFile(file, say) {
       const before = Object.keys(progress).length;
       progress = merge(progress, data.progress ?? data);
       localStorage.setItem(P_KEY, JSON.stringify(progress));
-      say(`было ${before} слов, стало ${Object.keys(progress).length}`);
+      say(`was ${before} words, now ${Object.keys(progress).length}`);
       buildQueue(); render();
-    } catch (e) { say(`не похоже на файл прогресса: ${e.message}`); }
+    } catch (e) { say(`that is not a progress file: ${e.message}`); }
   };
   r.readAsText(file);
 }
@@ -199,40 +197,40 @@ function openMenu() {
   const t = today();
   const known = Object.values(progress);
   const rows = [
-    ['слов всего', deck.cards.length],
-    ['начато', known.length],
-    ['на сегодня', pool().filter((c) => !progress[c.f] || progress[c.f].due <= t).length],
-    ['в закладках', known.filter((p) => p.star).length],
-    ['знаю дольше месяца', known.filter((p) => p.iv >= 30).length],
+    ['words in all', deck.cards.length],
+    ['started', known.length],
+    ['due today', pool().filter((c) => !progress[c.f] || progress[c.f].due <= t).length],
+    ['bookmarked', known.filter((p) => p.star).length],
+    ['known over a month', known.filter((p) => p.iv >= 30).length],
   ];
   $('sheet').innerHTML = `
     <h3>Megu</h3>
     <table>${rows.map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table>
-    <label>Что повторяем</label>
+    <label>What to review</label>
     <select id="pick">
-      <option value="all">Все слова</option>
-      <option value="star">Только закладки</option>
-      <option value="last">Последний урок</option>
+      <option value="all">Everything</option>
+      <option value="star">Bookmarks only</option>
+      <option value="last">Newest lesson</option>
       ${deck.decks.map((d) => `<option value="${d.id}">${esc(d.name)}</option>`).join('')}
     </select>
-    <label>Новых слов за раз</label>
+    <label>New words at a time</label>
     <input id="per" type="number" min="0" max="100" value="${settings.perDay}">
-    <label>Облако (адрес и ключ)</label>
+    <label>Cloud backup (address and key)</label>
     <input id="cloud" placeholder="https://…workers.dev" value="${esc(settings.cloud)}">
-    <input id="key" placeholder="ключ" value="${esc(settings.key)}" style="margin-top:6px">
-    <button class="wide" id="now">Сохранить в облако сейчас</button>
-    <button class="wide" id="grab">Скачать весь звук на телефон</button>
-    <button class="wide" id="file">Сохранить прогресс в файл</button>
-    <button class="wide" id="pickfile">Восстановить из файла</button>
+    <input id="key" placeholder="key" value="${esc(settings.key)}" style="margin-top:6px">
+    <button class="wide" id="now">Back up to the cloud now</button>
+    <button class="wide" id="grab">Download all the sound</button>
+    <button class="wide" id="file">Save progress to a file</button>
+    <button class="wide" id="pickfile">Restore from a file</button>
     <input id="hidden" type="file" accept="application/json" style="display:none">
     <div class="note" id="note"></div>
-    <button class="wide" id="close">Закрыть</button>`;
+    <button class="wide" id="close">Close</button>`;
   $('pick').value = settings.deck;
   const say = (m) => { $('note').textContent = m; };
 
   $('now').addEventListener('click', async () => {
-    say('сохраняю…');
-    try { say(await sync()); } catch (e) { say(`не вышло: ${e.message}`); }
+    say('backing up…');
+    try { say(await sync()); } catch (e) { say(`did not work: ${e.message}`); }
   });
   $('grab').addEventListener('click', async () => {
     const files = deck.cards.filter((c) => c.a).map((c) => `audio/${c.a}.m4a`);
@@ -240,9 +238,9 @@ function openMenu() {
     let n = 0;
     for (const f of files) {
       if (!(await cache.match(f))) { try { await cache.add(f); } catch { /* skip a bad one */ } }
-      if (++n % 25 === 0) say(`скачано ${n} из ${files.length}`);
+      if (++n % 25 === 0) say(`downloaded ${n} of ${files.length}`);
     }
-    say(`звук на месте: ${files.length} слов, интернет больше не нужен`);
+    say(`sound is on the phone: ${files.length} words, no internet needed`);
   });
   $('file').addEventListener('click', saveFile);
   $('pickfile').addEventListener('click', () => $('hidden').click());

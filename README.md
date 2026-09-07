@@ -1,22 +1,23 @@
-# Megu на телефоне
+# Megu on the phone
 
-Карточки с японскими словами: те же 808 слов, что и в Megu на компьютере, со
-звуком и с расписанием повторений. Ставится ярлыком, работает без интернета.
+The same 808 Japanese words as Megu on the computer, with sound and with a
+review schedule. Installs as a home-screen icon; works with no internet.
 
-## Поставить на телефон
+## Put it on the phone
 
-Открыть адрес сайта в Safari → «Поделиться» → «На экран „Домой"».
-Потом один раз зайти в меню (☰) и нажать «Скачать весь звук на телефон» —
-после этого интернет не нужен вообще.
+Open the site in Safari -> Share -> "Add to Home Screen". Then open the menu
+(the ☰ button) once and press "Download all the sound" - after that the phone
+needs no network at all.
 
-## Откуда берётся содержимое
+## Where the contents come from
 
-Собирается в Megu: `npm run pwa` читает `portable/library` и озвучку, кладёт
-сюда `deck.json` и `audio/`. Руками тут правится только `index.html`,
-`app.js` и `sw.js`.
+Built by Megu: `npm run pwa` reads `portable/library` and the generated audio,
+and writes `deck.json` and `audio/` here. The only hand-written files are
+`index.html`, `app.js` and `sw.js`.
 
-## Прогресс
+## Progress
 
-Живёт на телефоне. Копия уходит в облако (см. `../worker`), плюс кнопка
-«Сохранить прогресс в файл». Привязан к слову, а не к колоде: слова можно
-добавлять, перекладывать и переименовывать колоды — история остаётся.
+Lives on the phone. A copy goes to the cloud (see `../worker`), and there is a
+"Save progress to a file" button as well. It is tied to the WORD, not to the
+deck, so words can be added, moved between decks, and decks renamed, and the
+history still follows the word.
