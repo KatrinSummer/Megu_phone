@@ -53,13 +53,18 @@ function buildQueue() {
 }
 
 // ---------------------------------------------------------------- audio
-let audio = null;
+let audio = null, unlocked = false;
 function play() {
   if (!current?.a) return;
-  audio ??= new Audio();
-  audio.src = `audio/${current.a}.m4a`;
-  audio.play().catch(() => {});          // iOS refuses before the first tap; harmless
+  audio ??= new Audio();                 // one element for the whole session: iOS
+  audio.src = `audio/${current.a}.m4a`;  // unlocks it once and trusts it after
+  audio.play().then(() => { unlocked = true; }).catch(() => {});
 }
+
+// The very first card is drawn before she has touched anything, and iOS will not
+// speak until she does. Say it on her first tap instead - the Japanese word is
+// still what is on screen at that moment.
+addEventListener('pointerdown', () => { if (!unlocked) play(); }, { capture: true });
 
 // ---------------------------------------------------------------- render
 function render() {
@@ -91,6 +96,7 @@ function render() {
   current = queue.shift();
   shown = false;
   draw();
+  if (settings.autoPlay) play();          // the word speaks as soon as it is shown
 }
 
 function draw() {
@@ -114,7 +120,7 @@ function draw() {
       </div>`
       : '<button id="reveal">Показать</button>'}`;
 
-  const reveal = () => { if (!shown) { shown = true; draw(); if (settings.autoPlay) play(); } };
+  const reveal = () => { if (!shown) { shown = true; draw(); } };
   $('face').addEventListener('click', reveal);
   $('reveal')?.addEventListener('click', reveal);
   for (const g of ['again', 'good', 'easy']) {
@@ -278,5 +284,6 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catc
 // Only on a local machine: lets scripts/check-pwa.mjs test the schedule and the
 // merge for real instead of poking at the screen.
 if (['127.0.0.1', 'localhost'].includes(location.hostname)) {
-  window.megu = { merge, answer, get progress() { return progress; }, get deck() { return deck; } };
+  window.megu = { merge, answer, get progress() { return progress; }, get deck() { return deck; },
+                  get audioSrc() { return audio?.src ?? ''; } };
 }
