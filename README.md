@@ -27,7 +27,8 @@ word, the more recent review wins.
 
 ## Where the words come from
 
-Built by **Megu on the computer**, which is where the vocabulary actually lives:
+Built by [**Megu on the computer**](https://github.com/KatrinSummer/Megu-desktop),
+which is where the vocabulary actually lives:
 lessons come in, words get filed into decks, and the deck is exported.
 `npm run pwa` over there writes `deck.json` and `audio/` into this repository.
 Sound is generated once per word (edge-tts, voice `ja-JP-NanamiNeural`).
