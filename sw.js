@@ -8,9 +8,19 @@ self.addEventListener('install', (e) => {
 });
 
 self.addEventListener('activate', (e) => {
-  e.waitUntil(caches.keys()
-    .then((ks) => Promise.all(ks.filter((k) => k !== VERSION).map((k) => caches.delete(k))))
-    .then(() => self.clients.claim()));
+  e.waitUntil((async () => {
+    // Old versions kept the sound in the same cache as the shell, so throw away
+    // only the shell files. Dropping the whole cache would cost her the 808
+    // downloads, and a bumped version is not worth that.
+    for (const key of await caches.keys()) {
+      if (key === VERSION) continue;
+      const old = await caches.open(key);
+      for (const req of await old.keys()) {
+        if (!new URL(req.url).pathname.includes('/audio/')) await old.delete(req);
+      }
+    }
+    await self.clients.claim();
+  })());
 });
 
 self.addEventListener('fetch', (e) => {
