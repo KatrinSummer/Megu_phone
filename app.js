@@ -10,7 +10,15 @@ const S_KEY = 'megu.settings.v1';
 const load = (k, fallback) => { try { return JSON.parse(localStorage.getItem(k)) ?? fallback; } catch { return fallback; } };
 
 let progress = load(P_KEY, {});        // Front -> {due, iv, ease, reps, lapses, star, seen}
-let settings = { deck: 'all', perDay: 20, autoPlay: true, ...load(S_KEY, {}) };
+let settings = { deck: 'all', perDay: 20, autoPlay: true, theme: 'light', ...load(S_KEY, {}) };
+
+// The head applies this too, before the first paint; here it is for the switch.
+const applyTheme = () => {
+  const dark = settings.theme === 'dark';
+  if (dark) document.documentElement.dataset.theme = 'dark';
+  else delete document.documentElement.dataset.theme;
+  document.querySelector('meta[name=theme-color]').content = dark ? '#191b28' : '#ffffff';
+};
 let deck = { cards: [], decks: [] };
 let queue = [], current = null, shown = false, doneToday = 0;
 
@@ -73,7 +81,6 @@ function render() {
   // Short enough to survive any font: the buttons beside it must not be pushed.
   $('counts').innerHTML = left ? `<b>${left}</b> to go · <b>${doneToday}</b> ✓` : `done for today`;
   $('counts').title = left ? `${left} left, ${doneToday} done today` : `${all.length} words in all`;
-  $('star').textContent = current && progress[current.f]?.star ? '★' : '☆';
   $('star').className = 'icon' + (current && progress[current.f]?.star ? ' starred' : '');
 
   if (!queue.length) {
@@ -204,6 +211,7 @@ function openMenu() {
     </select>
     <label>New words at a time</label>
     <input id="per" type="number" min="0" max="100" value="${settings.perDay}">
+    <button class="wide" id="theme">${settings.theme === 'dark' ? 'Day theme' : 'Night theme'}</button>
     <button class="wide" id="grab">Download all the sound</button>
     <button class="wide" id="file">Save progress to a file</button>
     <button class="wide" id="pickfile">Restore from a file</button>
@@ -212,6 +220,13 @@ function openMenu() {
     <button class="wide" id="close">Close</button>`;
   $('pick').value = settings.deck;
   const say = (m) => { $('note').textContent = m; };
+
+  $('theme').addEventListener('click', () => {
+    settings.theme = settings.theme === 'dark' ? 'light' : 'dark';
+    saveSettings();                       // saved at once, so a force-quit keeps it
+    applyTheme();
+    $('theme').textContent = settings.theme === 'dark' ? 'Day theme' : 'Night theme';
+  });
 
   $('grab').addEventListener('click', async () => {
     const files = deck.cards.filter((c) => c.a).map((c) => `audio/${c.a}.m4a`);
@@ -245,7 +260,6 @@ $('star').addEventListener('click', () => {
   p.star = p.star ? 0 : 1;
   saveProgress();
   // Only the button changes; redrawing the card would hide a revealed answer.
-  $('star').textContent = p.star ? '★' : '☆';
   $('star').className = 'icon' + (p.star ? ' starred' : '');
 });
 

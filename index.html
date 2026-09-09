@@ -6,14 +6,28 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#191b28">
+<meta name="theme-color" content="#ffffff">
+<!-- Read before the first paint, or a dark session starts with a white flash. -->
+<script>try{if(JSON.parse(localStorage.getItem('megu.settings.v1')||'{}').theme==='dark'){
+  document.documentElement.dataset.theme='dark';
+  document.querySelector('meta[name=theme-color]').content='#191b28';}}catch{}</script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon.png">
 <title>Megu</title>
 <style>
   :root{
+    /* Day: white, with yellow saved for the two things that matter - the
+       bookmark and "Knew it".  The card is white too, so its border draws it. */
+    --bg:#ffffff; --card:#ffffff; --line:#dcdce4; --ink:#17171d; --dim:#67677a;
+    --good:#a07800; --hard:#67677a; --again:#67677a; --star:#c08a00;
+    /* The one warm thing on the resting screen, so the app reads yellow-white
+       and not merely white.  At night both fall back to the plain card. */
+    --warm:#fff8e3; --warm-line:#eccf7e;
+  }
+  :root[data-theme="dark"]{
     --bg:#191b28; --card:#232637; --line:#33374d; --ink:#e9eaf2; --dim:#9aa0b8;
     --good:#4ec9a0; --hard:#e8b64c; --again:#e8746a; --star:#f0c04a;
+    --warm:var(--card); --warm-line:var(--line);
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
   html,body{height:100%}
@@ -28,9 +42,14 @@
     overflow:hidden;text-overflow:ellipsis}
   .counts b{color:var(--ink);font-weight:600}
   button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
-  .icon{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-size:19px;
+  .icon{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;
     border:1px solid var(--line);background:var(--card);flex:none}
   .icon:active{background:var(--line)}
+  /* Drawn, not typed: the emoji fonts give every glyph its own height, which is
+     what made the three buttons sit at three different levels on the phone. */
+  .icon svg{width:21px;height:21px;display:block;fill:none;stroke:currentColor;
+    stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .starred svg{fill:currentColor}
 
   main{flex:1;display:flex;flex-direction:column;justify-content:center;
     padding:16px;gap:16px;overflow-y:auto}
@@ -52,14 +71,14 @@
   .row>button:active{transform:translateY(1px)}
   .row .s{display:block;font-size:11px;font-weight:400;color:var(--dim);margin-top:2px}
   #again{color:var(--again)} #good{color:var(--good)} #easy{color:var(--hard)}
-  #reveal{width:100%;padding:16px;border-radius:14px;background:var(--card);
-    border:1px solid var(--line);font-size:16px;font-weight:600}
+  #reveal{width:100%;padding:16px;border-radius:14px;background:var(--warm);
+    border:1px solid var(--warm-line);font-size:16px;font-weight:600}
 
   .starred{color:var(--star);border-color:var(--star)}
   .done{text-align:center;padding:40px 20px;color:var(--dim)}
   .done h2{color:var(--ink);font-size:22px;margin:0 0 8px}
 
-  dialog{border:0;border-radius:18px 18px 0 0;background:var(--card);color:var(--ink);
+  dialog{border:1px solid var(--line);border-bottom:0;border-radius:18px 18px 0 0;background:var(--card);color:var(--ink);
     padding:20px;width:100%;max-width:520px;margin:auto auto 0;
     max-height:88vh;overflow-y:auto;overscroll-behavior:contain;
     padding-bottom:calc(20px + env(safe-area-inset-bottom))}
@@ -78,10 +97,13 @@
 </head>
 <body>
 <header>
-  <button class="icon" id="menu" aria-label="Menu">☰</button>
+  <button class="icon" id="menu" aria-label="Menu">
+    <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
   <div class="grow"><div class="counts" id="counts">…</div></div>
-  <button class="icon" id="star" aria-label="Bookmark">☆</button>
-  <button class="icon" id="sound" aria-label="Say it">🔊</button>
+  <button class="icon" id="star" aria-label="Bookmark">
+    <svg viewBox="0 0 24 24"><path d="M12 3.6l2.6 5.3 5.8.9-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.9z"/></svg></button>
+  <button class="icon" id="sound" aria-label="Say it">
+    <svg viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13L7.5 14.5H4z"/><path d="M15.4 9.6a3.6 3.6 0 010 4.8M18 7.2a7.2 7.2 0 010 9.6"/></svg></button>
 </header>
 
 <main id="main"></main>
