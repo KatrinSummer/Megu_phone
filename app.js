@@ -230,7 +230,10 @@ function openMenu() {
 
   $('grab').addEventListener('click', async () => {
     const files = deck.cards.filter((c) => c.a).map((c) => `audio/${c.a}.m4a`);
-    const cache = await caches.open('megu-v1');
+    // Ask the service worker which cache is current instead of naming it here:
+    // a version bump in sw.js would otherwise throw away every downloaded word.
+    const name = (await caches.keys()).find((k) => k.startsWith('megu-'));
+    const cache = await caches.open(name ?? 'megu-v2');
     let n = 0;
     for (const f of files) {
       if (!(await cache.match(f))) { try { await cache.add(f); } catch { /* skip a bad one */ } }

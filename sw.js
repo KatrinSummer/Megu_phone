@@ -1,6 +1,6 @@
 // Offline cache. The deck and its audio are versioned together: bump VERSION
 // in build-pwa and the phone quietly picks up the new words on next launch.
-const VERSION = 'megu-v1';
+const VERSION = 'megu-v2';
 const SHELL = ['.', 'index.html', 'app.js', 'manifest.webmanifest', 'icon.png', 'deck.json'];
 
 self.addEventListener('install', (e) => {
