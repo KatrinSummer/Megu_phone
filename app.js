@@ -10,7 +10,8 @@ const S_KEY = 'megu.settings.v1';
 const load = (k, fallback) => { try { return JSON.parse(localStorage.getItem(k)) ?? fallback; } catch { return fallback; } };
 
 let progress = load(P_KEY, {});        // Front -> {due, iv, ease, reps, lapses, star, known, seen}
-let settings = { deck: 'all', perDay: 20, autoPlay: true, theme: 'light', ...load(S_KEY, {}) };
+let settings = { deck: 'all', perDay: 20, autoPlay: true, theme: 'light',
+                 doneOn: 0, doneCount: 0, ...load(S_KEY, {}) };
 
 // The head applies this too, before the first paint; here it is for the switch.
 const applyTheme = () => {
@@ -20,15 +21,40 @@ const applyTheme = () => {
   document.querySelector('meta[name=theme-color]').content = dark ? '#191b28' : '#ffffff';
 };
 let deck = { cards: [], decks: [] };
-let queue = [], current = null, shown = false, revealed = false, doneToday = 0;
+let queue = [], current = null, shown = false, revealed = false;
 
-const saveProgress = () => localStorage.setItem(P_KEY, JSON.stringify(progress));
-const saveSettings = () => localStorage.setItem(S_KEY, JSON.stringify(settings));
+// What she has done today, not what she has done since the queue was last built.
+// It used to be a plain variable that buildQueue() reset, so opening the settings
+// sheet - or any reload - put the tally back to zero.
+const doneToday = () => (settings.doneOn === today() ? settings.doneCount : 0);
+const countDone = () => {
+  settings.doneCount = doneToday() + 1;
+  settings.doneOn = today();
+  saveSettings();
+};
+
+// A phone can refuse to write: no room left, or private browsing. Failing in
+// silence is the worst thing this app can do, so it says so and keeps saying so
+// until a write succeeds - her answers are only in memory until then.
+function write(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    $('warn').hidden = true;
+    return true;
+  } catch (e) {
+    $('warn').textContent =
+      `Nothing is being saved (${e.name}). Save your progress to a file from the menu.`;
+    $('warn').hidden = false;
+    return false;
+  }
+}
+const saveProgress = () => write(P_KEY, progress);
+const saveSettings = () => write(S_KEY, settings);
 
 // ---------------------------------------------------------------- schedule
 // SM-2, trimmed to what a vocabulary list actually needs.
 function answer(card, grade) {
-  const p = progress[card.f] ?? { due: 0, iv: 0, ease: 2.5, reps: 0, lapses: 0, star: 0 };
+  const p = progress[card.f] ?? fresh();
   if (grade === 'again') {
     p.lapses++; p.reps = 0; p.iv = 0; p.ease = Math.max(1.3, p.ease - 0.2);
     p.due = today();                       // comes back later in this same session
@@ -37,13 +63,21 @@ function answer(card, grade) {
     p.iv = p.reps === 0 ? 1 : p.reps === 1 ? 3 : Math.round(p.iv * p.ease);
     if (grade === 'easy') p.iv = Math.max(2, Math.round(p.iv * 1.5));
     p.reps++;
+    // reps is the rung of the ladder and drops back to the bottom on a slip;
+    // total is how many times she has really recalled the word, and never drops.
+    p.total = lifetime(p) + 1;
     p.due = today() + p.iv;
   }
   p.seen = today();
   progress[card.f] = p;
   saveProgress();
-  if (grade === 'again') queue.push(card); else doneToday++;
+  if (grade === 'again') queue.push(card); else countDone();
 }
+
+/** A word she has never answered. `total` is the count that survives a slip. */
+const fresh = () => ({ due: today(), iv: 0, ease: 2.5, reps: 0, total: 0, lapses: 0, star: 0 });
+/** Older saves have no `total`; back then `reps` was the count, so read it. */
+const lifetime = (p) => p.total ?? p.reps ?? 0;
 
 // What the board holds, whether or not she has waved a word off.  The bars
 // count against this, or marking a word known would shrink the goalpost too.
@@ -72,13 +106,12 @@ const isMemorized = (c) => { const p = progress[c.f]; return !!p && (p.known ===
 function buildQueue() {
   const t = today(), all = pool();
   // The Known board is not a lesson, it is the list she goes through to undo.
-  if (settings.deck === 'known') { queue = [...all]; doneToday = 0; return; }
+  if (settings.deck === 'known') { queue = [...all]; return; }
   const due = all.filter((c) => progress[c.f] && progress[c.f].due <= t);
-  const fresh = all.filter((c) => !progress[c.f]);
+  const unseen = all.filter((c) => !progress[c.f]);
   // Newest lesson first, so what she just learned is what she sees first.
-  fresh.sort((a, b) => (b.when || '').localeCompare(a.when || ''));
-  queue = [...due.sort(() => Math.random() - 0.5), ...fresh.slice(0, settings.perDay)];
-  doneToday = 0;
+  unseen.sort((a, b) => (b.when || '').localeCompare(a.when || ''));
+  queue = [...due.sort(() => Math.random() - 0.5), ...unseen.slice(0, settings.perDay)];
 }
 
 // ---------------------------------------------------------------- home
@@ -128,7 +161,8 @@ function stats() {
   const learn = cards.filter((c) => progress[c.f] && !isMemorized(c)).length;
   const pct = (n) => (cards.length ? Math.round((n / cards.length) * 100) : 0);
   const p = current ? progress[current.f] : null;
-  const round = current ? (p?.reps ?? 0) + (p?.lapses ?? 0) + 1 : '-';
+  // reps goes back to zero on a slip, so counting rounds with it ran backwards.
+  const round = current ? lifetime(p ?? {}) + (p?.lapses ?? 0) + 1 : '-';
   $('stats').hidden = false;
   $('stats').innerHTML = `
     <div class="bar"><div class="t"><span>Learning</span><b>${learn}/${cards.length}</b></div>
@@ -159,8 +193,8 @@ function render() {
   $('main').className = '';
   const left = queue.length;
   // Short enough to survive any font: the buttons beside it must not be pushed.
-  $('counts').innerHTML = left ? `<b>${left}</b> to go \u00b7 <b>${doneToday}</b> \u2713` : `done for today`;
-  $('counts').title = left ? `${left} left, ${doneToday} done today` : `${all.length} words in all`;
+  $('counts').innerHTML = left ? `<b>${left}</b> to go \u00b7 <b>${doneToday()}</b> \u2713` : `done for today`;
+  $('counts').title = left ? `${left} left, ${doneToday()} done today` : `${all.length} words in all`;
   $('star').className = 'icon' + (current && progress[current.f]?.star ? ' starred' : '');
 
   if (!queue.length) {
@@ -190,7 +224,8 @@ function render() {
 function draw() {
   const c = current;
   const p = progress[c.f];
-  const seen = p?.reps || p?.lapses ? `${p.reps} reviews${p.lapses ? ` \u00b7 ${p.lapses} slips` : ''}` : 'new word';
+  const seen = p && (lifetime(p) || p.lapses)
+    ? `${lifetime(p)} reviews${p.lapses ? ` \u00b7 ${p.lapses} slips` : ''}` : 'new word';
   // The word itself is the question, in the kana she reads it in, with the
   // kanji sitting small above it.  The answer is the sound and the meaning.
   $('main').innerHTML = `
@@ -224,13 +259,13 @@ function draw() {
   $('say').addEventListener('click', (e) => { e.stopPropagation(); play(); });
   $('reveal')?.addEventListener('click', flip);
   $('hide').addEventListener('click', () => {
-    const q = progress[c.f] ??= { due: today(), iv: 0, ease: 2.5, reps: 0, lapses: 0, star: 0 };
+    const q = progress[c.f] ??= fresh();
     q.known = q.known ? 0 : 1;
     q.seen = today();
     saveProgress();
     // Either way it no longer belongs in what she is going through right now.
     queue = queue.filter((x) => x.f !== c.f);
-    if (q.known) doneToday++;
+    if (q.known) countDone();
     render();
   });
   for (const g of ['again', 'good', 'easy']) {
@@ -250,11 +285,26 @@ const esc = (s) => String(s ?? '').replace(/[<>&"]/g, (m) => ({ '<': '&lt;', '>'
 
 // ---------------------------------------------------------------- backup
 
-/** Newer record per word wins, so two phones never overwrite each other. */
+/** Two phones, one word: keep the further-along schedule and lose nothing else.
+ *  Taking the newer record whole used to drop a bookmark the newer side had
+ *  never set - and `seen` counts days, so two phones used on the same day were
+ *  a tie that the incoming record always lost. */
 function merge(a, b) {
   const out = { ...a };
   for (const [k, v] of Object.entries(b)) {
-    if (!out[k] || (v.seen ?? 0) > (out[k].seen ?? 0)) out[k] = v;
+    const mine = out[k];
+    if (!mine) { out[k] = v; continue; }
+    const seen = (p) => p.seen ?? 0;
+    const done = (p) => lifetime(p) + (p.lapses ?? 0);
+    // The schedule belongs to whichever was touched last; on the same day, to
+    // whichever has been through more. Field by field, so the loser's own
+    // fields survive where the winner simply never wrote one.
+    const theirs = seen(v) > seen(mine) || (seen(v) === seen(mine) && done(v) > done(mine));
+    out[k] = theirs ? { ...mine, ...v } : { ...v, ...mine };
+    // These only ever climb, whichever phone did the counting.
+    out[k].total = Math.max(lifetime(mine), lifetime(v));
+    out[k].lapses = Math.max(mine.lapses ?? 0, v.lapses ?? 0);
+    out[k].seen = Math.max(seen(mine), seen(v));
   }
   return out;
 }
@@ -285,7 +335,7 @@ function loadFile(file, say) {
       const data = JSON.parse(r.result);
       const before = Object.keys(progress).length;
       progress = merge(progress, data.progress ?? data);
-      localStorage.setItem(P_KEY, JSON.stringify(progress));
+      saveProgress();
       say(`was ${before} words, now ${Object.keys(progress).length}`);
       buildQueue(); render();
     } catch (e) { say(`that is not a progress file: ${e.message}`); }
@@ -303,6 +353,7 @@ function openMenu() {
     ['due today', pool().filter((c) => !progress[c.f] || progress[c.f].due <= t).length],
     ['bookmarked', known.filter((p) => p.star).length],
     ['known over a month', known.filter((p) => p.iv >= 30).length],
+    ['done today', doneToday()],
     ['marked as known', known.filter((p) => p.known).length],
   ];
   $('sheet').innerHTML = `
@@ -343,11 +394,14 @@ function openMenu() {
   $('pickfile').addEventListener('click', () => $('hidden').click());
   $('hidden').addEventListener('change', (e) => e.target.files[0] && loadFile(e.target.files[0], say));
   $('close').addEventListener('click', () => {
-    settings.perDay = Math.max(0, Number($('per').value) || 0);
+    const per = Math.max(0, Number($('per').value) || 0);
+    const changed = per !== settings.perDay;
+    settings.perDay = per;
     saveSettings();
     $('sheet').close();
-    // She may be sitting on the board list; do not shove her into a card.
-    if ($('main').className !== 'home') { buildQueue(); render(); }
+    // Rebuilding costs her the card she is on, so only do it if the number that
+    // shapes the queue actually changed - and never on the board list.
+    if (changed && $('main').className !== 'home') { buildQueue(); render(); }
   });
   $('sheet').showModal();
 }
@@ -357,7 +411,7 @@ $('menu').addEventListener('click', openMenu);
 $('back').addEventListener('click', home);
 $('star').addEventListener('click', () => {
   if (!current) return;
-  const p = progress[current.f] ??= { due: today(), iv: 0, ease: 2.5, reps: 0, lapses: 0, star: 0 };
+  const p = progress[current.f] ??= fresh();
   p.star = p.star ? 0 : 1;
   saveProgress();
   // Only the button changes; redrawing the card would hide a revealed answer.
@@ -394,5 +448,6 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) chec
 if (['127.0.0.1', 'localhost'].includes(location.hostname)) {
   window.megu = { merge, answer, get progress() { return progress; }, get deck() { return deck; },
                   get audioSrc() { return audio?.src ?? ''; }, get current() { return current; },
-                  stats, home, checkForUpdate, get queue() { return queue; } };
+                  stats, home, checkForUpdate, saveProgress, doneToday, lifetime,
+                  get queue() { return queue; } };
 }

@@ -107,6 +107,10 @@
   #say svg{width:22px;height:22px;display:block;fill:none;stroke:currentColor;
     stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
   #say:active{background:var(--warm)}
+  #warn{padding:10px 16px;font-size:13px;line-height:1.4;
+    background:#fdecec;color:#8a1c1c;border-bottom:1px solid #f0bcbc}
+  :root[data-theme="dark"] #warn{background:#3a2222;color:#f0b8b8;border-bottom-color:#5c3333}
+  #warn[hidden]{display:none}
   .hidden{display:none}
   .tap{font-size:13px;color:var(--dim)}
   .meta{font-size:12px;color:var(--dim)}
@@ -161,6 +165,10 @@
   <button class="icon" id="menu" aria-label="Settings">
     <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
 </header>
+
+<!-- Only ever seen when the phone refuses to write: a save that fails in
+     silence is the app quietly forgetting everything she does. -->
+<div id="warn" hidden></div>
 
 <div class="stats" id="stats" hidden></div>
 
