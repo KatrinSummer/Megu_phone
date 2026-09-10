@@ -94,7 +94,7 @@ function home() {
     ...deck.decks.map((d) => [d.id, d.name]),
     ...(Object.values(progress).some((p) => p.known) ? [['known', 'Marked as known']] : []),
   ];
-  $('star').hidden = $('sound').hidden = $('back').hidden = true;
+  $('star').hidden = $('back').hidden = true;
   $('stats').hidden = true;
   $('counts').innerHTML = `<b>${deck.cards.length}</b> words`;
   $('counts').title = 'pick a board to start';
@@ -155,7 +155,7 @@ addEventListener('pointerdown', () => { if (!unlocked) play(); }, { capture: tru
 // ---------------------------------------------------------------- render
 function render() {
   const t = today(), all = pool();
-  $('star').hidden = $('sound').hidden = $('back').hidden = false;
+  $('star').hidden = $('back').hidden = false;
   $('main').className = '';
   const left = queue.length;
   // Short enough to survive any font: the buttons beside it must not be pushed.
@@ -200,6 +200,8 @@ function draw() {
     <div class="card" id="face">
       ${c.k ? `<div class="kanji">${esc(c.k)}</div>` : ''}
       <div class="kana">${esc(c.f)}</div>
+      <button id="say" aria-label="Say it" title="Say it">
+        <svg viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M15.5 8.6a5 5 0 010 6.8"/><path d="M18.5 5.6a9 9 0 010 12.8"/></svg></button>
       ${shown ? `<div class="back">
           <div class="reading">${esc(c.r)}</div>
           <div class="english">${esc(c.e)}</div>
@@ -218,6 +220,8 @@ function draw() {
   // the three buttons stay put, so flipping back never costs her the answer.
   const flip = () => { shown = !shown; revealed = true; draw(); };
   $('face').addEventListener('click', flip);
+  // It sits on the card, so its tap must not also turn the card over.
+  $('say').addEventListener('click', (e) => { e.stopPropagation(); play(); });
   $('reveal')?.addEventListener('click', flip);
   $('hide').addEventListener('click', () => {
     const q = progress[c.f] ??= { due: today(), iv: 0, ease: 2.5, reps: 0, lapses: 0, star: 0 };
@@ -351,7 +355,6 @@ function openMenu() {
 // ---------------------------------------------------------------- start
 $('menu').addEventListener('click', openMenu);
 $('back').addEventListener('click', home);
-$('sound').addEventListener('click', play);
 $('star').addEventListener('click', () => {
   if (!current) return;
   const p = progress[current.f] ??= { due: today(), iv: 0, ease: 2.5, reps: 0, lapses: 0, star: 0 };
