@@ -38,8 +38,19 @@ wins, so restoring an old file never loses newer work.
 Built by [**Megu on the computer**](https://github.com/KatrinSummer/Megu),
 which is where the vocabulary actually lives:
 lessons come in, words get filed into decks, and the deck is exported.
-`npm run pwa` over there writes `deck.json` and `audio/` into this repository.
-Sound is generated once per word (edge-tts, voice `ja-JP-NanamiNeural`).
+After a lesson is imported over there, two commands bring the new words here:
+
+```
+npm run say    # sound for the words that have none yet
+npm run pwa    # writes deck.json and audio/ into this repository
+```
+
+Then commit and push this repository - GitHub Pages does the rest, and a phone
+with the app open notices the new version and reloads itself.
+
+Sound is said once per word (edge-tts, voice `ja-JP-NanamiNeural`) and kept
+forever in `_audio_test/cache`, named after the md5 of the word, so `npm run
+say` only ever fetches what is missing.
 
 Everything here is hand-written — no framework, no build step. One subject per
 file, and `shell.json` lists them all so the service worker and the update check
