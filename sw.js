@@ -1,10 +1,15 @@
 // Offline cache. The app itself is fetched fresh every launch; the cache is
 // what keeps it working with no signal. Sound is the opposite: cached forever.
 const VERSION = 'megu-v2';
-const SHELL = ['.', 'index.html', 'app.js', 'manifest.webmanifest', 'icon.png', 'deck.json'];
 
+// The list of files lives in shell.json, because app.js needs the same list to
+// tell whether the running app is out of date, and two copies would drift.
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  e.waitUntil((async () => {
+    const shell = await (await fetch('shell.json')).json();
+    await (await caches.open(VERSION)).addAll(shell);
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener('activate', (e) => {

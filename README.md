@@ -41,5 +41,20 @@ lessons come in, words get filed into decks, and the deck is exported.
 `npm run pwa` over there writes `deck.json` and `audio/` into this repository.
 Sound is generated once per word (edge-tts, voice `ja-JP-NanamiNeural`).
 
-The only hand-written files here are `index.html`, `app.js` and `sw.js` — no
-framework, no build step.
+Everything here is hand-written — no framework, no build step. One subject per
+file, and `shell.json` lists them all so the service worker and the update check
+never disagree about what the app is made of:
+
+| file | answers |
+| --- | --- |
+| `index.html` | the markup and every line of CSS |
+| `dom.js` | talking to the page |
+| `store.js` | what is saved, and what happens when saving fails |
+| `schedule.js` | when a word comes back |
+| `boards.js` | which words she is shown, and in what order |
+| `sound.js` | saying the word out loud |
+| `screens.js` | what is on the screen |
+| `backup.js` | moving progress between two phones |
+| `menu.js` | the settings sheet |
+| `app.js` | wiring, startup, and noticing a new version |
+| `sw.js` | the offline cache |

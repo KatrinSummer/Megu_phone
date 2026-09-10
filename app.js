@@ -1,443 +1,54 @@
 // Megu review app. Everything lives on the phone; the network is only ever
 // used to back the progress up, never to show a card.
+//
+// dom.js       talking to the page
+// store.js     what is saved, and what happens when saving fails
+// schedule.js  when a word comes back
+// boards.js    which words she is shown, and in what order
+// sound.js     saying the word out loud
+// screens.js   what is on the screen
+// backup.js    moving progress between two phones
+// menu.js      the settings sheet
+import { $ } from './dom.js';
+import { progress, doneToday, lifetime, saveProgress } from './store.js';
+import { deck, setDeck, queue } from './boards.js';
+import { answer } from './schedule.js';
+import { merge } from './backup.js';
+import { playing, sayOnFirstTap } from './sound.js';
+import { home, render, stats, currentCard, toggleStar } from './screens.js';
+import { openMenu } from './menu.js';
 
-const $ = (id) => document.getElementById(id);
-const today = () => Math.floor(new Date().setHours(0, 0, 0, 0) / 86400000);
-
-// ---------------------------------------------------------------- storage
-const P_KEY = 'megu.progress.v1';
-const S_KEY = 'megu.settings.v1';
-const load = (k, fallback) => { try { return JSON.parse(localStorage.getItem(k)) ?? fallback; } catch { return fallback; } };
-
-let progress = load(P_KEY, {});        // Front -> {due, iv, ease, reps, lapses, star, known, seen}
-let settings = { deck: 'all', perDay: 20, autoPlay: true, theme: 'light',
-                 doneOn: 0, doneCount: 0, ...load(S_KEY, {}) };
-
-// The head applies this too, before the first paint; here it is for the switch.
-const applyTheme = () => {
-  const dark = settings.theme === 'dark';
-  if (dark) document.documentElement.dataset.theme = 'dark';
-  else delete document.documentElement.dataset.theme;
-  document.querySelector('meta[name=theme-color]').content = dark ? '#191b28' : '#ffffff';
-};
-let deck = { cards: [], decks: [] };
-let queue = [], current = null, shown = false, revealed = false;
-
-// What she has done today, not what she has done since the queue was last built.
-// It used to be a plain variable that buildQueue() reset, so opening the settings
-// sheet - or any reload - put the tally back to zero.
-const doneToday = () => (settings.doneOn === today() ? settings.doneCount : 0);
-const countDone = () => {
-  settings.doneCount = doneToday() + 1;
-  settings.doneOn = today();
-  saveSettings();
-};
-
-// A phone can refuse to write: no room left, or private browsing. Failing in
-// silence is the worst thing this app can do, so it says so and keeps saying so
-// until a write succeeds - her answers are only in memory until then.
-function write(key, value) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-    $('warn').hidden = true;
-    return true;
-  } catch (e) {
-    $('warn').textContent =
-      `Nothing is being saved (${e.name}). Save your progress to a file from the menu.`;
-    $('warn').hidden = false;
-    return false;
-  }
-}
-const saveProgress = () => write(P_KEY, progress);
-const saveSettings = () => write(S_KEY, settings);
-
-// ---------------------------------------------------------------- schedule
-// SM-2, trimmed to what a vocabulary list actually needs.
-function answer(card, grade) {
-  const p = progress[card.f] ?? fresh();
-  if (grade === 'again') {
-    p.lapses++; p.reps = 0; p.iv = 0; p.ease = Math.max(1.3, p.ease - 0.2);
-    p.due = today();                       // comes back later in this same session
-  } else {
-    if (grade === 'easy') p.ease += 0.15;
-    p.iv = p.reps === 0 ? 1 : p.reps === 1 ? 3 : Math.round(p.iv * p.ease);
-    if (grade === 'easy') p.iv = Math.max(2, Math.round(p.iv * 1.5));
-    p.reps++;
-    // reps is the rung of the ladder and drops back to the bottom on a slip;
-    // total is how many times she has really recalled the word, and never drops.
-    p.total = lifetime(p) + 1;
-    p.due = today() + p.iv;
-  }
-  p.seen = today();
-  progress[card.f] = p;
-  saveProgress();
-  if (grade === 'again') queue.push(card); else countDone();
-}
-
-/** A word she has never answered. `total` is the count that survives a slip. */
-const fresh = () => ({ due: today(), iv: 0, ease: 2.5, reps: 0, total: 0, lapses: 0, star: 0 });
-/** Older saves have no `total`; back then `reps` was the count, so read it. */
-const lifetime = (p) => p.total ?? p.reps ?? 0;
-
-// What the board holds, whether or not she has waved a word off.  The bars
-// count against this, or marking a word known would shrink the goalpost too.
-const boardCards = (id) => id === 'all' ? deck.cards
-  : id === 'star' ? deck.cards.filter((c) => progress[c.f]?.star)
-  : id === 'new' ? newestLesson()
-  : id === 'known' ? deck.cards.filter((c) => progress[c.f]?.known)
-  // A word sits in its own deck and may also sit in a review deck like Last.
-  : deck.cards.filter((c) => c.d === id || c.last === id);
-
-/** The words from the most recent lesson.  Only real dates count: the library
- *  marks older imports "Legacy / undated", and that sorts above any of them. */
-const newestLesson = () => {
-  const day = deck.cards.reduce((m, c) => (/^\d{8}$/.test(c.when) && c.when > m ? c.when : m), '');
-  return day ? deck.cards.filter((c) => c.when === day) : [];
-};
-
-// What she will actually be shown.  The Known board is the way back: open it
-// and press the eye again to put a word back into rotation.
-const poolOf = (id) => id === 'known' ? boardCards(id)
-  : boardCards(id).filter((c) => !progress[c.f]?.known);
-const pool = () => poolOf(settings.deck);
-
-const isMemorized = (c) => { const p = progress[c.f]; return !!p && (p.known === 1 || p.iv >= 30); };
-
-function buildQueue() {
-  const t = today(), all = pool();
-  // The Known board is not a lesson, it is the list she goes through to undo.
-  if (settings.deck === 'known') { queue = [...all]; return; }
-  const due = all.filter((c) => progress[c.f] && progress[c.f].due <= t);
-  const unseen = all.filter((c) => !progress[c.f]);
-  // Newest lesson first, so what she just learned is what she sees first.
-  unseen.sort((a, b) => (b.when || '').localeCompare(a.when || ''));
-  queue = [...due.sort(() => Math.random() - 0.5), ...unseen.slice(0, settings.perDay)];
-}
-
-// ---------------------------------------------------------------- home
-// Nothing is reviewed until she picks a board, so the app opens on the list
-// rather than dropping her into whichever deck she chose last.
-function home() {
-  current = null;
-  const t = today();
-  const rows = [
-    ['all', 'Everything'],
-    ['star', 'Bookmarks'],
-    ['new', 'Newest lesson'],
-    ...deck.decks.map((d) => [d.id, d.name]),
-    ...(Object.values(progress).some((p) => p.known) ? [['known', 'Marked as known']] : []),
-  ];
-  $('star').hidden = $('back').hidden = true;
-  $('stats').hidden = true;
-  $('counts').innerHTML = `<b>${deck.cards.length}</b> words`;
-  $('counts').title = 'pick a board to start';
-  $('main').className = 'home';
-  $('main').innerHTML = rows.map(([id, name]) => {
-    const cards = poolOf(id);
-    const due = cards.filter((c) => progress[c.f] && progress[c.f].due <= t).length;
-    const fresh = cards.filter((c) => !progress[c.f]).length;
-    const note = !cards.length ? 'empty'
-      : [due ? `${due} due` : 'nothing due', fresh ? `${fresh} new` : ''].filter(Boolean).join(' · ');
-    return `<button class="deck" data-id="${esc(id)}" ${cards.length ? '' : 'disabled'}>
-      <span class="n">${esc(name)}</span><span class="s">${note}</span></button>`;
-  }).join('');
-  for (const b of document.querySelectorAll('.deck')) {
-    b.addEventListener('click', () => {
-      settings.deck = b.dataset.id;
-      saveSettings();
-      buildQueue();
-      render();
-    });
-  }
-}
-
-// ---------------------------------------------------------------- stats
-// Learning is what she has started; Memorized is what the schedule has parked
-// for over a month, plus whatever she waved off herself.  The circle is about
-// the word on screen, not the board: how many times it has come up in all.
-function stats() {
-  const cards = boardCards(settings.deck);
-  const mem = cards.filter(isMemorized).length;
-  const learn = cards.filter((c) => progress[c.f] && !isMemorized(c)).length;
-  const pct = (n) => (cards.length ? Math.round((n / cards.length) * 100) : 0);
-  const p = current ? progress[current.f] : null;
-  // reps goes back to zero on a slip, so counting rounds with it ran backwards.
-  const round = current ? lifetime(p ?? {}) + (p?.lapses ?? 0) + 1 : '-';
-  $('stats').hidden = false;
-  $('stats').innerHTML = `
-    <div class="bar"><div class="t"><span>Learning</span><b>${learn}/${cards.length}</b></div>
-      <div class="track"><div class="fill" style="width:${pct(learn)}%"></div></div></div>
-    <div class="round" title="times this word has come up"><span class="l">round</span><span class="n">${round}</span></div>
-    <div class="bar mem"><div class="t"><span>Memorized</span><b>${mem}/${cards.length}</b></div>
-      <div class="track"><div class="fill" style="width:${pct(mem)}%"></div></div></div>`;
-}
-
-// ---------------------------------------------------------------- audio
-let audio = null, unlocked = false;
-function play() {
-  if (!current?.a) return;
-  audio ??= new Audio();                 // one element for the whole session: iOS
-  audio.src = `audio/${current.a}.m4a`;  // unlocks it once and trusts it after
-  audio.play().then(() => { unlocked = true; }).catch(() => {});
-}
-
-// The very first card is drawn before she has touched anything, and iOS will not
-// speak until she does. Say it on her first tap instead - the Japanese word is
-// still what is on screen at that moment.
-addEventListener('pointerdown', () => { if (!unlocked) play(); }, { capture: true });
-
-// ---------------------------------------------------------------- render
-function render() {
-  const t = today(), all = pool();
-  $('star').hidden = $('back').hidden = false;
-  $('main').className = '';
-  const left = queue.length;
-  // Short enough to survive any font: the buttons beside it must not be pushed.
-  $('counts').innerHTML = left ? `<b>${left}</b> to go \u00b7 <b>${doneToday()}</b> \u2713` : `done for today`;
-  $('counts').title = left ? `${left} left, ${doneToday()} done today` : `${all.length} words in all`;
-  $('star').className = 'icon' + (current && progress[current.f]?.star ? ' starred' : '');
-
-  if (!queue.length) {
-    current = null;
-    stats();
-    const later = all.filter((c) => progress[c.f]?.due > t).length;
-    const news = all.filter((c) => !progress[c.f]).length;
-    $('main').innerHTML = `<div class="done"><h2>Done for today</h2>
-      <div>${later} words are waiting for their day, ${news} have never been shown.</div>
-      <button class="wide" id="more">Show ${Math.min(settings.perDay, news)} more new words</button></div>`;
-    $('more')?.addEventListener('click', () => {
-      queue = all.filter((c) => !progress[c.f])
-        .sort((a, b) => (b.when || '').localeCompare(a.when || '')).slice(0, settings.perDay);
-      render();
-    });
-    return;
-  }
-
-  current = queue.shift();
-  shown = false;
-  revealed = false;
-  stats();
-  draw();
-  if (settings.autoPlay) play();          // the word speaks as soon as it is shown
-}
-
-function draw() {
-  const c = current;
-  const p = progress[c.f];
-  const seen = p && (lifetime(p) || p.lapses)
-    ? `${lifetime(p)} reviews${p.lapses ? ` \u00b7 ${p.lapses} slips` : ''}` : 'new word';
-  // The word itself is the question, in the kana she reads it in, with the
-  // kanji sitting small above it.  The answer is the sound and the meaning.
-  $('main').innerHTML = `
-    <button id="hide" class="${p?.known ? 'on' : ''}"
-      aria-label="I know this one, stop showing it" title="I know this one, stop showing it">
-      <svg viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.7 5.3A9.4 9.4 0 0112 5.2c5 0 9 4.3 9 6.8 0 .9-.5 2-1.4 3.1M6.6 7.4C4.1 8.9 3 10.9 3 12c0 2.5 4 6.8 9 6.8 1.5 0 2.9-.4 4.1-1"/><path d="M9.9 10.1a3 3 0 004.2 4.2"/></svg></button>
-    <div class="card" id="face">
-      ${c.k ? `<div class="kanji">${esc(c.k)}</div>` : ''}
-      <div class="kana">${esc(c.f)}</div>
-      <button id="say" aria-label="Say it" title="Say it">
-        <svg viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M15.5 8.6a5 5 0 010 6.8"/><path d="M18.5 5.6a9 9 0 010 12.8"/></svg></button>
-      ${shown ? `<div class="back">
-          <div class="reading">${esc(c.r)}</div>
-          <div class="english">${esc(c.e)}</div>
-        </div>
-        <div class="meta">${seen} \u00b7 tap to flip back</div>`
-        : '<div class="tap">tap to flip</div>'}
-    </div>
-    ${revealed ? `<div class="row">
-        <button id="again">Forgot<span class="s">again</span></button>
-        <button id="good">Knew it<span class="s">${nextIn('good')}</span></button>
-        <button id="easy">Easy<span class="s">${nextIn('easy')}</span></button>
-      </div>`
-      : '<button id="reveal">Show</button>'}`;
-
-  // Both ways: once she has seen the back, the card turns over on every tap and
-  // the three buttons stay put, so flipping back never costs her the answer.
-  const flip = () => { shown = !shown; revealed = true; draw(); };
-  $('face').addEventListener('click', flip);
-  // It sits on the card, so its tap must not also turn the card over.
-  $('say').addEventListener('click', (e) => { e.stopPropagation(); play(); });
-  $('reveal')?.addEventListener('click', flip);
-  $('hide').addEventListener('click', () => {
-    const q = progress[c.f] ??= fresh();
-    q.known = q.known ? 0 : 1;
-    q.seen = today();
-    saveProgress();
-    // Either way it no longer belongs in what she is going through right now.
-    queue = queue.filter((x) => x.f !== c.f);
-    if (q.known) countDone();
-    render();
-  });
-  for (const g of ['again', 'good', 'easy']) {
-    $(g)?.addEventListener('click', () => { answer(current, g); render(); });
-  }
-}
-
-/** What the button will cost her, in plain words. */
-function nextIn(grade) {
-  const p = progress[current.f] ?? { iv: 0, ease: 2.5, reps: 0 };
-  let iv = p.reps === 0 ? 1 : p.reps === 1 ? 3 : Math.round(p.iv * (p.ease + (grade === 'easy' ? 0.15 : 0)));
-  if (grade === 'easy') iv = Math.max(2, Math.round(iv * 1.5));
-  return iv === 1 ? 'tomorrow' : iv < 30 ? `in ${iv} days` : `in ${Math.round(iv / 30)} months`;
-}
-
-const esc = (s) => String(s ?? '').replace(/[<>&"]/g, (m) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[m]));
-
-// ---------------------------------------------------------------- backup
-
-/** Two phones, one word: keep the further-along schedule and lose nothing else.
- *  Taking the newer record whole used to drop a bookmark the newer side had
- *  never set - and `seen` counts days, so two phones used on the same day were
- *  a tie that the incoming record always lost. */
-function merge(a, b) {
-  const out = { ...a };
-  for (const [k, v] of Object.entries(b)) {
-    const mine = out[k];
-    if (!mine) { out[k] = v; continue; }
-    const seen = (p) => p.seen ?? 0;
-    const done = (p) => lifetime(p) + (p.lapses ?? 0);
-    // The schedule belongs to whichever was touched last; on the same day, to
-    // whichever has been through more. Field by field, so the loser's own
-    // fields survive where the winner simply never wrote one.
-    const theirs = seen(v) > seen(mine) || (seen(v) === seen(mine) && done(v) > done(mine));
-    out[k] = theirs ? { ...mine, ...v } : { ...v, ...mine };
-    // These only ever climb, whichever phone did the counting.
-    out[k].total = Math.max(lifetime(mine), lifetime(v));
-    out[k].lapses = Math.max(mine.lapses ?? 0, v.lapses ?? 0);
-    out[k].seen = Math.max(seen(mine), seen(v));
-  }
-  return out;
-}
-
-// On the home screen iOS gives a web app no download bar, so the share sheet is
-// the only way the file reaches Files. Everywhere else the link still works.
-async function saveFile(say) {
-  const name = `megu-progress-${new Date().toISOString().slice(0, 10)}.json`;
-  const body = JSON.stringify({ progress }, null, 1);
-  const file = new File([body], name, { type: 'application/json' });
-  if (navigator.canShare?.({ files: [file] })) {
-    try { await navigator.share({ files: [file] }); say('now pick Save to Files'); }
-    catch { /* she closed the sheet */ }
-    return;
-  }
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([body], { type: 'application/json' }));
-  a.download = name;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-  say(`${Object.keys(progress).length} words saved`);
-}
-
-function loadFile(file, say) {
-  const r = new FileReader();
-  r.onload = () => {
-    try {
-      const data = JSON.parse(r.result);
-      const before = Object.keys(progress).length;
-      progress = merge(progress, data.progress ?? data);
-      saveProgress();
-      say(`was ${before} words, now ${Object.keys(progress).length}`);
-      buildQueue(); render();
-    } catch (e) { say(`that is not a progress file: ${e.message}`); }
-  };
-  r.readAsText(file);
-}
-
-// ---------------------------------------------------------------- menu
-function openMenu() {
-  const t = today();
-  const known = Object.values(progress);
-  const rows = [
-    ['words in all', deck.cards.length],
-    ['started', known.length],
-    ['due today', pool().filter((c) => !progress[c.f] || progress[c.f].due <= t).length],
-    ['bookmarked', known.filter((p) => p.star).length],
-    ['known over a month', known.filter((p) => p.iv >= 30).length],
-    ['done today', doneToday()],
-    ['marked as known', known.filter((p) => p.known).length],
-  ];
-  $('sheet').innerHTML = `
-    <h3>Megu</h3>
-    <table>${rows.map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table>
-    <label>New words at a time</label>
-    <input id="per" type="number" min="0" max="100" value="${settings.perDay}">
-    <button class="wide" id="theme">${settings.theme === 'dark' ? 'Day theme' : 'Night theme'}</button>
-    <button class="wide" id="grab">Download all the sound</button>
-    <button class="wide" id="file">Save progress to a file</button>
-    <button class="wide" id="pickfile">Restore from a file</button>
-    <input id="hidden" type="file" accept="application/json" style="display:none">
-    <div class="note" id="note"></div>
-    <button class="wide" id="close">Close</button>`;
-  const say = (m) => { $('note').textContent = m; };
-
-  $('theme').addEventListener('click', () => {
-    settings.theme = settings.theme === 'dark' ? 'light' : 'dark';
-    saveSettings();                       // saved at once, so a force-quit keeps it
-    applyTheme();
-    $('theme').textContent = settings.theme === 'dark' ? 'Day theme' : 'Night theme';
-  });
-
-  $('grab').addEventListener('click', async () => {
-    const files = deck.cards.filter((c) => c.a).map((c) => `audio/${c.a}.m4a`);
-    // Ask the service worker which cache is current instead of naming it here:
-    // a version bump in sw.js would otherwise throw away every downloaded word.
-    const name = (await caches.keys()).find((k) => k.startsWith('megu-'));
-    const cache = await caches.open(name ?? 'megu-v2');
-    let n = 0;
-    for (const f of files) {
-      if (!(await cache.match(f))) { try { await cache.add(f); } catch { /* skip a bad one */ } }
-      if (++n % 25 === 0) say(`downloaded ${n} of ${files.length}`);
-    }
-    say(`sound is on the phone: ${files.length} words, no internet needed`);
-  });
-  $('file').addEventListener('click', () => saveFile(say));
-  $('pickfile').addEventListener('click', () => $('hidden').click());
-  $('hidden').addEventListener('change', (e) => e.target.files[0] && loadFile(e.target.files[0], say));
-  $('close').addEventListener('click', () => {
-    const per = Math.max(0, Number($('per').value) || 0);
-    const changed = per !== settings.perDay;
-    settings.perDay = per;
-    saveSettings();
-    $('sheet').close();
-    // Rebuilding costs her the card she is on, so only do it if the number that
-    // shapes the queue actually changed - and never on the board list.
-    if (changed && $('main').className !== 'home') { buildQueue(); render(); }
-  });
-  $('sheet').showModal();
-}
-
-// ---------------------------------------------------------------- start
 $('menu').addEventListener('click', openMenu);
 $('back').addEventListener('click', home);
-$('star').addEventListener('click', () => {
-  if (!current) return;
-  const p = progress[current.f] ??= fresh();
-  p.star = p.star ? 0 : 1;
-  saveProgress();
-  // Only the button changes; redrawing the card would hide a revealed answer.
-  $('star').className = 'icon' + (p.star ? ' starred' : '');
-});
+$('star').addEventListener('click', toggleStar);
+sayOnFirstTap(currentCard);
 
-fetch('deck.json').then((r) => r.json()).then((d) => {
-  deck = d;
-  home();
-});
+fetch('deck.json').then((r) => r.json()).then((d) => { setDeck(d); home(); });
 
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 
 // The service worker fetches the app from the network, so every launch gets the
 // newest one - but a tab left open all day never launches again, and goes on
 // running the code it started with.  Whenever she comes back to the app, ask
-// whether it has changed and reload if it has.
-let appStamp = null;
+// whether it has changed and reload if it has.  The app is many small files, so
+// it asks about all of them: any one of them is enough to make it out of date.
+async function stamp() {
+  const files = await (await fetch('shell.json', { cache: 'no-cache' })).json();
+  const watched = ['shell.json', ...files.filter((f) => /\.(js|html|json)$/.test(f))];
+  const tags = await Promise.all(watched.map(async (f) => {
+    // HEAD skips the worker's fetch handler entirely and costs only headers.
+    const r = await fetch(f, { method: 'HEAD', cache: 'no-cache' });
+    return r.headers.get('etag') ?? r.headers.get('last-modified') ?? '';
+  }));
+  return tags.join('|');
+}
+
+let running = null;
 async function checkForUpdate() {
   try {
-    // HEAD skips the worker's fetch handler entirely and costs only headers.
-    const res = await fetch('app.js', { method: 'HEAD', cache: 'no-cache' });
-    const tag = res.headers.get('etag') ?? res.headers.get('last-modified');
-    if (!tag) return;
-    if (appStamp && tag !== appStamp) location.reload();
-    else appStamp = tag;
+    const now = await stamp();
+    if (running && now !== running) location.reload();
+    else running = now;
   } catch {}                       // no signal: go on running what we have
 }
 checkForUpdate();
@@ -446,8 +57,8 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) chec
 // Only on a local machine: lets scripts/check-pwa.mjs test the schedule and the
 // merge for real instead of poking at the screen.
 if (['127.0.0.1', 'localhost'].includes(location.hostname)) {
-  window.megu = { merge, answer, get progress() { return progress; }, get deck() { return deck; },
-                  get audioSrc() { return audio?.src ?? ''; }, get current() { return current; },
-                  stats, home, checkForUpdate, saveProgress, doneToday, lifetime,
+  window.megu = { merge, answer, stats, home, checkForUpdate, saveProgress, doneToday, lifetime,
+                  get progress() { return progress; }, get deck() { return deck; },
+                  get audioSrc() { return playing(); }, get current() { return currentCard(); },
                   get queue() { return queue; } };
 }
