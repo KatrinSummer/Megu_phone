@@ -9,7 +9,7 @@ const P_KEY = 'megu.progress.v1';
 const S_KEY = 'megu.settings.v1';
 const load = (k, fallback) => { try { return JSON.parse(localStorage.getItem(k)) ?? fallback; } catch { return fallback; } };
 
-let progress = load(P_KEY, {});        // Front -> {due, iv, ease, reps, lapses, star, seen}
+let progress = load(P_KEY, {});        // Front -> {due, iv, ease, reps, lapses, star, known, seen}
 let settings = { deck: 'all', perDay: 20, autoPlay: true, theme: 'light', ...load(S_KEY, {}) };
 
 // The head applies this too, before the first paint; here it is for the switch.
@@ -20,7 +20,7 @@ const applyTheme = () => {
   document.querySelector('meta[name=theme-color]').content = dark ? '#191b28' : '#ffffff';
 };
 let deck = { cards: [], decks: [] };
-let queue = [], current = null, shown = false, doneToday = 0;
+let queue = [], current = null, shown = false, revealed = false, doneToday = 0;
 
 const saveProgress = () => localStorage.setItem(P_KEY, JSON.stringify(progress));
 const saveSettings = () => localStorage.setItem(S_KEY, JSON.stringify(settings));
@@ -45,14 +45,26 @@ function answer(card, grade) {
   if (grade === 'again') queue.push(card); else doneToday++;
 }
 
-const poolOf = (id) => id === 'all' ? deck.cards
+// What the board holds, whether or not she has waved a word off.  The bars
+// count against this, or marking a word known would shrink the goalpost too.
+const boardCards = (id) => id === 'all' ? deck.cards
   : id === 'star' ? deck.cards.filter((c) => progress[c.f]?.star)
   : id === 'last' ? deck.cards.filter((c) => c.last)
+  : id === 'known' ? deck.cards.filter((c) => progress[c.f]?.known)
   : deck.cards.filter((c) => c.d === id);
+
+// What she will actually be shown.  The Known board is the way back: open it
+// and press the eye again to put a word back into rotation.
+const poolOf = (id) => id === 'known' ? boardCards(id)
+  : boardCards(id).filter((c) => !progress[c.f]?.known);
 const pool = () => poolOf(settings.deck);
+
+const isMemorized = (c) => { const p = progress[c.f]; return !!p && (p.known === 1 || p.iv >= 30); };
 
 function buildQueue() {
   const t = today(), all = pool();
+  // The Known board is not a lesson, it is the list she goes through to undo.
+  if (settings.deck === 'known') { queue = [...all]; doneToday = 0; return; }
   const due = all.filter((c) => progress[c.f] && progress[c.f].due <= t);
   const fresh = all.filter((c) => !progress[c.f]);
   // Newest lesson first, so what she just learned is what she sees first.
@@ -72,8 +84,10 @@ function home() {
     ['star', 'Bookmarks'],
     ['last', 'Newest lesson'],
     ...deck.decks.map((d) => [d.id, d.name]),
+    ...(Object.values(progress).some((p) => p.known) ? [['known', 'Marked as known']] : []),
   ];
   $('star').hidden = $('sound').hidden = true;
+  $('stats').hidden = true;
   $('counts').innerHTML = `<b>${deck.cards.length}</b> words`;
   $('counts').title = 'pick a board to start';
   $('main').className = 'home';
@@ -94,6 +108,26 @@ function home() {
       render();
     });
   }
+}
+
+// ---------------------------------------------------------------- stats
+// Learning is what she has started; Memorized is what the schedule has parked
+// for over a month, plus whatever she waved off herself.  The circle is about
+// the word on screen, not the board: how many times it has come up in all.
+function stats() {
+  const cards = boardCards(settings.deck);
+  const mem = cards.filter(isMemorized).length;
+  const learn = cards.filter((c) => progress[c.f] && !isMemorized(c)).length;
+  const pct = (n) => (cards.length ? Math.round((n / cards.length) * 100) : 0);
+  const p = current ? progress[current.f] : null;
+  const round = current ? (p?.reps ?? 0) + (p?.lapses ?? 0) + 1 : '-';
+  $('stats').hidden = false;
+  $('stats').innerHTML = `
+    <div class="bar"><div class="t"><span>Learning</span><b>${learn}/${cards.length}</b></div>
+      <div class="track"><div class="fill" style="width:${pct(learn)}%"></div></div></div>
+    <div class="round" title="times this word has come up"><span class="l">round</span><span class="n">${round}</span></div>
+    <div class="bar mem"><div class="t"><span>Memorized</span><b>${mem}/${cards.length}</b></div>
+      <div class="track"><div class="fill" style="width:${pct(mem)}%"></div></div></div>`;
 }
 
 // ---------------------------------------------------------------- audio
@@ -117,12 +151,13 @@ function render() {
   $('main').className = '';
   const left = queue.length;
   // Short enough to survive any font: the buttons beside it must not be pushed.
-  $('counts').innerHTML = left ? `<b>${left}</b> to go · <b>${doneToday}</b> ✓` : `done for today`;
+  $('counts').innerHTML = left ? `<b>${left}</b> to go \u00b7 <b>${doneToday}</b> \u2713` : `done for today`;
   $('counts').title = left ? `${left} left, ${doneToday} done today` : `${all.length} words in all`;
   $('star').className = 'icon' + (current && progress[current.f]?.star ? ' starred' : '');
 
   if (!queue.length) {
     current = null;
+    stats();
     const later = all.filter((c) => progress[c.f]?.due > t).length;
     const news = all.filter((c) => !progress[c.f]).length;
     $('main').innerHTML = `<div class="done"><h2>Done for today</h2>
@@ -140,6 +175,8 @@ function render() {
 
   current = queue.shift();
   shown = false;
+  revealed = false;
+  stats();
   draw();
   if (settings.autoPlay) play();          // the word speaks as soon as it is shown
 }
@@ -147,27 +184,51 @@ function render() {
 function draw() {
   const c = current;
   const p = progress[c.f];
-  const seen = p ? `${p.reps} reviews${p.lapses ? ` · ${p.lapses} slips` : ''}` : 'new word';
+  const seen = p?.reps || p?.lapses ? `${p.reps} reviews${p.lapses ? ` \u00b7 ${p.lapses} slips` : ''}` : 'new word';
+  // The question is the written word - the kanji when there is one.  The answer
+  // is how it is read and what it means.
+  const front = c.k || c.f;
   $('main').innerHTML = `
-    <div class="card" id="face">
-      <div class="kana">${esc(c.f)}</div>
-      <div class="${shown ? '' : 'hidden'}">
-        <div class="reading">${esc(c.r)}</div>
-        ${c.k ? `<div class="kanji">${esc(c.k)}</div>` : ''}
-      </div>
-      <div class="english ${shown ? '' : 'hidden'}">${esc(c.e)}</div>
-      ${shown ? `<div class="meta">${seen}</div>` : '<div class="tap">tap to see</div>'}
+    <div class="tools">
+      <button id="toboards" aria-label="Back to the boards">
+        <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>boards</button>
+      <button id="hide" class="${p?.known ? 'on' : ''}"
+        aria-label="I know this one, stop showing it" title="I know this one, stop showing it">
+        <svg viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.7 5.3A9.4 9.4 0 0112 5.2c5 0 9 4.3 9 6.8 0 .9-.5 2-1.4 3.1M6.6 7.4C4.1 8.9 3 10.9 3 12c0 2.5 4 6.8 9 6.8 1.5 0 2.9-.4 4.1-1"/><path d="M9.9 10.1a3 3 0 004.2 4.2"/></svg></button>
     </div>
-    ${shown ? `<div class="row">
+    <div class="card" id="face">
+      <div class="kana">${esc(front)}</div>
+      ${shown ? `<div class="back">
+          ${c.k ? `<div class="jp">${esc(c.f)}</div>` : ''}
+          <div class="reading">${esc(c.r)}</div>
+          <div class="english">${esc(c.e)}</div>
+        </div>
+        <div class="meta">${seen} \u00b7 tap to flip back</div>`
+        : '<div class="tap">tap to flip</div>'}
+    </div>
+    ${revealed ? `<div class="row">
         <button id="again">Forgot<span class="s">again</span></button>
         <button id="good">Knew it<span class="s">${nextIn('good')}</span></button>
         <button id="easy">Easy<span class="s">${nextIn('easy')}</span></button>
       </div>`
       : '<button id="reveal">Show</button>'}`;
 
-  const reveal = () => { if (!shown) { shown = true; draw(); } };
-  $('face').addEventListener('click', reveal);
-  $('reveal')?.addEventListener('click', reveal);
+  // Both ways: once she has seen the back, the card turns over on every tap and
+  // the three buttons stay put, so flipping back never costs her the answer.
+  const flip = () => { shown = !shown; revealed = true; draw(); };
+  $('face').addEventListener('click', flip);
+  $('reveal')?.addEventListener('click', flip);
+  $('toboards').addEventListener('click', home);
+  $('hide').addEventListener('click', () => {
+    const q = progress[c.f] ??= { due: today(), iv: 0, ease: 2.5, reps: 0, lapses: 0, star: 0 };
+    q.known = q.known ? 0 : 1;
+    q.seen = today();
+    saveProgress();
+    // Either way it no longer belongs in what she is going through right now.
+    queue = queue.filter((x) => x.f !== c.f);
+    if (q.known) doneToday++;
+    render();
+  });
   for (const g of ['again', 'good', 'easy']) {
     $(g)?.addEventListener('click', () => { answer(current, g); render(); });
   }
@@ -238,11 +299,11 @@ function openMenu() {
     ['due today', pool().filter((c) => !progress[c.f] || progress[c.f].due <= t).length],
     ['bookmarked', known.filter((p) => p.star).length],
     ['known over a month', known.filter((p) => p.iv >= 30).length],
+    ['marked as known', known.filter((p) => p.known).length],
   ];
   $('sheet').innerHTML = `
     <h3>Megu</h3>
     <table>${rows.map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table>
-    <button class="wide" id="boards">Choose a board</button>
     <label>New words at a time</label>
     <input id="per" type="number" min="0" max="100" value="${settings.perDay}">
     <button class="wide" id="theme">${settings.theme === 'dark' ? 'Day theme' : 'Night theme'}</button>
@@ -253,13 +314,6 @@ function openMenu() {
     <div class="note" id="note"></div>
     <button class="wide" id="close">Close</button>`;
   const say = (m) => { $('note').textContent = m; };
-
-  $('boards').addEventListener('click', () => {
-    settings.perDay = Math.max(0, Number($('per').value) || 0);
-    saveSettings();
-    $('sheet').close();
-    home();
-  });
 
   $('theme').addEventListener('click', () => {
     settings.theme = settings.theme === 'dark' ? 'light' : 'dark';
@@ -317,5 +371,6 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catc
 // merge for real instead of poking at the screen.
 if (['127.0.0.1', 'localhost'].includes(location.hostname)) {
   window.megu = { merge, answer, get progress() { return progress; }, get deck() { return deck; },
-                  get audioSrc() { return audio?.src ?? ''; } };
+                  get audioSrc() { return audio?.src ?? ''; }, get current() { return current; },
+                  stats, home, get queue() { return queue; } };
 }
