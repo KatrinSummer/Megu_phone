@@ -1,5 +1,5 @@
-// Offline cache. The deck and its audio are versioned together: bump VERSION
-// in build-pwa and the phone quietly picks up the new words on next launch.
+// Offline cache. The app itself is fetched fresh every launch; the cache is
+// what keeps it working with no signal. Sound is the opposite: cached forever.
 const VERSION = 'megu-v2';
 const SHELL = ['.', 'index.html', 'app.js', 'manifest.webmanifest', 'icon.png', 'deck.json'];
 
@@ -26,21 +26,24 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET' || url.origin !== location.origin) return;  // sync goes to the network
-  e.respondWith((async () => {
-    const hit = await caches.match(e.request);
-    if (hit) {
-      // Serve the cached copy at once, but fetch a fresh one behind her back so
-      // the next launch has it. Without this an updated app.js would never
-      // reach the phone. Sound files never change, so they are left alone.
-      if (!url.pathname.includes('/audio/')) e.waitUntil(refresh(e.request).catch(() => {}));
-      return hit;
-    }
-    return refresh(e.request).catch(() => hit ?? Response.error());
-  })());
+
+  // Sound never changes and there is a lot of it: cache wins, network only if missing.
+  if (url.pathname.includes('/audio/')) {
+    e.respondWith(caches.match(e.request).then((hit) => hit ?? refresh(e.request)));
+    return;
+  }
+
+  // The app itself asks the network first. Serving it from cache meant a change
+  // landed only on the launch after next, and caches.match searches every cache,
+  // so a stale copy in an old one beat the fresh copy forever.
+  // 'no-cache' revalidates instead of trusting the browser's own copy, which
+  // GitHub Pages lets it hold for ten minutes. An ETag match costs nothing.
+  e.respondWith(refresh(e.request, 'no-cache')
+    .catch(async () => (await caches.match(e.request)) ?? Response.error()));
 });
 
-async function refresh(request) {
-  const res = await fetch(request);
+async function refresh(request, cache) {
+  const res = await fetch(request, cache ? { cache } : undefined);
   if (res.ok) (await caches.open(VERSION)).put(request, res.clone());
   return res;
 }
