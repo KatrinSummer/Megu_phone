@@ -368,10 +368,28 @@ fetch('deck.json').then((r) => r.json()).then((d) => {
 
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 
+// The service worker fetches the app from the network, so every launch gets the
+// newest one - but a tab left open all day never launches again, and goes on
+// running the code it started with.  Whenever she comes back to the app, ask
+// whether it has changed and reload if it has.
+let appStamp = null;
+async function checkForUpdate() {
+  try {
+    // HEAD skips the worker's fetch handler entirely and costs only headers.
+    const res = await fetch('app.js', { method: 'HEAD', cache: 'no-cache' });
+    const tag = res.headers.get('etag') ?? res.headers.get('last-modified');
+    if (!tag) return;
+    if (appStamp && tag !== appStamp) location.reload();
+    else appStamp = tag;
+  } catch {}                       // no signal: go on running what we have
+}
+checkForUpdate();
+document.addEventListener('visibilitychange', () => { if (!document.hidden) checkForUpdate(); });
+
 // Only on a local machine: lets scripts/check-pwa.mjs test the schedule and the
 // merge for real instead of poking at the screen.
 if (['127.0.0.1', 'localhost'].includes(location.hostname)) {
   window.megu = { merge, answer, get progress() { return progress; }, get deck() { return deck; },
                   get audioSrc() { return audio?.src ?? ''; }, get current() { return current; },
-                  stats, home, get queue() { return queue; } };
+                  stats, home, checkForUpdate, get queue() { return queue; } };
 }
