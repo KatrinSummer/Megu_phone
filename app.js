@@ -86,7 +86,7 @@ function home() {
     ...deck.decks.map((d) => [d.id, d.name]),
     ...(Object.values(progress).some((p) => p.known) ? [['known', 'Marked as known']] : []),
   ];
-  $('star').hidden = $('sound').hidden = true;
+  $('star').hidden = $('sound').hidden = $('back').hidden = true;
   $('stats').hidden = true;
   $('counts').innerHTML = `<b>${deck.cards.length}</b> words`;
   $('counts').title = 'pick a board to start';
@@ -147,7 +147,7 @@ addEventListener('pointerdown', () => { if (!unlocked) play(); }, { capture: tru
 // ---------------------------------------------------------------- render
 function render() {
   const t = today(), all = pool();
-  $('star').hidden = $('sound').hidden = false;
+  $('star').hidden = $('sound').hidden = $('back').hidden = false;
   $('main').className = '';
   const left = queue.length;
   // Short enough to survive any font: the buttons beside it must not be pushed.
@@ -162,9 +162,7 @@ function render() {
     const news = all.filter((c) => !progress[c.f]).length;
     $('main').innerHTML = `<div class="done"><h2>Done for today</h2>
       <div>${later} words are waiting for their day, ${news} have never been shown.</div>
-      <button class="wide" id="more">Show ${Math.min(settings.perDay, news)} more new words</button>
-      <button class="wide" id="back">Back to the boards</button></div>`;
-    $('back').addEventListener('click', home);
+      <button class="wide" id="more">Show ${Math.min(settings.perDay, news)} more new words</button></div>`;
     $('more')?.addEventListener('click', () => {
       queue = all.filter((c) => !progress[c.f])
         .sort((a, b) => (b.when || '').localeCompare(a.when || '')).slice(0, settings.perDay);
@@ -189,13 +187,9 @@ function draw() {
   // is how it is read and what it means.
   const front = c.k || c.f;
   $('main').innerHTML = `
-    <div class="tools">
-      <button id="toboards" aria-label="Back to the boards">
-        <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>boards</button>
-      <button id="hide" class="${p?.known ? 'on' : ''}"
-        aria-label="I know this one, stop showing it" title="I know this one, stop showing it">
-        <svg viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.7 5.3A9.4 9.4 0 0112 5.2c5 0 9 4.3 9 6.8 0 .9-.5 2-1.4 3.1M6.6 7.4C4.1 8.9 3 10.9 3 12c0 2.5 4 6.8 9 6.8 1.5 0 2.9-.4 4.1-1"/><path d="M9.9 10.1a3 3 0 004.2 4.2"/></svg></button>
-    </div>
+    <button id="hide" class="${p?.known ? 'on' : ''}"
+      aria-label="I know this one, stop showing it" title="I know this one, stop showing it">
+      <svg viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.7 5.3A9.4 9.4 0 0112 5.2c5 0 9 4.3 9 6.8 0 .9-.5 2-1.4 3.1M6.6 7.4C4.1 8.9 3 10.9 3 12c0 2.5 4 6.8 9 6.8 1.5 0 2.9-.4 4.1-1"/><path d="M9.9 10.1a3 3 0 004.2 4.2"/></svg></button>
     <div class="card" id="face">
       <div class="kana">${esc(front)}</div>
       ${shown ? `<div class="back">
@@ -218,7 +212,6 @@ function draw() {
   const flip = () => { shown = !shown; revealed = true; draw(); };
   $('face').addEventListener('click', flip);
   $('reveal')?.addEventListener('click', flip);
-  $('toboards').addEventListener('click', home);
   $('hide').addEventListener('click', () => {
     const q = progress[c.f] ??= { due: today(), iv: 0, ease: 2.5, reps: 0, lapses: 0, star: 0 };
     q.known = q.known ? 0 : 1;
@@ -350,6 +343,7 @@ function openMenu() {
 
 // ---------------------------------------------------------------- start
 $('menu').addEventListener('click', openMenu);
+$('back').addEventListener('click', home);
 $('sound').addEventListener('click', play);
 $('star').addEventListener('click', () => {
   if (!current) return;

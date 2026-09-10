@@ -36,7 +36,7 @@
     display:flex;flex-direction:column;
     padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
 
-  header{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line)}
+  header{display:flex;align-items:center;gap:9px;padding:12px 14px;border-bottom:1px solid var(--line)}
   header .grow{flex:1;min-width:0}
   .counts{font-size:13px;color:var(--dim);white-space:nowrap;
     overflow:hidden;text-overflow:ellipsis}
@@ -52,7 +52,7 @@
   .starred svg{fill:currentColor}
 
   main{flex:1;display:flex;flex-direction:column;justify-content:center;
-    padding:16px;gap:16px;overflow-y:auto}
+    padding:16px;gap:16px;overflow-y:auto;position:relative}
   /* A long list of boards has to start at the top, not sit centred and clipped. */
   main.home{justify-content:flex-start;gap:10px}
   .deck{display:flex;justify-content:space-between;align-items:center;gap:12px;
@@ -82,13 +82,12 @@
   .round .l{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em}
   .round .n{font-size:16px;font-weight:600}
 
-  /* Back to the boards and "I know this one", right above the card. */
-  .tools{display:flex;justify-content:space-between;align-items:center;margin-bottom:-8px}
-  .tools button{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--dim);
-    padding:7px 10px;border-radius:10px}
-  .tools button:active{background:var(--line)}
-  .tools svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.7;
-    stroke-linecap:round;stroke-linejoin:round;flex:none}
+  /* "I know this one" lives in the corner of the screen, out of the way of the
+     card: it is a rare press, and a row of its own only got in the way. */
+  #hide{position:absolute;top:4px;right:10px;padding:7px;border-radius:10px;color:var(--dim)}
+  #hide svg{width:22px;height:22px;display:block;fill:none;stroke:currentColor;
+    stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  #hide:active{background:var(--line)}
   #hide.on{color:var(--good)}
 
   .card{background:var(--card);border:1px solid var(--line);border-radius:18px;
@@ -147,13 +146,15 @@
 </head>
 <body>
 <header>
-  <button class="icon" id="menu" aria-label="Menu">
-    <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  <button class="icon" id="back" aria-label="Back to the boards">
+    <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
   <div class="grow"><div class="counts" id="counts">…</div></div>
   <button class="icon" id="star" aria-label="Bookmark">
     <svg viewBox="0 0 24 24"><path d="M12 3.6l2.6 5.3 5.8.9-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.9z"/></svg></button>
   <button class="icon" id="sound" aria-label="Say it">
     <svg viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13L7.5 14.5H4z"/><path d="M15.4 9.6a3.6 3.6 0 010 4.8M18 7.2a7.2 7.2 0 010 9.6"/></svg></button>
+  <button class="icon" id="menu" aria-label="Settings">
+    <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
 </header>
 
 <div class="stats" id="stats" hidden></div>
