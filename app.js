@@ -49,9 +49,17 @@ function answer(card, grade) {
 // count against this, or marking a word known would shrink the goalpost too.
 const boardCards = (id) => id === 'all' ? deck.cards
   : id === 'star' ? deck.cards.filter((c) => progress[c.f]?.star)
-  : id === 'last' ? deck.cards.filter((c) => c.last)
+  : id === 'new' ? newestLesson()
   : id === 'known' ? deck.cards.filter((c) => progress[c.f]?.known)
-  : deck.cards.filter((c) => c.d === id);
+  // A word sits in its own deck and may also sit in a review deck like Last.
+  : deck.cards.filter((c) => c.d === id || c.last === id);
+
+/** The words from the most recent lesson.  Only real dates count: the library
+ *  marks older imports "Legacy / undated", and that sorts above any of them. */
+const newestLesson = () => {
+  const day = deck.cards.reduce((m, c) => (/^\d{8}$/.test(c.when) && c.when > m ? c.when : m), '');
+  return day ? deck.cards.filter((c) => c.when === day) : [];
+};
 
 // What she will actually be shown.  The Known board is the way back: open it
 // and press the eye again to put a word back into rotation.
@@ -82,7 +90,7 @@ function home() {
   const rows = [
     ['all', 'Everything'],
     ['star', 'Bookmarks'],
-    ['last', 'Newest lesson'],
+    ['new', 'Newest lesson'],
     ...deck.decks.map((d) => [d.id, d.name]),
     ...(Object.values(progress).some((p) => p.known) ? [['known', 'Marked as known']] : []),
   ];
@@ -183,17 +191,16 @@ function draw() {
   const c = current;
   const p = progress[c.f];
   const seen = p?.reps || p?.lapses ? `${p.reps} reviews${p.lapses ? ` \u00b7 ${p.lapses} slips` : ''}` : 'new word';
-  // The question is the written word - the kanji when there is one.  The answer
-  // is how it is read and what it means.
-  const front = c.k || c.f;
+  // The word itself is the question, in the kana she reads it in, with the
+  // kanji sitting small above it.  The answer is the sound and the meaning.
   $('main').innerHTML = `
     <button id="hide" class="${p?.known ? 'on' : ''}"
       aria-label="I know this one, stop showing it" title="I know this one, stop showing it">
       <svg viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.7 5.3A9.4 9.4 0 0112 5.2c5 0 9 4.3 9 6.8 0 .9-.5 2-1.4 3.1M6.6 7.4C4.1 8.9 3 10.9 3 12c0 2.5 4 6.8 9 6.8 1.5 0 2.9-.4 4.1-1"/><path d="M9.9 10.1a3 3 0 004.2 4.2"/></svg></button>
     <div class="card" id="face">
-      <div class="kana">${esc(front)}</div>
+      ${c.k ? `<div class="kanji">${esc(c.k)}</div>` : ''}
+      <div class="kana">${esc(c.f)}</div>
       ${shown ? `<div class="back">
-          ${c.k ? `<div class="jp">${esc(c.f)}</div>` : ''}
           <div class="reading">${esc(c.r)}</div>
           <div class="english">${esc(c.e)}</div>
         </div>
