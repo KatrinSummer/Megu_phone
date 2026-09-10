@@ -45,10 +45,11 @@ function answer(card, grade) {
   if (grade === 'again') queue.push(card); else doneToday++;
 }
 
-const pool = () => settings.deck === 'all' ? deck.cards
-  : settings.deck === 'star' ? deck.cards.filter((c) => progress[c.f]?.star)
-  : settings.deck === 'last' ? deck.cards.filter((c) => c.last)
-  : deck.cards.filter((c) => c.d === settings.deck);
+const poolOf = (id) => id === 'all' ? deck.cards
+  : id === 'star' ? deck.cards.filter((c) => progress[c.f]?.star)
+  : id === 'last' ? deck.cards.filter((c) => c.last)
+  : deck.cards.filter((c) => c.d === id);
+const pool = () => poolOf(settings.deck);
 
 function buildQueue() {
   const t = today(), all = pool();
@@ -58,6 +59,41 @@ function buildQueue() {
   fresh.sort((a, b) => (b.when || '').localeCompare(a.when || ''));
   queue = [...due.sort(() => Math.random() - 0.5), ...fresh.slice(0, settings.perDay)];
   doneToday = 0;
+}
+
+// ---------------------------------------------------------------- home
+// Nothing is reviewed until she picks a board, so the app opens on the list
+// rather than dropping her into whichever deck she chose last.
+function home() {
+  current = null;
+  const t = today();
+  const rows = [
+    ['all', 'Everything'],
+    ['star', 'Bookmarks'],
+    ['last', 'Newest lesson'],
+    ...deck.decks.map((d) => [d.id, d.name]),
+  ];
+  $('star').hidden = $('sound').hidden = true;
+  $('counts').innerHTML = `<b>${deck.cards.length}</b> words`;
+  $('counts').title = 'pick a board to start';
+  $('main').className = 'home';
+  $('main').innerHTML = rows.map(([id, name]) => {
+    const cards = poolOf(id);
+    const due = cards.filter((c) => progress[c.f] && progress[c.f].due <= t).length;
+    const fresh = cards.filter((c) => !progress[c.f]).length;
+    const note = !cards.length ? 'empty'
+      : [due ? `${due} due` : 'nothing due', fresh ? `${fresh} new` : ''].filter(Boolean).join(' · ');
+    return `<button class="deck" data-id="${esc(id)}" ${cards.length ? '' : 'disabled'}>
+      <span class="n">${esc(name)}</span><span class="s">${note}</span></button>`;
+  }).join('');
+  for (const b of document.querySelectorAll('.deck')) {
+    b.addEventListener('click', () => {
+      settings.deck = b.dataset.id;
+      saveSettings();
+      buildQueue();
+      render();
+    });
+  }
 }
 
 // ---------------------------------------------------------------- audio
@@ -77,6 +113,8 @@ addEventListener('pointerdown', () => { if (!unlocked) play(); }, { capture: tru
 // ---------------------------------------------------------------- render
 function render() {
   const t = today(), all = pool();
+  $('star').hidden = $('sound').hidden = false;
+  $('main').className = '';
   const left = queue.length;
   // Short enough to survive any font: the buttons beside it must not be pushed.
   $('counts').innerHTML = left ? `<b>${left}</b> to go · <b>${doneToday}</b> ✓` : `done for today`;
@@ -89,7 +127,9 @@ function render() {
     const news = all.filter((c) => !progress[c.f]).length;
     $('main').innerHTML = `<div class="done"><h2>Done for today</h2>
       <div>${later} words are waiting for their day, ${news} have never been shown.</div>
-      <button class="wide" id="more">Show ${Math.min(settings.perDay, news)} more new words</button></div>`;
+      <button class="wide" id="more">Show ${Math.min(settings.perDay, news)} more new words</button>
+      <button class="wide" id="back">Back to the boards</button></div>`;
+    $('back').addEventListener('click', home);
     $('more')?.addEventListener('click', () => {
       queue = all.filter((c) => !progress[c.f])
         .sort((a, b) => (b.when || '').localeCompare(a.when || '')).slice(0, settings.perDay);
@@ -202,13 +242,7 @@ function openMenu() {
   $('sheet').innerHTML = `
     <h3>Megu</h3>
     <table>${rows.map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table>
-    <label>What to review</label>
-    <select id="pick">
-      <option value="all">Everything</option>
-      <option value="star">Bookmarks only</option>
-      <option value="last">Newest lesson</option>
-      ${deck.decks.map((d) => `<option value="${d.id}">${esc(d.name)}</option>`).join('')}
-    </select>
+    <button class="wide" id="boards">Choose a board</button>
     <label>New words at a time</label>
     <input id="per" type="number" min="0" max="100" value="${settings.perDay}">
     <button class="wide" id="theme">${settings.theme === 'dark' ? 'Day theme' : 'Night theme'}</button>
@@ -218,8 +252,14 @@ function openMenu() {
     <input id="hidden" type="file" accept="application/json" style="display:none">
     <div class="note" id="note"></div>
     <button class="wide" id="close">Close</button>`;
-  $('pick').value = settings.deck;
   const say = (m) => { $('note').textContent = m; };
+
+  $('boards').addEventListener('click', () => {
+    settings.perDay = Math.max(0, Number($('per').value) || 0);
+    saveSettings();
+    $('sheet').close();
+    home();
+  });
 
   $('theme').addEventListener('click', () => {
     settings.theme = settings.theme === 'dark' ? 'light' : 'dark';
@@ -245,11 +285,11 @@ function openMenu() {
   $('pickfile').addEventListener('click', () => $('hidden').click());
   $('hidden').addEventListener('change', (e) => e.target.files[0] && loadFile(e.target.files[0], say));
   $('close').addEventListener('click', () => {
-    settings.deck = $('pick').value;
     settings.perDay = Math.max(0, Number($('per').value) || 0);
     saveSettings();
     $('sheet').close();
-    buildQueue(); render();
+    // She may be sitting on the board list; do not shove her into a card.
+    if ($('main').className !== 'home') { buildQueue(); render(); }
   });
   $('sheet').showModal();
 }
@@ -268,8 +308,7 @@ $('star').addEventListener('click', () => {
 
 fetch('deck.json').then((r) => r.json()).then((d) => {
   deck = d;
-  buildQueue();
-  render();
+  home();
 });
 
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
