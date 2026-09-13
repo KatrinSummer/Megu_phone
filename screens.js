@@ -117,6 +117,7 @@ function draw() {
       ${shown ? `<div class="back">
           <div class="reading">${esc(c.r)}</div>
           <div class="english">${esc(c.e)}</div>
+          ${c.x?.length ? `<div class="ex">${c.x.map((s) => `<div>${esc(s)}</div>`).join('')}</div>` : ''}
         </div>
         <div class="meta">${seen} · tap to flip back</div>`
         : '<div class="tap">tap to flip</div>'}
