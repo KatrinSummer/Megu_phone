@@ -19,7 +19,6 @@ export function home() {
   const rows = [
     ['all', 'Everything'],
     ['star', 'Bookmarks'],
-    ['new', 'Newest lesson'],
     ...deck.decks.map((d) => [d.id, d.name]),
     ...(Object.values(progress).some((p) => p.known) ? [['known', 'Marked as known']] : []),
   ];

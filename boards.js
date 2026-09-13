@@ -8,17 +8,9 @@ export const setDeck = (d) => Object.assign(deck, d);
 // count against this, or marking a word known would shrink the goalpost too.
 export const boardCards = (id) => id === 'all' ? deck.cards
   : id === 'star' ? deck.cards.filter((c) => progress[c.f]?.star)
-  : id === 'new' ? newestLesson()
   : id === 'known' ? deck.cards.filter((c) => progress[c.f]?.known)
   // A word sits in its own deck and may also sit in a review deck like Last.
   : deck.cards.filter((c) => c.d === id || c.last === id);
-
-/** The words from the most recent lesson.  Only real dates count: the library
- *  marks older imports "Legacy / undated", and that sorts above any of them. */
-export const newestLesson = () => {
-  const day = deck.cards.reduce((m, c) => (/^\d{8}$/.test(c.when) && c.when > m ? c.when : m), '');
-  return day ? deck.cards.filter((c) => c.when === day) : [];
-};
 
 // What she will actually be shown.  The Known board is the way back: open it
 // and press the eye again to put a word back into rotation.
