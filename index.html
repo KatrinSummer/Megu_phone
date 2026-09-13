@@ -104,6 +104,13 @@
   /* The word in use. Quieter than the meaning: it is there to be read, not tested. */
   .ex{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:10px;
     font-size:16px;line-height:1.5;color:var(--dim)}
+  /* Each sentence is its own button: a tap says it, and does not turn the card. */
+  .ex button{font:inherit;color:inherit;background:none;border:0;padding:4px 0;margin:0;
+    display:flex;gap:7px;align-items:flex-start;justify-content:center;text-align:left;cursor:pointer}
+  .ex button:disabled{cursor:default}
+  .ex button:active:not(:disabled){opacity:.55}
+  .ex svg{flex:none;width:16px;height:16px;margin-top:5px;fill:none;stroke:currentColor;
+    stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
   /* Her thumb is on the word, not up in the header, so the sound is there too. */
   #say{align-self:center;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;
     border:1px solid var(--line);background:var(--card);color:var(--dim)}

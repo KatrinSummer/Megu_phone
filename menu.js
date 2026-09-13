@@ -40,7 +40,9 @@ export function openMenu() {
   });
 
   $('grab').addEventListener('click', async () => {
-    const files = deck.cards.filter((c) => c.a).map((c) => `audio/${c.a}.m4a`);
+    // The words and their example sentences: both have to work with no signal.
+    const files = deck.cards.flatMap((c) => [c.a, ...(c.x ?? []).map((x) => x.a)])
+      .filter(Boolean).map((a) => `audio/${a}.m4a`);
     // Ask the service worker which cache is current instead of naming it here:
     // a version bump in sw.js would otherwise throw away every downloaded word.
     const name = (await caches.keys()).find((k) => k.startsWith('megu-'));
@@ -50,7 +52,7 @@ export function openMenu() {
       if (!(await cache.match(f))) { try { await cache.add(f); } catch { /* skip a bad one */ } }
       if (++n % 25 === 0) say(`downloaded ${n} of ${files.length}`);
     }
-    say(`sound is on the phone: ${files.length} words, no internet needed`);
+    say(`sound is on the phone: ${files.length} files, words and sentences, no internet needed`);
   });
 
   $('file').addEventListener('click', () => saveFile(say));

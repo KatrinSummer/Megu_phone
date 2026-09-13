@@ -7,6 +7,7 @@ import { deck, boardCards, poolOf, pool, queue, buildQueue, dropFromQueue, moreN
 import { play } from './sound.js';
 
 let current = null, shown = false, revealed = false;
+const SPEAKER = '<svg viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M15.5 8.6a5 5 0 010 6.8"/></svg>';
 export const currentCard = () => current;
 
 // ---------------------------------------------------------------- boards
@@ -117,7 +118,8 @@ function draw() {
       ${shown ? `<div class="back">
           <div class="reading">${esc(c.r)}</div>
           <div class="english">${esc(c.e)}</div>
-          ${c.x?.length ? `<div class="ex">${c.x.map((s) => `<div>${esc(s)}</div>`).join('')}</div>` : ''}
+          ${c.x?.length ? `<div class="ex">${c.x.map((x, i) => `<button data-i="${i}" ${x.a ? '' : 'disabled'}
+            aria-label="Say this sentence">${x.a ? SPEAKER : ''}<span>${esc(x.t)}</span></button>`).join('')}</div>` : ''}
         </div>
         <div class="meta">${seen} · tap to flip back</div>`
         : '<div class="tap">tap to flip</div>'}
@@ -135,6 +137,10 @@ function draw() {
   $('face').addEventListener('click', flip);
   // It sits on the card, so its tap must not also turn the card over.
   $('say').addEventListener('click', (e) => { e.stopPropagation(); play(c); });
+  // A sentence says itself when tapped - she reads kana, not kanji.
+  for (const b of document.querySelectorAll('.ex button')) {
+    b.addEventListener('click', (e) => { e.stopPropagation(); play(c.x[b.dataset.i]); });
+  }
   $('reveal')?.addEventListener('click', flip);
   $('hide').addEventListener('click', () => {
     const q = progress[c.f] ??= fresh();
