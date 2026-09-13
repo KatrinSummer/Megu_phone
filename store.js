@@ -14,7 +14,7 @@ const read = (k, fallback) => {
 export let progress = read(P_KEY, {});
 export const setProgress = (p) => { progress = p; };
 
-export const settings = { deck: 'all', perDay: 20, autoPlay: true, theme: 'light',
+export const settings = { deck: 'last', perDay: 20, autoPlay: true, theme: 'light',
                           doneOn: 0, doneCount: 0, ...read(S_KEY, {}) };
 
 // A phone can refuse to write: no room left, or private browsing. Failing in

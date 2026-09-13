@@ -6,8 +6,8 @@ export const setDeck = (d) => Object.assign(deck, d);
 
 // What the board holds, whether or not she has waved a word off.  The bars
 // count against this, or marking a word known would shrink the goalpost too.
-export const boardCards = (id) => id === 'all' ? deck.cards
-  : id === 'star' ? deck.cards.filter((c) => progress[c.f]?.star)
+// There is no board of every word: she splits them into decks on purpose.
+export const boardCards = (id) => id === 'star' ? deck.cards.filter((c) => progress[c.f]?.star)
   : id === 'known' ? deck.cards.filter((c) => progress[c.f]?.known)
   // A word sits in its own deck and may also sit in a review deck like Last.
   : deck.cards.filter((c) => c.d === id || c.last === id);

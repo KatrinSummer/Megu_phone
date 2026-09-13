@@ -17,7 +17,6 @@ export function home() {
   current = null;
   const t = today();
   const rows = [
-    ['all', 'Everything'],
     ['star', 'Bookmarks'],
     ...deck.decks.map((d) => [d.id, d.name]),
     ...(Object.values(progress).some((p) => p.known) ? [['known', 'Marked as known']] : []),
