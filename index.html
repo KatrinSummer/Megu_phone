@@ -108,6 +108,13 @@
   .ex button{font:inherit;color:inherit;background:none;border:0;padding:4px 0;margin:0;
     display:flex;gap:7px;align-items:flex-start;justify-content:center;text-align:left;cursor:pointer}
   .ex button:disabled{cursor:default}
+  .ex button:focus:not(:focus-visible){outline:none}
+  .ex .lines{display:flex;flex-direction:column;gap:2px}
+  /* She reads kana: the kana line under the kanji, a gap between words. */
+  .ex .yomi{font-size:14px;word-spacing:.4em}
+  /* One word and its meaning per piece, so から|あげ is never cut in two. */
+  .ex .gloss{display:flex;flex-wrap:wrap;column-gap:12px;font-size:12px;line-height:1.45;opacity:.8}
+  .ex .gloss i{font-style:normal;opacity:.75}
   .ex button:active:not(:disabled){opacity:.55}
   .ex svg{flex:none;width:16px;height:16px;margin-top:5px;fill:none;stroke:currentColor;
     stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}

@@ -119,7 +119,13 @@ function draw() {
           <div class="reading">${esc(c.r)}</div>
           <div class="english">${esc(c.e)}</div>
           ${c.x?.length ? `<div class="ex">${c.x.map((x, i) => `<button data-i="${i}" ${x.a ? '' : 'disabled'}
-            aria-label="Say this sentence">${x.a ? SPEAKER : ''}<span>${esc(x.t)}</span></button>`).join('')}</div>` : ''}
+            aria-label="Say this sentence">${x.a ? SPEAKER : ''}<span class="lines"><span class="jp">${esc(x.t)}</span>${
+              // The same sentence in kana, word by word, and her words in it in English.
+              x.k ? `<span class="yomi">${esc(x.k)}</span>` : ''}${
+              // The word itself is left out: its meaning is right above.
+              x.w?.some(([k]) => k !== c.f) ? `<span class="gloss">${x.w.filter(([k]) => k !== c.f)
+                .map(([k, e]) => `<span>${esc(k)} <i>${esc(e)}</i></span>`).join('')}</span>` : ''
+            }</span></button>`).join('')}</div>` : ''}
         </div>
         <div class="meta">${seen} · tap to flip back</div>`
         : '<div class="tap">tap to flip</div>'}
