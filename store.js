@@ -50,6 +50,15 @@ export const fresh = () => ({ due: today(), iv: 0, ease: 2.5, reps: 0, total: 0,
 /** Older saves have no `total`; back then `reps` was the count, so read it. */
 export const lifetime = (p) => p.total ?? p.reps ?? 0;
 
+/** The bookmark, on this card or a word tapped in a sentence. It is not
+ *  progress, so it leaves `seen` alone: a star must not win a backup merge. */
+export const flipStar = (front) => {
+  const p = progress[front] ??= fresh();
+  p.star = p.star ? 0 : 1;
+  saveProgress();
+  return p.star;
+};
+
 // The head applies this too, before the first paint; here it is for the switch.
 export const applyTheme = () => {
   const dark = settings.theme === 'dark';

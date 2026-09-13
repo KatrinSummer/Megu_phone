@@ -1,5 +1,5 @@
 // Which words she is shown, and in what order.
-import { progress, settings, today } from './store.js';
+import { progress, settings, today, fresh, saveProgress } from './store.js';
 
 export const deck = { cards: [], decks: [] };
 export const setDeck = (d) => Object.assign(deck, d);
@@ -44,6 +44,17 @@ export function buildQueue() {
 
 /** She waved the word off, so it leaves whatever is left of today's round. */
 export const dropFromQueue = (front) => refill(queue.filter((c) => c.f !== front));
+
+/** The eye, or "I know it" on a word tapped in a sentence. Either way the word
+ *  no longer belongs in what she is going through right now. */
+export function flipKnown(front) {
+  const p = progress[front] ??= fresh();
+  p.known = p.known ? 0 : 1;
+  p.seen = today();
+  saveProgress();
+  dropFromQueue(front);
+  return p.known;
+}
 
 /** "Show more new words" on the done screen. */
 export const moreNew = () =>

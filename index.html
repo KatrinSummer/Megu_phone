@@ -118,6 +118,26 @@
   .ex button:active:not(:disabled){opacity:.55}
   .ex svg{flex:none;width:16px;height:16px;margin-top:5px;fill:none;stroke:currentColor;
     stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  /* Her other words in the kana line: the dotted line says a tap opens the word. */
+  .ex .w{text-decoration:underline dotted;text-decoration-thickness:1px;text-underline-offset:3px}
+  /* The word she tapped, in a box right above it, over a clear sheet that only
+     closes it - a tap beside the box must not turn the card or say anything. */
+  #pop{position:fixed;inset:0;z-index:5}
+  #pop .box{position:absolute;width:min(280px,calc(100vw - 16px));padding:12px 14px;border-radius:14px;
+    border:1px solid var(--line);background:var(--card);box-shadow:0 8px 28px #0003;line-height:1.4}
+  #pop .top{display:flex;align-items:center;gap:8px}
+  #pop .top b{font-size:22px;font-weight:600}
+  #pop .k{color:var(--dim)}
+  #pop .say{margin-left:auto;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+    border:1px solid var(--line);color:var(--dim)}
+  #pop .say svg{width:17px;height:17px;fill:none;stroke:currentColor;
+    stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  #pop .e{margin-top:4px}
+  #pop .m{font-size:12px;color:var(--dim)}
+  #pop .acts{display:flex;gap:8px;margin-top:10px}
+  #pop .acts button{flex:1;padding:9px 6px;border-radius:10px;border:1px solid var(--line);
+    font-size:13px;font-weight:600}
+  #pop .acts .on{color:var(--star);border-color:var(--star)}
   /* Her thumb is on the word, not up in the header, so the sound is there too. */
   #say{align-self:center;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;
     border:1px solid var(--line);background:var(--card);color:var(--dim)}

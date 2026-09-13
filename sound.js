@@ -2,6 +2,8 @@
 // the screen once, which is the only reason this is not two lines.
 let audio = null, unlocked = false;
 
+export const SPEAKER = '<svg viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M15.5 8.6a5 5 0 010 6.8"/></svg>';
+
 export function play(card) {
   if (!card?.a) return;
   audio ??= new Audio();               // one element for the whole session: iOS

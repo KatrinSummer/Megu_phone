@@ -1,13 +1,13 @@
 // What is on the screen: the list of boards, the two bars, and the card.
 import { $, esc } from './dom.js';
-import { progress, settings, today, fresh, lifetime, doneToday, countDone,
-         saveProgress, saveSettings } from './store.js';
+import { progress, settings, today, lifetime, doneToday, countDone,
+         saveSettings, flipStar } from './store.js';
 import { answer, nextIn, isMemorized } from './schedule.js';
-import { deck, boardCards, poolOf, pool, queue, buildQueue, dropFromQueue, moreNew } from './boards.js';
-import { play } from './sound.js';
+import { deck, boardCards, poolOf, pool, queue, buildQueue, flipKnown, moreNew } from './boards.js';
+import { play, SPEAKER } from './sound.js';
+import { yomi, openWord } from './word.js';
 
 let current = null, shown = false, revealed = false;
-const SPEAKER = '<svg viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M15.5 8.6a5 5 0 010 6.8"/></svg>';
 export const currentCard = () => current;
 
 // ---------------------------------------------------------------- boards
@@ -121,7 +121,7 @@ function draw() {
           ${c.x?.length ? `<div class="ex">${c.x.map((x, i) => `<button data-i="${i}" ${x.a ? '' : 'disabled'}
             aria-label="Say this sentence">${x.a ? SPEAKER : ''}<span class="lines"><span class="jp">${esc(x.t)}</span>${
               // The same sentence in kana, word by word, and her words in it in English.
-              x.k ? `<span class="yomi">${esc(x.k)}</span>` : ''}${
+              x.k ? `<span class="yomi">${yomi(x.k, c.f)}</span>` : ''}${
               // The word itself is left out: its meaning is right above.
               x.w?.some(([k]) => k !== c.f) ? `<span class="gloss">${x.w.filter(([k]) => k !== c.f)
                 .map(([k, e]) => `<span>${esc(k)} <i>${esc(e)}</i></span>`).join('')}</span>` : ''
@@ -143,19 +143,18 @@ function draw() {
   $('face').addEventListener('click', flip);
   // It sits on the card, so its tap must not also turn the card over.
   $('say').addEventListener('click', (e) => { e.stopPropagation(); play(c); });
-  // A sentence says itself when tapped - she reads kana, not kanji.
+  // A sentence says itself when tapped - she reads kana, not kanji. One of her
+  // own words in its kana opens that word instead.
   for (const b of document.querySelectorAll('.ex button')) {
-    b.addEventListener('click', (e) => { e.stopPropagation(); play(c.x[b.dataset.i]); });
+    b.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const w = e.target.closest('.w');
+      if (w) openWord(w); else play(c.x[b.dataset.i]);
+    });
   }
   $('reveal')?.addEventListener('click', flip);
   $('hide').addEventListener('click', () => {
-    const q = progress[c.f] ??= fresh();
-    q.known = q.known ? 0 : 1;
-    q.seen = today();
-    saveProgress();
-    // Either way it no longer belongs in what she is going through right now.
-    dropFromQueue(c.f);
-    if (q.known) countDone();
+    if (flipKnown(c.f)) countDone();
     render();
   });
   for (const g of ['again', 'good', 'easy']) {
@@ -169,8 +168,5 @@ function draw() {
 /** The bookmark button in the header, which must not redraw a revealed card. */
 export function toggleStar() {
   if (!current) return;
-  const p = progress[current.f] ??= fresh();
-  p.star = p.star ? 0 : 1;
-  saveProgress();
-  $('star').className = 'icon' + (p.star ? ' starred' : '');
+  $('star').className = 'icon' + (flipStar(current.f) ? ' starred' : '');
 }
