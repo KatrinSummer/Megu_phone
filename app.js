@@ -5,6 +5,7 @@
 // store.js     what is saved, and what happens when saving fails
 // schedule.js  when a word comes back
 // boards.js    which words she is shown, and in what order
+// lesson.js    the lesson she is in, and where a reload finds her
 // sound.js     saying the word out loud
 // screens.js   what is on the screen
 // word.js      a word of hers tapped inside a sentence
@@ -13,22 +14,29 @@
 // backup.js    moving progress between two phones
 // menu.js      the settings sheet
 import { $ } from './dom.js';
-import { progress, doneToday, lifetime, saveProgress } from './store.js';
-import { deck, setDeck, queue } from './boards.js';
+import { progress, settings, doneToday, lifetime, saveProgress } from './store.js';
+import { deck, setDeck, cardOf } from './boards.js';
+import { queue, again, resume } from './lesson.js';
 import { answer, setPri } from './schedule.js';
 import { merge } from './backup.js';
 import { playing, sayOnFirstTap } from './sound.js';
-import { home, stats, currentCard, toggleStar, skip, back } from './screens.js';
+import { home, render, stats, currentCard, toggleStar, skip, back } from './screens.js';
 import { openMenu } from './menu.js';
 import { onSwipe } from './swipe.js';
 
 $('menu').addEventListener('click', openMenu);
 $('back').addEventListener('click', home);
 $('star').addEventListener('click', toggleStar);
-onSwipe($('main'), { right: skip, left: back });
+// Like turning a page: the finger goes left to the next card, right to the last.
+onSwipe($('main'), { left: skip, right: back });
 sayOnFirstTap(currentCard);
 
-fetch('deck.json').then((r) => r.json()).then((d) => { setDeck(d); home(); });
+fetch('deck.json').then((r) => r.json()).then((d) => {
+  setDeck(d);
+  // Back in the lesson she was in today, if the app was closed on her mid-way.
+  const id = resume(cardOf);
+  if (id) { settings.deck = id; render(); } else home();
+});
 
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 
@@ -65,5 +73,5 @@ if (['127.0.0.1', 'localhost'].includes(location.hostname)) {
   window.megu = { merge, answer, setPri, stats, home, checkForUpdate, saveProgress, doneToday, lifetime,
                   get progress() { return progress; }, get deck() { return deck; },
                   get audioSrc() { return playing(); }, get current() { return currentCard(); },
-                  get queue() { return queue; } };
+                  get queue() { return queue; }, get again() { return again; } };
 }

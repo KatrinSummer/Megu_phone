@@ -35,6 +35,11 @@ function write(key, value) {
 export const saveProgress = () => write(P_KEY, progress);
 export const saveSettings = () => write(S_KEY, settings);
 
+/** The lesson she is in, so that a reload finds her where she was. */
+const L_KEY = 'megu.lesson.v1';
+export const loadLesson = () => read(L_KEY, null);
+export const saveLesson = (l) => write(L_KEY, l);
+
 // What she has done today, not what she has done since the queue was last built.
 // It used to be a plain variable that buildQueue() reset, so opening the settings
 // sheet - or any reload - put the tally back to zero.

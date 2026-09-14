@@ -1,8 +1,12 @@
 // Which words she is shown, and in what order.
 import { progress, settings, today, fresh, saveProgress, started } from './store.js';
+import { startLesson, drop } from './lesson.js';
 
 export const deck = { cards: [], decks: [] };
 export const setDeck = (d) => Object.assign(deck, d);
+// The deck arrives once, before the first card is drawn.
+let byFront = null;
+export const cardOf = (f) => (byFront ??= new Map(deck.cards.map((c) => [c.f, c]))).get(f);
 
 // What the board holds, whether or not she has waved a word off.  The bars
 // count against this, or marking a word known would shrink the goalpost too.
@@ -22,9 +26,8 @@ export const pool = () => poolOf(settings.deck);
 export const isNew = (c) => !started(progress[c.f]);
 export const isDue = (c) => started(progress[c.f]) && progress[c.f].due <= today();
 
-// One array for the life of the session, so everyone holds the same queue.
-export const queue = [];
-const refill = (list) => { queue.length = 0; queue.push(...list); };
+// Every new list of cards is a new lesson.
+const refill = startLesson;
 
 const pri = (c) => progress[c.f]?.pri ?? 0;
 /** "More often" first and "less often" last; within that the newest lesson
@@ -50,9 +53,6 @@ export function buildQueue() {
   refill(withFavourites([...shuffle(all.filter(isDue)), ...unseen.slice(0, settings.perDay)]));
 }
 
-/** She waved the word off, so it leaves whatever is left of today's round. */
-export const dropFromQueue = (front) => refill(queue.filter((c) => c.f !== front));
-
 /** The eye, or "I know it" on a word tapped in a sentence. Either way the word
  *  no longer belongs in what she is going through right now. */
 export function flipKnown(front) {
@@ -60,7 +60,7 @@ export function flipKnown(front) {
   p.known = p.known ? 0 : 1;
   p.seen = today();
   saveProgress();
-  dropFromQueue(front);
+  drop(front);
   return p.known;
 }
 

@@ -2,14 +2,10 @@
 // lives in and how she is doing with it, in a small box right above it.
 import { $, esc } from './dom.js';
 import { progress, lifetime, flipStar, started } from './store.js';
-import { deck, flipKnown } from './boards.js';
+import { deck, flipKnown, cardOf } from './boards.js';
 import { isMemorized } from './schedule.js';
 import { play, SPEAKER } from './sound.js';
 import { priButtons, bindPri } from './priority.js';
-
-// The deck arrives once, before the first card is drawn.
-let byFront = null;
-const cardOf = (f) => (byFront ??= new Map(deck.cards.map((c) => [c.f, c]))).get(f);
 
 /** The colour of her word in a sentence: green once she knows it, orange while
  *  she is learning it, grey before she has started it. */

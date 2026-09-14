@@ -3,8 +3,9 @@ import { $, esc } from './dom.js';
 import { progress, settings, lifetime, doneToday, countDone, uncountDone,
          saveSettings, saveProgress, flipStar } from './store.js';
 import { answer, nextIn, isMemorized } from './schedule.js';
-import { deck, boardCards, poolOf, pool, queue, buildQueue, flipKnown, moreNew,
+import { deck, boardCards, poolOf, pool, buildQueue, flipKnown, moreNew,
          isNew, isDue } from './boards.js';
+import { queue, again, first, lesson, nextCard, keep, forget } from './lesson.js';
 import { play, SPEAKER } from './sound.js';
 import { yomi, openWord } from './word.js';
 import { priButtons, bindPri } from './priority.js';
@@ -17,6 +18,7 @@ export const currentCard = () => current;
 // rather than dropping her into whichever deck she chose last.
 export function home() {
   current = null;
+  forget();                                // so the boards, not a lesson, open next time
   const rows = [
     ['star', 'Bookmarks'],
     ...deck.decks.map((d) => [d.id, d.name]),
@@ -73,30 +75,40 @@ export function render() {
   const all = pool();
   $('star').hidden = $('back').hidden = false;
   $('main').className = 'study';
-  const left = queue.length;
-  // Short enough to survive any font: the buttons beside it must not be pushed.
-  $('counts').innerHTML = left ? `<b>${left}</b> to go · <b>${doneToday()}</b> ✓` : 'done for today';
+  current = nextCard();
+  // What is left of the lesson, this card included: it goes down at every card,
+  // whatever her answer. Short enough to survive any font beside the buttons.
+  const left = current ? queue.length + 1 : 0;
+  $('counts').innerHTML = left
+    ? `<b>${left}</b> ${lesson.repeating ? 'once more' : 'to go'} · <b>${doneToday()}</b> ✓` : 'lesson done';
   $('counts').title = left ? `${left} left, ${doneToday()} done today` : `${all.length} words in all`;
   $('star').className = 'icon' + (current && progress[current.f]?.star ? ' starred' : '');
-
-  if (!left) {
-    current = null;
-    stats();
-    const later = all.filter((c) => !isNew(c) && !isDue(c)).length;
-    const news = all.filter(isNew).length;
-    $('main').innerHTML = `<div class="done"><h2>Done for today</h2>
-      <div>${later} words are waiting for their day, ${news} have never been shown.</div>
-      <button class="wide" id="more">Show ${Math.min(settings.perDay, news)} more new words</button></div>`;
-    $('more')?.addEventListener('click', () => { moreNew(); render(); });
-    return;
-  }
-
-  current = queue.shift();
+  stats();
+  if (!current) { forget(); summary(all); return; }
+  keep(settings.deck, current);
   shown = false;
   revealed = false;
-  stats();
   draw();
   if (settings.autoPlay) play(current);   // the word speaks as soon as it is shown
+}
+
+// The end of the lesson: how it went, what she forgot, and the way back.
+function summary(all) {
+  const how = [...first.values()];
+  const n = (k) => how.filter((v) => v === k).length;
+  const rows = [['Words', how.length], ['Knew it', n('good')], ['Easy', n('easy')],
+    ['Forgot', n('again')], ['Skipped', n('skip')]].filter(([, v], i) => !i || v);
+  const missed = [...first].filter(([, v]) => v === 'again').map(([f]) => f);
+  const later = all.filter((c) => !isNew(c) && !isDue(c)).length;
+  const news = all.filter(isNew).length;
+  $('main').innerHTML = `<div class="done"><h2>${how.length ? 'Lesson done' : 'Done for today'}</h2>
+    ${how.length ? `<table>${rows.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('')}</table>` : ''}
+    ${missed.length ? `<div class="note">Forgot: ${missed.map(esc).join(' · ')}</div>` : ''}
+    <div>${later} words are waiting for their day, ${news} have never been shown.</div>
+    <button class="wide" id="boards">Back to the boards</button>
+    ${news ? `<button class="wide" id="more">Show ${Math.min(settings.perDay, news)} more new words</button>` : ''}</div>`;
+  $('boards').addEventListener('click', home);
+  $('more')?.addEventListener('click', () => { past.length = 0; moreNew(); render(); });
 }
 
 function draw() {
@@ -160,14 +172,13 @@ function draw() {
   $('hide').addEventListener('click', (e) => {
     e.stopPropagation();
     const before = snap(c);
-    const known = flipKnown(c.f);
-    moveOn(c, before, false, !!known);
+    moveOn(c, before, flipKnown(c.f) ? 'known' : 'unknown');
   });
   for (const g of ['again', 'good', 'easy']) {
     $(g)?.addEventListener('click', () => {
       const before = snap(c);
-      const again = answer(c, g);
-      moveOn(c, before, again, !again);
+      answer(c, g);
+      moveOn(c, before, g);
     });
   }
   bindPri($('face'), draw);
@@ -178,32 +189,45 @@ function draw() {
 // so a swipe back can put the card on screen again and undo what she did to it.
 const past = [];
 const snap = (c) => progress[c.f] && { ...progress[c.f] };
+/** What adds to "done today": a word she knew, or waved off as known. */
+const counted = (how) => how === 'good' || how === 'easy' || how === 'known';
 
-/** `pushed`: the card went to the back of the round. `counted`: it counted as done. */
-function moveOn(c, before, pushed, counted) {
-  past.push({ c, before, pushed, counted });
-  if (pushed) queue.push(c);
-  if (counted) countDone();
+/** `how`: her answer (again, good, easy), a skip, or the eye (known, unknown).
+ *  A forgotten or skipped card waits for the end of the lesson. */
+function moveOn(c, before, how) {
+  const noted = how !== 'known' && how !== 'unknown' && !first.has(c.f);
+  past.push({ c, before, how, noted, repeating: lesson.repeating });
+  if (noted) first.set(c.f, how);
+  if (how === 'again' || how === 'skip') again.push(c);
+  if (counted(how)) countDone();
   render();
 }
 
 const onCards = () => $('main').className === 'study' && !$('pop');
 
-/** A swipe to the right: past this card for now; it comes back later in the round. */
+/** A swipe to the left: past this card for now; it comes round once more at the end. */
 export function skip() {
-  if (onCards() && current) moveOn(current, snap(current), true, false);
+  if (onCards() && current) moveOn(current, snap(current), 'skip');
 }
 
-/** A swipe to the left: the card before, back on screen, with whatever she did
+/** A swipe to the right: the card before, back on screen, with whatever she did
  *  to it undone so she can answer it again. */
 export function back() {
   const h = onCards() && past.pop();
   if (!h) return;
-  const i = queue.lastIndexOf(h.c);
-  if (h.pushed && i >= 0) queue.splice(i, 1);
+  // It waits at the end of the lesson - or is on screen again, when it was the last card.
+  if (h.how === 'again' || h.how === 'skip') {
+    if (current === h.c) current = null;
+    else for (const list of [again, queue]) {
+      const i = list.lastIndexOf(h.c);
+      if (i >= 0) { list.splice(i, 1); break; }
+    }
+  }
   if (h.before) progress[h.c.f] = h.before; else delete progress[h.c.f];
   saveProgress();
-  if (h.counted) uncountDone();
+  if (counted(h.how)) uncountDone();
+  if (h.noted) first.delete(h.c.f);
+  lesson.repeating = h.repeating;
   if (current) queue.unshift(current);
   queue.unshift(h.c);
   render();

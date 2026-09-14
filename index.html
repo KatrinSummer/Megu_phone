@@ -33,7 +33,11 @@
     --w-know:#4ec9a0; --w-learn:#f0a04b; --w-new:#c4c4c4;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
-  html,body{height:100%}
+  /* Nothing scrolls as a whole page - the board list and the card scroll inside
+     themselves - so a sideways swipe has nothing to slide.  On her phone it slid
+     the whole screen, header and all, a little off to one side. */
+  html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+  body{position:fixed;inset:0}
   body{margin:0;background:var(--bg);color:var(--ink);
     font:16px/1.5 -apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",system-ui,sans-serif;
     display:flex;flex-direction:column;
@@ -61,7 +65,6 @@
   /* On a card only the card scrolls: the buttons under it never move.  A swipe
      across it is hers (next / back), not the browser's history gesture. */
   main.study{overflow:hidden;touch-action:pan-y}
-  html,body{overscroll-behavior-x:none}
   main>*{flex-shrink:0}
   .deck{display:flex;justify-content:space-between;align-items:center;gap:12px;
     width:100%;padding:16px;border-radius:14px;text-align:left;
@@ -100,7 +103,7 @@
 
   /* No box: the word is the whole point, and a border around it only boxed in
      the empty space that a short word leaves. */
-  .card{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;position:relative;
+  .card{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;position:relative;
     padding:40px 20px 24px;text-align:center;display:flex;flex-direction:column;gap:14px}
   /* Centred while it fits, scrolled from its top when it does not.  Centring
      with justify-content cut the top off a long card and slid its bottom under
@@ -135,9 +138,10 @@
   .ex button:active:not(:disabled){opacity:.55}
   .ex svg{flex:none;width:16px;height:16px;margin-top:5px;fill:none;stroke:currentColor;
     stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-  /* Her other words in the kana line, in the colour of how well she knows them
-     and underlined in it: a thin dotted line vanished on the night theme. */
-  .ex .w{font-weight:600;text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:3px}
+  /* Her other words in the kana line, dotted underneath - the way she likes it -
+     in the colour of how well she knows them.  The dots are that colour too: a
+     grey dotted line of its own vanished on the night theme. */
+  .ex .w{font-weight:600;text-decoration:underline dotted;text-decoration-thickness:1.5px;text-underline-offset:4px}
   .ex .w.know{color:var(--w-know)}
   .ex .w.learn{color:var(--w-learn)}
   .ex .w.new{color:var(--w-new)}
@@ -191,6 +195,8 @@
   .starred{color:var(--star);border-color:var(--star)}
   .done{text-align:center;padding:40px 20px;color:var(--dim)}
   .done h2{color:var(--ink);font-size:22px;margin:0 0 8px}
+  .done table{margin:4px 0 14px}
+  .done td:first-child{text-align:left}
 
   dialog{border:1px solid var(--line);border-bottom:0;border-radius:18px 18px 0 0;background:var(--card);color:var(--ink);
     padding:20px;width:100%;max-width:520px;margin:auto auto 0;
