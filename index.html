@@ -23,11 +23,14 @@
     /* The one warm thing on the resting screen, so the app reads yellow-white
        and not merely white.  At night both fall back to the plain card. */
     --warm:#fff8e3; --warm-line:#eccf7e;
+    /* Her words inside a sentence: known, being learned, not started yet. */
+    --w-know:#1e8a50; --w-learn:#d46b08; --w-new:#8a8a8a;
   }
   :root[data-theme="dark"]{
     --bg:#191b28; --card:#232637; --line:#33374d; --ink:#e9eaf2; --dim:#9aa0b8;
     --good:#4ec9a0; --hard:#e8b64c; --again:#e8746a; --star:#f0c04a;
     --warm:var(--card); --warm-line:var(--line);
+    --w-know:#4ec9a0; --w-learn:#f0a04b; --w-new:#c4c4c4;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
   html,body{height:100%}
@@ -55,6 +58,11 @@
     padding:16px;gap:16px;overflow-y:auto;position:relative}
   /* A long list of boards has to start at the top, not sit centred and clipped. */
   main.home{justify-content:flex-start;gap:10px}
+  /* On a card only the card scrolls: the buttons under it never move.  A swipe
+     across it is hers (next / back), not the browser's history gesture. */
+  main.study{overflow:hidden;touch-action:pan-y}
+  html,body{overscroll-behavior-x:none}
+  main>*{flex-shrink:0}
   .deck{display:flex;justify-content:space-between;align-items:center;gap:12px;
     width:100%;padding:16px;border-radius:14px;text-align:left;
     border:1px solid var(--line);background:var(--card)}
@@ -84,7 +92,7 @@
 
   /* "I know this one" lives in the corner of the screen, out of the way of the
      card: it is a rare press, and a row of its own only got in the way. */
-  #hide{position:absolute;top:4px;right:10px;padding:7px;border-radius:10px;color:var(--dim)}
+  #hide{position:absolute;top:0;right:0;z-index:1;padding:7px;border-radius:10px;color:var(--dim)}
   #hide svg{width:22px;height:22px;display:block;fill:none;stroke:currentColor;
     stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
   #hide:active{background:var(--line)}
@@ -92,11 +100,19 @@
 
   /* No box: the word is the whole point, and a border around it only boxed in
      the empty space that a short word leaves. */
-  .card{padding:28px 20px;text-align:center;min-height:44vh;
-    display:flex;flex-direction:column;justify-content:center;gap:14px}
+  .card{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;position:relative;
+    padding:40px 20px 24px;text-align:center;display:flex;flex-direction:column;gap:14px}
+  /* Centred while it fits, scrolled from its top when it does not.  Centring
+     with justify-content cut the top off a long card and slid its bottom under
+     the buttons. */
+  .card>*{flex-shrink:0}
+  .card>#hide+*{margin-top:auto}
+  .card>:last-child{margin-bottom:auto}
   /* Front: the word as it is written in kana, with its kanji small above it. */
   .kanji{font-size:min(6.4vw,23px);font-weight:700;color:var(--dim);line-height:1.3;word-break:break-word}
   .kana{font-size:min(13vw,46px);font-weight:600;line-height:1.25;word-break:break-word}
+  /* A whole phrase at that size is three lines of the screen. */
+  .kana.long{font-size:min(8.5vw,32px)}
   /* Back: how it is read, then what it means. */
   .back{display:flex;flex-direction:column;gap:9px}
   .reading{font-size:17px;color:var(--dim);letter-spacing:.02em}
@@ -106,7 +122,8 @@
     font-size:16px;line-height:1.5;color:var(--dim)}
   /* Each sentence is its own button: a tap says it, and does not turn the card. */
   .ex button{font:inherit;color:inherit;background:none;border:0;padding:4px 0;margin:0;
-    display:flex;gap:7px;align-items:flex-start;justify-content:center;text-align:left;cursor:pointer}
+    display:flex;gap:7px;align-items:flex-start;justify-content:flex-start;text-align:left;cursor:pointer;
+    width:100%}   /* left, not centred: a short sentence pushed its speaker inwards */
   .ex button:disabled{cursor:default}
   .ex button:focus:not(:focus-visible){outline:none}
   .ex .lines{display:flex;flex-direction:column;gap:2px}
@@ -118,8 +135,18 @@
   .ex button:active:not(:disabled){opacity:.55}
   .ex svg{flex:none;width:16px;height:16px;margin-top:5px;fill:none;stroke:currentColor;
     stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-  /* Her other words in the kana line: the dotted line says a tap opens the word. */
-  .ex .w{text-decoration:underline dotted;text-decoration-thickness:1px;text-underline-offset:3px}
+  /* Her other words in the kana line, in the colour of how well she knows them
+     and underlined in it: a thin dotted line vanished on the night theme. */
+  .ex .w{font-weight:600;text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:3px}
+  .ex .w.know{color:var(--w-know)}
+  .ex .w.learn{color:var(--w-learn)}
+  .ex .w.new{color:var(--w-new)}
+  /* How often she wants the word: small, under everything else on the back. */
+  .pri{display:flex;justify-content:center;gap:6px}
+  .pri button{padding:6px 11px;border-radius:999px;border:1px solid var(--line);font-size:12px;color:var(--dim)}
+  .pri .on{color:var(--ink);border-color:var(--ink);font-weight:600}
+  #pop .pri{margin-top:8px}
+  #pop .pri button{flex:1;padding:7px 4px}
   /* The word she tapped, in a box right above it, over a clear sheet that only
      closes it - a tap beside the box must not turn the card or say anything. */
   #pop{position:fixed;inset:0;z-index:5}
@@ -178,7 +205,6 @@
     body{max-width:560px;margin:0 auto;
       border-left:1px solid var(--line);border-right:1px solid var(--line)}
     dialog{margin:auto;border:1px solid var(--line);border-radius:18px;max-height:84vh}
-    .card{min-height:38vh}
   }
   dialog h3{margin:0 0 14px;font-size:18px}
   label{display:block;margin:12px 0 4px;font-size:13px;color:var(--dim)}

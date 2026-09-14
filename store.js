@@ -44,11 +44,19 @@ export const countDone = () => {
   settings.doneOn = today();
   saveSettings();
 };
+/** A swipe back took an answer away again. */
+export const uncountDone = () => {
+  settings.doneCount = Math.max(0, doneToday() - 1);
+  settings.doneOn = today();
+  saveSettings();
+};
 
 /** A word she has never answered. `total` is the count that survives a slip. */
 export const fresh = () => ({ due: today(), iv: 0, ease: 2.5, reps: 0, total: 0, lapses: 0, star: 0 });
 /** Older saves have no `total`; back then `reps` was the count, so read it. */
 export const lifetime = (p) => p.total ?? p.reps ?? 0;
+/** She has answered it at least once. A star or a priority alone is not a start. */
+export const started = (p) => !!p && (lifetime(p) > 0 || (p.lapses ?? 0) > 0);
 
 /** The bookmark, on this card or a word tapped in a sentence. It is not
  *  progress, so it leaves `seen` alone: a star must not win a backup merge. */

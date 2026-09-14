@@ -7,20 +7,25 @@
 // boards.js    which words she is shown, and in what order
 // sound.js     saying the word out loud
 // screens.js   what is on the screen
+// word.js      a word of hers tapped inside a sentence
+// priority.js  how often she wants a word
+// swipe.js     which way her finger went
 // backup.js    moving progress between two phones
 // menu.js      the settings sheet
 import { $ } from './dom.js';
 import { progress, doneToday, lifetime, saveProgress } from './store.js';
 import { deck, setDeck, queue } from './boards.js';
-import { answer } from './schedule.js';
+import { answer, setPri } from './schedule.js';
 import { merge } from './backup.js';
 import { playing, sayOnFirstTap } from './sound.js';
-import { home, render, stats, currentCard, toggleStar } from './screens.js';
+import { home, stats, currentCard, toggleStar, skip, back } from './screens.js';
 import { openMenu } from './menu.js';
+import { onSwipe } from './swipe.js';
 
 $('menu').addEventListener('click', openMenu);
 $('back').addEventListener('click', home);
 $('star').addEventListener('click', toggleStar);
+onSwipe($('main'), { right: skip, left: back });
 sayOnFirstTap(currentCard);
 
 fetch('deck.json').then((r) => r.json()).then((d) => { setDeck(d); home(); });
@@ -57,7 +62,7 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) chec
 // Only on a local machine: lets scripts/check-pwa.mjs test the schedule and the
 // merge for real instead of poking at the screen.
 if (['127.0.0.1', 'localhost'].includes(location.hostname)) {
-  window.megu = { merge, answer, stats, home, checkForUpdate, saveProgress, doneToday, lifetime,
+  window.megu = { merge, answer, setPri, stats, home, checkForUpdate, saveProgress, doneToday, lifetime,
                   get progress() { return progress; }, get deck() { return deck; },
                   get audioSrc() { return playing(); }, get current() { return currentCard(); },
                   get queue() { return queue; } };

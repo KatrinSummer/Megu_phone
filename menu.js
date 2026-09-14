@@ -1,18 +1,17 @@
 // The settings sheet: the numbers, the switches, and the way in and out of a
 // backup file.
 import { $ } from './dom.js';
-import { progress, settings, today, doneToday, saveSettings, applyTheme } from './store.js';
-import { deck, pool, buildQueue } from './boards.js';
+import { progress, settings, doneToday, saveSettings, applyTheme, started } from './store.js';
+import { deck, pool, buildQueue, isNew, isDue } from './boards.js';
 import { saveFile, loadFile } from './backup.js';
 import { render } from './screens.js';
 
 export function openMenu() {
-  const t = today();
   const all = Object.values(progress);
   const rows = [
     ['words in all', deck.cards.length],
-    ['started', all.length],
-    ['due today', pool().filter((c) => !progress[c.f] || progress[c.f].due <= t).length],
+    ['started', all.filter(started).length],
+    ['due today', pool().filter((c) => isNew(c) || isDue(c)).length],
     ['bookmarked', all.filter((p) => p.star).length],
     ['known over a month', all.filter((p) => p.iv >= 30).length],
     ['done today', doneToday()],

@@ -1,5 +1,5 @@
 // Which words she is shown, and in what order.
-import { progress, settings, today, fresh, saveProgress } from './store.js';
+import { progress, settings, today, fresh, saveProgress, started } from './store.js';
 
 export const deck = { cards: [], decks: [] };
 export const setDeck = (d) => Object.assign(deck, d);
@@ -18,20 +18,36 @@ export const poolOf = (id) => id === 'known' ? boardCards(id)
   : boardCards(id).filter((c) => !progress[c.f]?.known);
 export const pool = () => poolOf(settings.deck);
 
+/** Never answered: a star or a priority set on a word does not start it. */
+export const isNew = (c) => !started(progress[c.f]);
+export const isDue = (c) => started(progress[c.f]) && progress[c.f].due <= today();
+
 // One array for the life of the session, so everyone holds the same queue.
 export const queue = [];
 const refill = (list) => { queue.length = 0; queue.push(...list); };
 
-/** Newest lesson first, so what she just learned is what she sees first. */
-const byNewest = (a, b) => (b.when || '').localeCompare(a.when || '');
+const pri = (c) => progress[c.f]?.pri ?? 0;
+/** "More often" first and "less often" last; within that the newest lesson
+ *  first, so what she just learned is what she sees first. */
+const byTurn = (a, b) => pri(b) - pri(a) || (b.when || '').localeCompare(a.when || '');
+const shuffle = (list) => list.sort(() => Math.random() - 0.5);
+
+/** The words she wants more often turn up in any board's round, at random, due
+ *  or not and whether or not they belong to it - about one card in five. */
+function withFavourites(list) {
+  const here = new Set(list.map((c) => c.f));
+  const extra = shuffle(deck.cards.filter((c) => pri(c) === 1 && !progress[c.f].known && !here.has(c.f)))
+    .slice(0, Math.ceil(list.length / 5));
+  for (const c of extra) list.splice(Math.floor(Math.random() * (list.length + 1)), 0, c);
+  return list;
+}
 
 export function buildQueue() {
-  const t = today(), all = pool();
+  const all = pool();
   // The Known board is not a lesson, it is the list she goes through to undo.
   if (settings.deck === 'known') return refill(all);
-  const due = all.filter((c) => progress[c.f] && progress[c.f].due <= t);
-  const unseen = all.filter((c) => !progress[c.f]).sort(byNewest);
-  refill([...due.sort(() => Math.random() - 0.5), ...unseen.slice(0, settings.perDay)]);
+  const unseen = all.filter(isNew).sort(byTurn);
+  refill(withFavourites([...shuffle(all.filter(isDue)), ...unseen.slice(0, settings.perDay)]));
 }
 
 /** She waved the word off, so it leaves whatever is left of today's round. */
@@ -50,4 +66,4 @@ export function flipKnown(front) {
 
 /** "Show more new words" on the done screen. */
 export const moreNew = () =>
-  refill(pool().filter((c) => !progress[c.f]).sort(byNewest).slice(0, settings.perDay));
+  refill(pool().filter(isNew).sort(byTurn).slice(0, settings.perDay));
