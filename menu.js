@@ -16,6 +16,8 @@ export function openMenu() {
     ['known over a month', all.filter((p) => p.iv >= 30).length],
     ['done today', doneToday()],
     ['marked as known', all.filter((p) => p.known).length],
+    // When this copy of the app was published, so two phones can be compared.
+    ['version', new Date(document.lastModified).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })],
   ];
   $('sheet').innerHTML = `
     <h3>Megu</h3>

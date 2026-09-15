@@ -141,7 +141,9 @@
   /* Her other words in the kana line, dotted underneath - the way she likes it -
      in the colour of how well she knows them.  The dots are that colour too: a
      grey dotted line of its own vanished on the night theme. */
-  .ex .w{font-weight:600;text-decoration:underline dotted;text-decoration-thickness:1.5px;text-underline-offset:4px}
+  /* Dots drawn as a border, not an underline: an underline with a style in it
+     showed on the computer and not on her phone. */
+  .ex .w{font-weight:600;border-bottom:1.5px dotted currentColor;padding-bottom:1px}
   .ex .w.know{color:var(--w-know)}
   .ex .w.learn{color:var(--w-learn)}
   .ex .w.new{color:var(--w-new)}
