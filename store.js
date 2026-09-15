@@ -10,12 +10,21 @@ const read = (k, fallback) => {
   try { return JSON.parse(localStorage.getItem(k)) ?? fallback; } catch { return fallback; }
 };
 
-// Front -> {due, iv, ease, reps, total, lapses, star, known, seen}
+// Front -> {due, iv, ease, reps, total, lapses, star, known, hide, seen}
+// known is the tick, "I know it"; hide is the eye, "not important".
 export let progress = read(P_KEY, {});
 export const setProgress = (p) => { progress = p; };
 
-export const settings = { deck: 'last', perDay: 20, autoPlay: true, theme: 'light',
+// mode: what the board's page last started, a lesson of new words or a review.
+export const settings = { deck: 'last', mode: 'learn', perDay: 20, autoPlay: true, theme: 'light',
                           doneOn: 0, doneCount: 0, ...read(S_KEY, {}) };
+
+/** The eye used to mean "I know it"; now it means "not important". She chose
+ *  to have everything she had marked with it hidden, not counted as known. */
+export const splitEye = (prog) => {
+  for (const p of Object.values(prog)) if (p.known) { p.hide = 1; delete p.known; }
+  return prog;
+};
 
 // A phone can refuse to write: no room left, or private browsing. Failing in
 // silence is the worst thing this app can do, so it says so and keeps saying so
@@ -34,6 +43,12 @@ function write(key, value) {
 }
 export const saveProgress = () => write(P_KEY, progress);
 export const saveSettings = () => write(S_KEY, settings);
+// Once, on the first start of the version where the eye and the tick parted.
+if (!settings.eyeSplit) {
+  splitEye(progress);
+  settings.eyeSplit = 1;
+  if (saveProgress()) saveSettings();
+}
 
 /** The lesson she is in, so that a reload finds her where she was. */
 const L_KEY = 'megu.lesson.v1';

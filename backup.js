@@ -1,6 +1,6 @@
 // Moving progress between her phone and her computer, and putting two copies
 // of it back together.
-import { progress, setProgress, lifetime, saveProgress } from './store.js';
+import { progress, setProgress, lifetime, saveProgress, splitEye } from './store.js';
 
 /** Two phones, one word: keep the further-along schedule and lose nothing else.
  *  Taking the newer record whole used to drop a bookmark the newer side had
@@ -30,7 +30,8 @@ export function merge(a, b) {
 // the only way the file reaches Files. Everywhere else the link still works.
 export async function saveFile(say) {
   const name = `megu-progress-${new Date().toISOString().slice(0, 10)}.json`;
-  const body = JSON.stringify({ progress }, null, 1);
+  // v2: `known` is the tick. A file with no v is older, and its `known` was the eye.
+  const body = JSON.stringify({ v: 2, progress }, null, 1);
   const file = new File([body], name, { type: 'application/json' });
   if (navigator.canShare?.({ files: [file] })) {
     try { await navigator.share({ files: [file] }); say('now pick Save to Files'); }
@@ -52,7 +53,8 @@ export function loadFile(file, say, after) {
     try {
       const data = JSON.parse(r.result);
       const before = Object.keys(progress).length;
-      setProgress(merge(progress, data.progress ?? data));
+      const theirs = data.progress ?? data;
+      setProgress(merge(progress, data.v >= 2 ? theirs : splitEye(theirs)));
       saveProgress();
       say(`was ${before} words, now ${Object.keys(progress).length}`);
       after();

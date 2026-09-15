@@ -1,77 +1,79 @@
 // What is on the screen: the list of boards, the two bars, and the card.
 import { $, esc } from './dom.js';
 import { progress, settings, lifetime, doneToday, countDone, uncountDone,
-         saveSettings, saveProgress, flipStar, today } from './store.js';
+         saveProgress, flipStar, today } from './store.js';
 import { answer, nextIn, isMemorized } from './schedule.js';
-import { deck, boardCards, poolOf, pool, buildQueue, flipKnown, isReview,
-         isNew, isDue } from './boards.js';
+import { deck, boardCards, poolOf, pool, buildQueue, flipMark, isOutBoard,
+         learnable, reviewable, isNew, isDue } from './boards.js';
 import { queue, again, first, lesson, nextCard, keep, forget } from './lesson.js';
 import { play, SPEAKER } from './sound.js';
 import { yomi, openWord } from './word.js';
 import { priButtons, bindPri } from './priority.js';
+import { openBoard, boardName } from './page.js';
 
 let current = null, shown = false, revealed = false;
 export const currentCard = () => current;
+
+/** Out of the lesson, onto a screen with no card: the boards or a board's page. */
+export function leave() {
+  current = null;
+  forget();                                // so the boards, not a lesson, open next time
+}
+
+/** The lesson or review the page's button asked for. */
+export function begin() {
+  past.length = 0;                         // a swipe back never leaves the lesson
+  buildQueue();
+  render();
+}
 
 // ---------------------------------------------------------------- boards
 // Nothing is reviewed until she picks a board, so the app opens on the list
 // rather than dropping her into whichever deck she chose last.
 export function home() {
-  current = null;
-  forget();                                // so the boards, not a lesson, open next time
-  const rows = [
-    ['learning', 'Review'],
-    ['star', 'Bookmarks'],
-    ...deck.decks.map((d) => [d.id, d.name]),
-    ...(Object.values(progress).some((p) => p.known) ? [['known', 'Marked as known']] : []),
-  ];
+  leave();
+  const some = (k) => Object.values(progress).some((p) => p[k]);
+  const ids = ['learning', 'star', ...deck.decks.map((d) => d.id),
+    ...(some('known') ? ['known'] : []), ...(some('hide') ? ['hidden'] : [])];
   $('star').hidden = $('back').hidden = true;
   $('stats').hidden = true;
   $('counts').innerHTML = `<b>${deck.cards.length}</b> words`;
-  $('counts').title = 'pick a board to start';
+  $('counts').title = 'pick a board';
   $('main').className = 'home';
-  $('main').innerHTML = rows.map(([id, name]) => {
+  $('main').innerHTML = ids.map((id) => {
     const cards = poolOf(id);
     const due = cards.filter(isDue).length;
     const unseen = cards.filter(isNew).length;
-    // A deck is for learning, so what it offers is its new words; a review
-    // offers everything in it, and says how much of that is due.
-    const offer = id === 'known' || isReview(id) ? cards.length : unseen;
     const note = !cards.length ? 'empty'
-      : id === 'known' ? `${cards.length} words`
-      : isReview(id) ? `${due ? `${due} due` : 'nothing due'} · ${cards.length} words`
-      : unseen ? `${unseen} new` : 'all started';
-    return `<button class="deck" data-id="${esc(id)}" ${offer ? '' : 'disabled'}>
-      <span class="n">${esc(name)}</span><span class="s">${note}</span></button>`;
+      : [!isOutBoard(id) && unseen && `${unseen} new`, !isOutBoard(id) && due && `${due} due`,
+        `${cards.length} words`].filter(Boolean).join(' · ');
+    return `<button class="deck" data-id="${esc(id)}" ${cards.length ? '' : 'disabled'}>
+      <span class="n">${esc(boardName(id))}</span><span class="s">${note}</span></button>`;
   }).join('');
   for (const b of document.querySelectorAll('.deck')) {
-    b.addEventListener('click', () => {
-      settings.deck = b.dataset.id;
-      saveSettings();
-      past.length = 0;                     // a swipe back never leaves the board
-      buildQueue();
-      render();
-    });
+    b.addEventListener('click', () => openBoard(b.dataset.id));
   }
 }
 
 // ---------------------------------------------------------------- stats
 // Learning is what she has started; Memorized is what the schedule has parked
-// for over a month, plus whatever she waved off herself.  The circle is about
-// the word on screen, not the board: how many times it has come up in all.
+// for over a month, plus whatever she ticked as known.  A word she hid as not
+// important does not count against the board.  The circle is about the word on
+// screen, not the board: how many times it has come up in all.
 export function stats() {
-  const cards = boardCards(settings.deck);
+  const id = settings.deck;
+  const cards = boardCards(id).filter((c) => id === 'hidden' || !progress[c.f]?.hide);
   const mem = cards.filter(isMemorized).length;
   const learn = cards.filter((c) => progress[c.f] && !isMemorized(c)).length;
   const pct = (n) => (cards.length ? Math.round((n / cards.length) * 100) : 0);
   const p = current ? progress[current.f] : null;
   // reps goes back to zero on a slip, so counting rounds with it ran backwards.
-  const round = current ? lifetime(p ?? {}) + (p?.lapses ?? 0) + 1 : '-';
+  const round = current ? lifetime(p ?? {}) + (p?.lapses ?? 0) + 1 : '';
   $('stats').hidden = false;
   $('stats').innerHTML = `
     <div class="bar"><div class="t"><span>Learning</span><b>${learn}/${cards.length}</b></div>
       <div class="track"><div class="fill" style="width:${pct(learn)}%"></div></div></div>
-    <div class="round" title="times this word has come up"><span class="l">round</span><span class="n">${round}</span></div>
+    ${current ? `<div class="round" title="times this word has come up"><span class="l">round</span><span class="n">${round}</span></div>` : ''}
     <div class="bar mem"><div class="t"><span>Memorized</span><b>${mem}/${cards.length}</b></div>
       <div class="track"><div class="fill" style="width:${pct(mem)}%"></div></div></div>`;
 }
@@ -90,7 +92,7 @@ export function render() {
   $('counts').title = left ? `${left} left, ${doneToday()} done today` : `${all.length} words in all`;
   $('star').className = 'icon' + (current && progress[current.f]?.star ? ' starred' : '');
   stats();
-  if (!current) { forget(); summary(all); return; }
+  if (!current) { forget(); summary(); return; }
   keep(settings.deck, current);
   shown = false;
   revealed = false;
@@ -99,25 +101,25 @@ export function render() {
 }
 
 // The end of the lesson: how it went, what she forgot, and the way back.
-function summary(all) {
+function summary() {
   const how = [...first.values()];
   const n = (k) => how.filter((v) => v === k).length;
   const rows = [['Words', how.length], ['Knew it', n('good')], ['Easy', n('easy')],
     ['Forgot', n('again')], ['Skipped', n('skip')]].filter(([, v], i) => !i || v);
   const missed = [...first].filter(([, v]) => v === 'again').map(([f]) => f);
-  // What is left: a review has the words not seen today, a deck its new words.
-  const rev = isReview(settings.deck);
-  const left = (rev ? all.filter((c) => progress[c.f]?.seen !== today()) : all.filter(isNew)).length;
+  // What is left: a review has the words not seen today, a lesson its new words.
+  const rev = settings.mode === 'review', id = settings.deck;
+  const left = (rev ? reviewable(id).filter((c) => progress[c.f]?.seen !== today()) : learnable(id)).length;
   const more = Math.min(settings.perDay, left);
   $('main').innerHTML = `<div class="done"><h2>${how.length ? 'Lesson done' : 'Done for today'}</h2>
     ${how.length ? `<table>${rows.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('')}</table>` : ''}
     ${missed.length ? `<div class="note">Forgot: ${missed.map(esc).join(' · ')}</div>` : ''}
     <div>${rev ? `${left} more to review today.` : left ? `${left} new words left on this board.`
-      : 'Every word of this board has been started: they come back in Review.'}</div>
-    <button class="wide" id="boards">Back to the boards</button>
+      : 'Every word of this board has been started: review them from its page.'}</div>
+    <button class="wide" id="boards">Back to the board</button>
     ${more ? `<button class="wide" id="more">${rev ? `Review ${more} more` : `Show ${more} more new words`}</button>` : ''}</div>`;
-  $('boards').addEventListener('click', home);
-  $('more')?.addEventListener('click', () => { past.length = 0; buildQueue(); render(); });
+  $('boards').addEventListener('click', () => openBoard(id));
+  $('more')?.addEventListener('click', begin);
 }
 
 function draw() {
@@ -128,12 +130,14 @@ function draw() {
   // The word itself is the question, in the kana she reads it in, with the
   // kanji sitting small above it.  The answer is the sound and the meaning.
   // The card scrolls by itself when the back does not fit, above buttons that
-  // stay put; the eye sits in its corner and scrolls with it.
+  // stay put; the eye and the tick sit in its corner and scroll with it.
   $('main').innerHTML = `
     <div class="card" id="face">
-      <button id="hide" class="${p?.known ? 'on' : ''}"
-        aria-label="I know this one, stop showing it" title="I know this one, stop showing it">
+      <button id="hide" class="${p?.hide ? 'on' : ''}"
+        aria-label="Not important, stop showing it" title="Not important, stop showing it">
         <svg viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.7 5.3A9.4 9.4 0 0112 5.2c5 0 9 4.3 9 6.8 0 .9-.5 2-1.4 3.1M6.6 7.4C4.1 8.9 3 10.9 3 12c0 2.5 4 6.8 9 6.8 1.5 0 2.9-.4 4.1-1"/><path d="M9.9 10.1a3 3 0 004.2 4.2"/></svg></button>
+      <button id="know" class="${p?.known ? 'on' : ''}" aria-label="I know this one" title="I know this one">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.3 12.3l2.5 2.5 5-5.2"/></svg></button>
       ${c.k ? `<div class="kanji">${esc(c.k)}</div>` : ''}
       <div class="kana${[...c.f].length > 7 ? ' long' : ''}">${esc(c.f)}</div>
       <button id="say" aria-label="Say it" title="Say it">
@@ -177,12 +181,14 @@ function draw() {
     });
   }
   $('reveal')?.addEventListener('click', flip);
-  // The eye is on the card now, so its tap must not also turn it over.
-  $('hide').addEventListener('click', (e) => {
-    e.stopPropagation();
-    const before = snap(c);
-    moveOn(c, before, flipKnown(c.f) ? 'known' : 'unknown');
-  });
+  // The eye and the tick are on the card, so their tap must not also turn it over.
+  for (const [btn, key, on, off] of [['hide', 'hide', 'hidden', 'shown'], ['know', 'known', 'known', 'unknown']]) {
+    $(btn).addEventListener('click', (e) => {
+      e.stopPropagation();
+      const before = snap(c);
+      moveOn(c, before, flipMark(c.f, key) ? on : off);
+    });
+  }
   for (const g of ['again', 'good', 'easy']) {
     $(g)?.addEventListener('click', () => {
       const before = snap(c);
@@ -198,13 +204,15 @@ function draw() {
 // so a swipe back can put the card on screen again and undo what she did to it.
 const past = [];
 const snap = (c) => progress[c.f] && { ...progress[c.f] };
-/** What adds to "done today": a word she knew, or waved off as known. */
+/** What adds to "done today": a word she knew, or ticked as known. Hiding one
+ *  as not important is not learning it. */
 const counted = (how) => how === 'good' || how === 'easy' || how === 'known';
+const MARKS = new Set(['known', 'unknown', 'hidden', 'shown']);
 
-/** `how`: her answer (again, good, easy), a skip, or the eye (known, unknown).
- *  A forgotten or skipped card waits for the end of the lesson. */
+/** `how`: her answer (again, good, easy), a skip, the tick (known, unknown) or
+ *  the eye (hidden, shown). A forgotten or skipped card waits for the end of the lesson. */
 function moveOn(c, before, how) {
-  const noted = how !== 'known' && how !== 'unknown' && !first.has(c.f);
+  const noted = !MARKS.has(how) && !first.has(c.f);
   past.push({ c, before, how, noted, repeating: lesson.repeating });
   if (noted) first.set(c.f, how);
   if (how === 'again' || how === 'skip') again.push(c);

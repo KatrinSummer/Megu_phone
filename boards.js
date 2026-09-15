@@ -13,20 +13,31 @@ export const cardOf = (f) => (byFront ??= new Map(deck.cards.map((c) => [c.f, c]
 // There is no board of every word: she splits them into decks on purpose.
 export const boardCards = (id) => id === 'star' ? deck.cards.filter((c) => progress[c.f]?.star)
   : id === 'known' ? deck.cards.filter((c) => progress[c.f]?.known)
+  : id === 'hidden' ? deck.cards.filter((c) => progress[c.f]?.hide)
   // Review: every word she has started, from every deck.
   : id === 'learning' ? deck.cards.filter((c) => started(progress[c.f]))
   // A word sits in its own deck and may also sit in a review deck like Last.
   : deck.cards.filter((c) => c.d === id || c.last === id);
 
-// What she will actually be shown.  The Known board is the way back: open it
-// and press the eye again to put a word back into rotation.
-export const poolOf = (id) => id === 'known' ? boardCards(id)
-  : boardCards(id).filter((c) => !progress[c.f]?.known);
+/** Out of the round: she ticked it as known, or hid it as not important. */
+export const isOut = (c) => !!(progress[c.f]?.known || progress[c.f]?.hide);
+
+/** The Known and Hidden boards are the way back, not a lesson: the box of a
+ *  word on their page puts it back into rotation. */
+export const isOutBoard = (id) => id === 'known' || id === 'hidden';
+
+// What she will actually be shown.
+export const poolOf = (id) => isOutBoard(id) ? boardCards(id)
+  : boardCards(id).filter((c) => !isOut(c));
 export const pool = () => poolOf(settings.deck);
 
 /** Never answered: a star or a priority set on a word does not start it. */
 export const isNew = (c) => !started(progress[c.f]);
 export const isDue = (c) => started(progress[c.f]) && progress[c.f].due <= today();
+
+/** What the two buttons on a board's page start: its new words, and its started ones. */
+export const learnable = (id) => poolOf(id).filter(isNew);
+export const reviewable = (id) => poolOf(id).filter((c) => !isNew(c));
 
 // Every new list of cards is a new lesson.
 const refill = startLesson;
@@ -47,9 +58,6 @@ function withFavourites(list) {
   return list;
 }
 
-/** The boards she goes through to repeat what she has started, not to learn. */
-export const isReview = (id) => id === 'learning' || id === 'star';
-
 /** The word whose day came first goes first; one already done today goes last,
  *  so "review more" moves on instead of starting over with what she just saw. */
 const byDue = (a, b) => {
@@ -57,23 +65,26 @@ const byDue = (a, b) => {
   return (p?.seen === today()) - (q?.seen === today()) || (p?.due ?? 0) - (q?.due ?? 0);
 };
 
+/** What the page's button started: `settings.mode` is 'learn' or 'review'. */
 export function buildQueue() {
-  const all = pool(), n = settings.perDay;
-  // The Known board is not a lesson, it is the list she goes through to undo.
-  if (settings.deck === 'known') return refill(all);
-  // A review: n of her words, whether their day has come or not.
-  if (isReview(settings.deck)) return refill(withFavourites(all.sort(byDue).slice(0, n)).slice(0, n));
-  // A lesson is for learning: new words only. What she has started comes back in Review.
-  refill(all.filter(isNew).sort(byTurn).slice(0, n));
+  const id = settings.deck, n = settings.perDay;
+  // A review: n of her started words, whether their day has come or not.
+  if (settings.mode === 'review') {
+    return refill(withFavourites(reviewable(id).sort(byDue).slice(0, n)).slice(0, n));
+  }
+  // A lesson is for learning: new words only. What she has started comes back in a review.
+  refill(learnable(id).sort(byTurn).slice(0, n));
 }
 
-/** The eye, or "I know it" on a word tapped in a sentence. Either way the word
- *  no longer belongs in what she is going through right now. */
-export function flipKnown(front) {
+/** `key` is 'known' (the tick, "I know it") or 'hide' (the eye, "not
+ *  important"). The one clears the other; either way the word no longer
+ *  belongs in what she is going through right now. */
+export function flipMark(front, key) {
   const p = progress[front] ??= fresh();
-  p.known = p.known ? 0 : 1;
+  p[key] = p[key] ? 0 : 1;
+  if (p[key]) p[key === 'known' ? 'hide' : 'known'] = 0;
   p.seen = today();
   saveProgress();
   drop(front);
-  return p.known;
+  return p[key];
 }

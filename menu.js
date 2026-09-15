@@ -2,7 +2,7 @@
 // backup file.
 import { $ } from './dom.js';
 import { progress, settings, doneToday, saveSettings, applyTheme, started } from './store.js';
-import { deck, buildQueue, isDue } from './boards.js';
+import { deck, buildQueue, isDue, poolOf } from './boards.js';
 import { saveFile, loadFile } from './backup.js';
 import { render } from './screens.js';
 
@@ -11,11 +11,12 @@ export function openMenu() {
   const rows = [
     ['words in all', deck.cards.length],
     ['started', all.filter(started).length],
-    ['due for review', deck.cards.filter((c) => isDue(c) && !progress[c.f].known).length],
+    ['due for review', poolOf('learning').filter(isDue).length],
     ['bookmarked', all.filter((p) => p.star).length],
     ['known over a month', all.filter((p) => p.iv >= 30).length],
     ['done today', doneToday()],
     ['marked as known', all.filter((p) => p.known).length],
+    ['hidden, not important', all.filter((p) => p.hide).length],
     // When this copy of the app was published, so two phones can be compared.
     ['version', new Date(document.lastModified).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })],
   ];

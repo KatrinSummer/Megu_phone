@@ -63,7 +63,25 @@
   main{flex:1;display:flex;flex-direction:column;justify-content:center;
     padding:16px;gap:16px;overflow-y:auto;position:relative}
   /* A long list of boards has to start at the top, not sit centred and clipped. */
-  main.home{justify-content:flex-start;gap:10px}
+  main.home,main.board{justify-content:flex-start;gap:10px}
+  /* A board's page: the two ways in, the filter, then every word on it. */
+  .go .wide{margin-top:0;background:var(--card)}
+  .go .wide+.wide{margin-top:10px}
+  #learn{background:var(--warm);border-color:var(--warm-line)}
+  .go .s{display:block;font-size:12px;font-weight:400;color:var(--dim)}
+  .go .note{margin:0;text-align:center}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chips button{padding:6px 11px;border-radius:999px;border:1px solid var(--line);font-size:13px;color:var(--dim)}
+  .chips .on{color:var(--ink);border-color:var(--ink);font-weight:600}
+  .wd{display:grid;grid-template-columns:1fr auto;column-gap:10px;width:100%;text-align:left;
+    padding:9px 2px;border-bottom:1px solid var(--line)}
+  .wd:active{background:var(--warm)}
+  .wd .jp{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .wd .jp b{font-size:18px;font-weight:600}
+  .wd .k{font-size:13px;color:var(--dim)}
+  .wd .st{font-size:12px;color:var(--dim);align-self:center}
+  .wd.learn .st{color:var(--w-learn)} .wd.know .st{color:var(--w-know)}
+  .wd .e{grid-column:1/-1;font-size:13px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   /* On a card only the card scrolls: the buttons under it never move.  A swipe
      across it is hers (next / back), not the browser's history gesture. */
   main.study{overflow:hidden;touch-action:pan-y}
@@ -95,13 +113,16 @@
   .round .l{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em}
   .round .n{font-size:16px;font-weight:600}
 
-  /* "I know this one" lives in the corner of the screen, out of the way of the
-     card: it is a rare press, and a row of its own only got in the way. */
-  #hide{position:absolute;top:0;right:0;z-index:1;padding:7px;border-radius:10px;color:var(--dim)}
-  #hide svg{width:22px;height:22px;display:block;fill:none;stroke:currentColor;
+  /* The eye ("not important") and under it the tick ("I know it") live in the
+     corner, out of the way of the card: rare presses, and a row of their own
+     only got in the way. */
+  #hide,#know{position:absolute;right:0;z-index:1;padding:7px;border-radius:10px;color:var(--dim)}
+  #hide{top:0} #know{top:40px}
+  #hide svg,#know svg{width:22px;height:22px;display:block;fill:none;stroke:currentColor;
     stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-  #hide:active{background:var(--line)}
-  #hide.on{color:var(--good)}
+  #hide:active,#know:active{background:var(--line)}
+  #hide.on{color:var(--ink)}
+  #know.on{color:var(--good)}
 
   /* No box: the word is the whole point, and a border around it only boxed in
      the empty space that a short word leaves. */
@@ -111,7 +132,7 @@
      with justify-content cut the top off a long card and slid its bottom under
      the buttons. */
   .card>*{flex-shrink:0}
-  .card>#hide+*{margin-top:auto}
+  .card>#know+*{margin-top:auto}
   .card>:last-child{margin-bottom:auto}
   /* Front: the word as it is written in kana, with its kanji small above it. */
   .kanji{font-size:min(6.4vw,23px);font-weight:700;color:var(--dim);line-height:1.3;word-break:break-word}

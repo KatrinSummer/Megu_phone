@@ -2,14 +2,14 @@
 // lives in and how she is doing with it, in a small box right above it.
 import { $, esc } from './dom.js';
 import { progress, lifetime, flipStar, started } from './store.js';
-import { deck, flipKnown, cardOf } from './boards.js';
+import { deck, flipMark, cardOf } from './boards.js';
 import { isMemorized } from './schedule.js';
 import { play, SPEAKER } from './sound.js';
 import { priButtons, bindPri } from './priority.js';
 
 /** The colour of her word in a sentence: green once she knows it, orange while
  *  she is learning it, grey before she has started it. */
-const stateOf = (c) => (isMemorized(c) ? 'know' : started(progress[c.f]) ? 'learn' : 'new');
+export const stateOf = (c) => (isMemorized(c) ? 'know' : started(progress[c.f]) ? 'learn' : 'new');
 
 /** Whether a piece of the kana is her word, not just spelled like it: は the
  *  particle is not は the tooth. It is hers where the sentence writes its kanji,
@@ -33,6 +33,7 @@ const deckName = (id) => deck.decks.find((d) => d.id === id)?.name ?? id;
 function status(c) {
   const p = progress[c.f];
   if (p?.known) return 'marked as known';
+  if (p?.hide) return 'hidden, not important';
   if (isMemorized(c)) return 'memorized';
   if (started(p)) {
     return `learning · ${lifetime(p)} reviews${p.lapses ? ` · ${p.lapses} slips` : ''}`;
@@ -42,7 +43,8 @@ function status(c) {
 
 const closeWord = () => $('pop')?.remove();
 
-export function openWord(el) {
+/** `onClose` runs once the box is closed, for a screen that shows what she changed. */
+export function openWord(el, onClose) {
   const c = cardOf(el.dataset.f);
   closeWord();
   const pop = document.createElement('div');
@@ -50,7 +52,7 @@ export function openWord(el) {
   document.body.append(pop);
   // The rest of the screen is a clear sheet: a tap there only closes the box,
   // it does not turn the card or say the sentence.
-  pop.addEventListener('click', (e) => { if (e.target === pop) closeWord(); });
+  pop.addEventListener('click', (e) => { if (e.target === pop) { closeWord(); onClose?.(); } });
   const draw = () => {
     const p = progress[c.f];
     pop.innerHTML = `<div class="box" role="dialog" aria-label="${esc(c.f)}">
@@ -62,10 +64,12 @@ export function openWord(el) {
       <div class="acts">
         <button class="star${p?.star ? ' on' : ''}">${p?.star ? 'Bookmarked' : 'Bookmark'}</button>
         <button class="known${p?.known ? ' on' : ''}">${p?.known ? 'Known' : 'I know it'}</button>
+        <button class="hide${p?.hide ? ' on' : ''}">${p?.hide ? 'Hidden' : 'Hide'}</button>
       </div>${priButtons(c.f)}</div>`;
     pop.querySelector('.say').onclick = () => play(c);
     pop.querySelector('.star').onclick = () => { flipStar(c.f); draw(); };
-    pop.querySelector('.known').onclick = () => { flipKnown(c.f); draw(); };
+    pop.querySelector('.known').onclick = () => { flipMark(c.f, 'known'); draw(); };
+    pop.querySelector('.hide').onclick = () => { flipMark(c.f, 'hide'); draw(); };
     bindPri(pop, draw);
     // What she changes here shows at once in the sentence under the box.
     for (const w of document.querySelectorAll('.ex .w')) {

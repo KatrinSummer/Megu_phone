@@ -8,6 +8,7 @@
 // lesson.js    the lesson she is in, and where a reload finds her
 // sound.js     saying the word out loud
 // screens.js   what is on the screen
+// page.js      a board's own page: its numbers, its two buttons, its words
 // word.js      a word of hers tapped inside a sentence
 // priority.js  how often she wants a word
 // swipe.js     which way her finger went
@@ -23,9 +24,11 @@ import { playing, sayOnFirstTap } from './sound.js';
 import { home, render, stats, currentCard, toggleStar, skip, back } from './screens.js';
 import { openMenu } from './menu.js';
 import { onSwipe } from './swipe.js';
+import { openBoard } from './page.js';
 
 $('menu').addEventListener('click', openMenu);
-$('back').addEventListener('click', home);
+// From a lesson back to its board's page; from the page back to the boards.
+$('back').addEventListener('click', () => ($('main').className === 'board' ? home() : openBoard(settings.deck)));
 $('star').addEventListener('click', toggleStar);
 // Like turning a page: the finger goes left to the next card, right to the last.
 onSwipe($('main'), { left: skip, right: back });
