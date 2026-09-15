@@ -2,7 +2,7 @@
 // backup file.
 import { $ } from './dom.js';
 import { progress, settings, doneToday, saveSettings, applyTheme, started } from './store.js';
-import { deck, pool, buildQueue, isNew, isDue } from './boards.js';
+import { deck, buildQueue, isDue } from './boards.js';
 import { saveFile, loadFile } from './backup.js';
 import { render } from './screens.js';
 
@@ -11,7 +11,7 @@ export function openMenu() {
   const rows = [
     ['words in all', deck.cards.length],
     ['started', all.filter(started).length],
-    ['due today', pool().filter((c) => isNew(c) || isDue(c)).length],
+    ['due for review', deck.cards.filter((c) => isDue(c) && !progress[c.f].known).length],
     ['bookmarked', all.filter((p) => p.star).length],
     ['known over a month', all.filter((p) => p.iv >= 30).length],
     ['done today', doneToday()],

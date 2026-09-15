@@ -13,6 +13,8 @@ export const cardOf = (f) => (byFront ??= new Map(deck.cards.map((c) => [c.f, c]
 // There is no board of every word: she splits them into decks on purpose.
 export const boardCards = (id) => id === 'star' ? deck.cards.filter((c) => progress[c.f]?.star)
   : id === 'known' ? deck.cards.filter((c) => progress[c.f]?.known)
+  // Review: every word she has started, from every deck.
+  : id === 'learning' ? deck.cards.filter((c) => started(progress[c.f]))
   // A word sits in its own deck and may also sit in a review deck like Last.
   : deck.cards.filter((c) => c.d === id || c.last === id);
 
@@ -35,8 +37,8 @@ const pri = (c) => progress[c.f]?.pri ?? 0;
 const byTurn = (a, b) => pri(b) - pri(a) || (b.when || '').localeCompare(a.when || '');
 const shuffle = (list) => list.sort(() => Math.random() - 0.5);
 
-/** The words she wants more often turn up in any board's round, at random, due
- *  or not and whether or not they belong to it - about one card in five. */
+/** The words she wants more often turn up in every review, at random, due or
+ *  not and whether or not they belong to it - about one card in five. */
 function withFavourites(list) {
   const here = new Set(list.map((c) => c.f));
   const extra = shuffle(deck.cards.filter((c) => pri(c) === 1 && !progress[c.f].known && !here.has(c.f)))
@@ -45,12 +47,24 @@ function withFavourites(list) {
   return list;
 }
 
+/** The boards she goes through to repeat what she has started, not to learn. */
+export const isReview = (id) => id === 'learning' || id === 'star';
+
+/** The word whose day came first goes first; one already done today goes last,
+ *  so "review more" moves on instead of starting over with what she just saw. */
+const byDue = (a, b) => {
+  const p = progress[a.f], q = progress[b.f];
+  return (p?.seen === today()) - (q?.seen === today()) || (p?.due ?? 0) - (q?.due ?? 0);
+};
+
 export function buildQueue() {
-  const all = pool();
+  const all = pool(), n = settings.perDay;
   // The Known board is not a lesson, it is the list she goes through to undo.
   if (settings.deck === 'known') return refill(all);
-  const unseen = all.filter(isNew).sort(byTurn);
-  refill(withFavourites([...shuffle(all.filter(isDue)), ...unseen.slice(0, settings.perDay)]));
+  // A review: n of her words, whether their day has come or not.
+  if (isReview(settings.deck)) return refill(withFavourites(all.sort(byDue).slice(0, n)).slice(0, n));
+  // A lesson is for learning: new words only. What she has started comes back in Review.
+  refill(all.filter(isNew).sort(byTurn).slice(0, n));
 }
 
 /** The eye, or "I know it" on a word tapped in a sentence. Either way the word
@@ -63,7 +77,3 @@ export function flipKnown(front) {
   drop(front);
   return p.known;
 }
-
-/** "Show more new words" on the done screen. */
-export const moreNew = () =>
-  refill(pool().filter(isNew).sort(byTurn).slice(0, settings.perDay));

@@ -1,9 +1,9 @@
 // What is on the screen: the list of boards, the two bars, and the card.
 import { $, esc } from './dom.js';
 import { progress, settings, lifetime, doneToday, countDone, uncountDone,
-         saveSettings, saveProgress, flipStar } from './store.js';
+         saveSettings, saveProgress, flipStar, today } from './store.js';
 import { answer, nextIn, isMemorized } from './schedule.js';
-import { deck, boardCards, poolOf, pool, buildQueue, flipKnown, moreNew,
+import { deck, boardCards, poolOf, pool, buildQueue, flipKnown, isReview,
          isNew, isDue } from './boards.js';
 import { queue, again, first, lesson, nextCard, keep, forget } from './lesson.js';
 import { play, SPEAKER } from './sound.js';
@@ -20,6 +20,7 @@ export function home() {
   current = null;
   forget();                                // so the boards, not a lesson, open next time
   const rows = [
+    ['learning', 'Review'],
     ['star', 'Bookmarks'],
     ...deck.decks.map((d) => [d.id, d.name]),
     ...(Object.values(progress).some((p) => p.known) ? [['known', 'Marked as known']] : []),
@@ -33,9 +34,14 @@ export function home() {
     const cards = poolOf(id);
     const due = cards.filter(isDue).length;
     const unseen = cards.filter(isNew).length;
+    // A deck is for learning, so what it offers is its new words; a review
+    // offers everything in it, and says how much of that is due.
+    const offer = id === 'known' || isReview(id) ? cards.length : unseen;
     const note = !cards.length ? 'empty'
-      : [due ? `${due} due` : 'nothing due', unseen ? `${unseen} new` : ''].filter(Boolean).join(' · ');
-    return `<button class="deck" data-id="${esc(id)}" ${cards.length ? '' : 'disabled'}>
+      : id === 'known' ? `${cards.length} words`
+      : isReview(id) ? `${due ? `${due} due` : 'nothing due'} · ${cards.length} words`
+      : unseen ? `${unseen} new` : 'all started';
+    return `<button class="deck" data-id="${esc(id)}" ${offer ? '' : 'disabled'}>
       <span class="n">${esc(name)}</span><span class="s">${note}</span></button>`;
   }).join('');
   for (const b of document.querySelectorAll('.deck')) {
@@ -99,16 +105,19 @@ function summary(all) {
   const rows = [['Words', how.length], ['Knew it', n('good')], ['Easy', n('easy')],
     ['Forgot', n('again')], ['Skipped', n('skip')]].filter(([, v], i) => !i || v);
   const missed = [...first].filter(([, v]) => v === 'again').map(([f]) => f);
-  const later = all.filter((c) => !isNew(c) && !isDue(c)).length;
-  const news = all.filter(isNew).length;
+  // What is left: a review has the words not seen today, a deck its new words.
+  const rev = isReview(settings.deck);
+  const left = (rev ? all.filter((c) => progress[c.f]?.seen !== today()) : all.filter(isNew)).length;
+  const more = Math.min(settings.perDay, left);
   $('main').innerHTML = `<div class="done"><h2>${how.length ? 'Lesson done' : 'Done for today'}</h2>
     ${how.length ? `<table>${rows.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('')}</table>` : ''}
     ${missed.length ? `<div class="note">Forgot: ${missed.map(esc).join(' · ')}</div>` : ''}
-    <div>${later} words are waiting for their day, ${news} have never been shown.</div>
+    <div>${rev ? `${left} more to review today.` : left ? `${left} new words left on this board.`
+      : 'Every word of this board has been started: they come back in Review.'}</div>
     <button class="wide" id="boards">Back to the boards</button>
-    ${news ? `<button class="wide" id="more">Show ${Math.min(settings.perDay, news)} more new words</button>` : ''}</div>`;
+    ${more ? `<button class="wide" id="more">${rev ? `Review ${more} more` : `Show ${more} more new words`}</button>` : ''}</div>`;
   $('boards').addEventListener('click', home);
-  $('more')?.addEventListener('click', () => { past.length = 0; moreNew(); render(); });
+  $('more')?.addEventListener('click', () => { past.length = 0; buildQueue(); render(); });
 }
 
 function draw() {
