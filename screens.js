@@ -158,12 +158,15 @@ function draw() {
         ${priButtons(c.f)}`
         : '<div class="tap">tap to flip</div>'}
     </div>
-    ${revealed ? `<div class="row">
+    <div class="row">
+      ${revealed ? `
         <button id="again">Forgot<span class="s">again</span></button>
         <button id="good">Knew it<span class="s">${nextIn(c, 'good')}</span></button>
-        <button id="easy">Easy<span class="s">${nextIn(c, 'easy')}</span></button>
-      </div>`
-      : '<button id="reveal">Show</button>'}`;
+        <button id="easy">Easy<span class="s">${nextIn(c, 'easy')}</span></button>`
+      : '<button id="reveal">Show</button>'}
+      <button id="skip" aria-label="Skip this word" title="Skip: it does not come back in this lesson">
+        <svg viewBox="0 0 24 24"><path d="M5 12h13M13 6.5l6 5.5-6 5.5"/></svg><span class="s">skip</span></button>
+    </div>`;
 
   // Both ways: once she has seen the back, the card turns over on every tap and
   // the three buttons stay put, so flipping back never costs her the answer.
@@ -181,6 +184,8 @@ function draw() {
     });
   }
   $('reveal')?.addEventListener('click', flip);
+  // The same as a swipe forward: past this word, and not again in this lesson.
+  $('skip').addEventListener('click', skip);
   // The eye and the tick are on the card, so their tap must not also turn it over.
   for (const [btn, key, on, off] of [['hide', 'hide', 'hidden', 'shown'], ['know', 'known', 'known', 'unknown']]) {
     $(btn).addEventListener('click', (e) => {
@@ -215,14 +220,17 @@ function moveOn(c, before, how) {
   const noted = !MARKS.has(how) && !first.has(c.f);
   past.push({ c, before, how, noted, repeating: lesson.repeating });
   if (noted) first.set(c.f, how);
-  if (how === 'again' || how === 'skip') again.push(c);
+  // A word she forgot comes round once more; one she skipped is done with for
+  // this lesson - she waved it past, and it must not turn up at the end either.
+  if (how === 'again') again.push(c);
   if (counted(how)) countDone();
   render();
 }
 
 const onCards = () => $('main').className === 'study' && !$('pop');
 
-/** A swipe to the left: past this card for now; it comes round once more at the end. */
+/** A swipe to the left, or the skip button: past this card, and not again in
+ *  this lesson. Nothing about the word itself is saved. */
 export function skip() {
   if (onCards() && current) moveOn(current, snap(current), 'skip');
 }
@@ -232,8 +240,9 @@ export function skip() {
 export function back() {
   const h = onCards() && past.pop();
   if (!h) return;
-  // It waits at the end of the lesson - or is on screen again, when it was the last card.
-  if (h.how === 'again' || h.how === 'skip') {
+  // A forgotten one waits at the end of the lesson - or is on screen again, when
+  // it was the last card. A skipped one is in neither list to take out.
+  if (h.how === 'again') {
     if (current === h.c) current = null;
     else for (const list of [again, queue]) {
       const i = list.lastIndexOf(h.c);
