@@ -56,8 +56,8 @@ export function settingsPage() {
 
     <div class="grp">About</div>
     <div class="pane rows">
-      <div>words on the phone<b>${deck.cards.length}</b></div>
-      <div>version<b>${new Date(document.lastModified)
+      <div>${ic('deck')}words on the phone<b>${deck.cards.length}</b></div>
+      <div>${ic('backup')}version<b>${new Date(document.lastModified)
         .toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}</b></div>
     </div>
     <button class="wide" id="close">Done</button>`;

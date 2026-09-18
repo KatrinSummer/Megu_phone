@@ -3,5 +3,6 @@
  "img/btn-go.webp", "img/btn-soft.webp", "img/chip-on.webp", "img/chip-off.webp",
  "img/sw-on.webp", "img/sw-off.webp", "img/tag-pink.webp", "img/tag-cream.webp", "img/panel.webp",
  "app.js", "dom.js", "store.js", "schedule.js", "boards.js", "lesson.js", "sound.js",
- "icons.js", "ring.js", "nav.js", "dash.js", "decks.js", "screens.js", "page.js", "statsview.js", "settings.js",
+ "icons.js", "ring.js", "nav.js", "dash.js", "decks.js", "screens.js", "page.js",
+ "statsview.js", "calendar.js", "settings.js",
  "word.js", "priority.js", "swipe.js", "backup.js"]

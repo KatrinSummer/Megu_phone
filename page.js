@@ -9,7 +9,8 @@ import { openWord, stateOf } from './word.js';
 import { ic } from './icons.js';
 import { markTab } from './nav.js';
 
-const NAMES = { learning: 'Review', star: 'Bookmarks', known: 'Marked as known', hidden: 'Hidden' };
+const NAMES = { learning: 'Review', star: 'Bookmarks', pri: 'Priorities',
+                known: 'Marked as known', hidden: 'Hidden' };
 export const boardName = (id) => NAMES[id] ?? deck.decks.find((d) => d.id === id)?.name ?? id;
 
 /** The filter a word falls under: hidden, know (memorized or ticked), learn, new. */

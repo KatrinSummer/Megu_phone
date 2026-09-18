@@ -1,30 +1,37 @@
-// Stats, the way she drew it: the name of the screen, then either the ring and
-// what it is made of, or the days she has studied.
+// Stats, the way she drew it: the name of the screen, and under it one of her
+// three tabs - what the library is made of, the numbers behind it, or the month.
 //
-// Nothing here is measured - every number on Overview is counted from the
-// progress she already has.  Progress is the one thing that has to be written
-// down as it happens, and store.js does that, a tally a day.
+// Nothing here is measured.  Overview is counted from the progress she already
+// has; the days and the minutes are written down as they happen, by store.js,
+// and this screen only reads them.
 import { $ } from './dom.js';
-import { progress, doneToday, daysDone, started, today } from './store.js';
+import { progress, doneToday, daysDone, daysTime, started, today } from './store.js';
 import { deck, poolOf, isDue } from './boards.js';
 import { isMemorized } from './schedule.js';
 import { ic } from './icons.js';
 import { leave } from './screens.js';
 import { markTab } from './nav.js';
+import { month } from './calendar.js';
 
 const R = 44, C = 2 * Math.PI * R;
-const TABS = [['overview', 'Overview'], ['progress', 'Progress']];
+const TABS = [['overview', 'Overview'], ['progress', 'Progress'], ['calendar', 'Calendar']];
 let tab = 'overview';
+// How far back the chart looks - her picker over it.  Both are remembered while
+// the app is open, the same as a board's filter.
+const SPANS = [[14, 'last 14 days'], [30, 'last 30 days']];
+let span = 14;
 
-const DAYS = 14;
-/** The last two weeks, oldest first: [label, words done that day]. */
-function fortnight() {
-  const days = daysDone(), now = today();
-  return Array.from({ length: DAYS }, (_, i) => {
-    const d = now - (DAYS - 1 - i);
-    return [new Date(d * 86400000).getDate(), days[d] ?? 0];
-  });
-}
+/** The days the chart draws, oldest first: [day of the month, words done]. */
+const bars = () => Array.from({ length: span }, (_, i) => {
+  const d = today() - (span - 1 - i);
+  return [new Date(d * 86400000).getDate(), daysDone()[d] ?? 0];
+});
+
+/** Minutes, said the way a person says them. */
+const clock = (m) => (m >= 60 ? `${Math.round(m / 6) / 10} h` : `${Math.round(m)} min`);
+/** What a tally of hers adds up to over the days the chart is showing. */
+const sum = (tally) => Object.entries(tally)
+  .filter(([d]) => Number(d) > today() - span).reduce((s, [, v]) => s + v, 0);
 
 export function statsPage() {
   leave();
@@ -43,8 +50,11 @@ export function statsPage() {
   const fresh = cards.length - know - learn - hid;
   const pct = cards.length ? Math.round((know / cards.length) * 100) : 0;
 
-  const legend = [['Learned', know, 'var(--good)'], ['Learning', learn, 'var(--w-learn)'],
-    ['New', fresh, 'var(--dim)'], ['Hidden', hid, 'var(--pink)']];
+  // The same colours her ring uses, in the same order: green what she has
+  // learned, blue what she has not, grey what she waved off.  Learning is the
+  // green on its way to blue, so it takes the colour in between.
+  const legend = [['Learned', know, 'var(--good)'], ['Learning', learn, 'var(--aqua)'],
+    ['New', fresh, 'var(--fresh)'], ['Hidden', hid, 'var(--gone)']];
   const rows = [
     ['words in all', cards.length], ['started', all.filter(started).length],
     ['due for review', poolOf('learning').filter(isDue).length],
@@ -55,11 +65,7 @@ export function statsPage() {
     ['more often', all.filter((p) => p.pri === 1).length],
   ];
 
-  const bars = fortnight();
-  const top = Math.max(10, ...bars.map(([, v]) => v));
-  const week = bars.slice(-7).reduce((s, [, v]) => s + v, 0);
-
-  const overview = `
+  const wheel = `
     <div class="pane wheel">
       <svg viewBox="0 0 104 104" aria-label="${pct}% learned">
         <circle cx="52" cy="52" r="${R}" fill="none" stroke="var(--line)" stroke-width="12"/>
@@ -70,21 +76,39 @@ export function statsPage() {
       </svg>
       <div class="legend">${legend.map(([n, v, c]) =>
         `<div><i class="dot" style="background:${c}"></i>${n}<b>${v}</b></div>`).join('')}</div>
-    </div>
-    <div class="pane rows">${rows.map(([n, v]) => `<div>${n}<b>${v}</b></div>`).join('')}</div>`;
+    </div>`;
 
   // The chart only knows about the days since this version arrived: before it,
   // nothing was written down, so an empty fortnight is the truth and not a bug.
-  const words = `
+  const days = bars();
+  const top = Math.max(10, ...days.map(([, v]) => v));
+  const studied = `
     <div class="pane">
-      <div class="cap">Words studied<span>last ${DAYS} days</span></div>
-      <div class="chart">${bars.map(([d, v]) =>
-        `<i class="${v ? '' : 'none'}" style="--h:${Math.round((v / top) * 100)}%"
-           title="${d}: ${v}"><span>${d}</span></i>`).join('')}</div>
+      <div class="cap">Words studied
+        <select id="span" aria-label="How far back">${SPANS.map(([n, name]) =>
+          `<option value="${n}"${n === span ? ' selected' : ''}>${name}</option>`).join('')}</select></div>
+      <div class="plot">
+        <div class="axis"><span>${top}</span><span>${Math.round(top / 2)}</span><span>0</span></div>
+        <div class="chart">${days.map(([d, v], i) =>
+          `<i class="${v ? '' : 'none'}" style="--h:${Math.round((v / top) * 100)}%"
+             title="${d}: ${v}"><span>${span <= 14 || i % 5 === 0 ? d : ''}</span></i>`).join('')}</div>
+      </div>
     </div>
+    <div class="cap">Study time<span>${SPANS.find(([n]) => n === span)[1]}</span></div>
     <div class="duo">
-      <button id="s-week" disabled>${ic('chart')}<span><b>${week}</b><span>this week</span></span></button>
-      <button id="s-today" disabled>${ic('streak')}<span><b>${doneToday()}</b><span>today</span></span></button>
+      <button id="s-time" disabled>${ic('time')}
+        <span><b>${clock(sum(daysTime()))}</b><span>on the cards</span></span></button>
+      <button id="s-week" disabled>${ic('chart')}
+        <span><b>${sum(daysDone())}</b><span>words</span></span></button>
+    </div>`;
+
+  const numbers = `
+    <div class="pane rows">${rows.map(([n, v]) => `<div>${n}<b>${v}</b></div>`).join('')}</div>
+    <div class="duo">
+      <button id="s-today" disabled>${ic('streak')}
+        <span><b>${doneToday()}</b><span>words today</span></span></button>
+      <button id="s-min" disabled>${ic('time')}
+        <span><b>${clock(daysTime()[today()] ?? 0)}</b><span>today</span></span></button>
     </div>`;
 
   $('main').className = 'page';
@@ -93,9 +117,10 @@ export function statsPage() {
       <span class="s">${cards.length} words</span></div>
     <div class="chips">${TABS.map(([k, name]) =>
       `<button data-k="${k}"${k === tab ? ' class="on"' : ''}>${name}</button>`).join('')}</div>
-    ${tab === 'overview' ? overview : words}`;
+    ${tab === 'overview' ? wheel + studied : tab === 'progress' ? numbers : month()}`;
 
   for (const b of document.querySelectorAll('.chips button')) {
     b.addEventListener('click', () => { tab = b.dataset.k; statsPage(); });
   }
+  $('span')?.addEventListener('change', (e) => { span = Number(e.target.value); statsPage(); });
 }

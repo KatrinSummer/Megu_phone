@@ -71,6 +71,19 @@ const countDay = (n) => {
 };
 export const daysDone = () => settings.days ?? {};
 
+/** Time on the cards, in minutes, kept day by day beside the tally and dropped
+ *  with it.  The clock runs only while a card is on screen: it starts when the
+ *  card is drawn and stops the moment she answers it.
+ *  A card she sat on for two minutes was a break, not study, so one card can
+ *  never add more than that - a phone left face up must not become an hour. */
+export const countTime = (sec) => {
+  const mins = settings.mins ??= {};
+  mins[today()] = Math.round(((mins[today()] ?? 0) + Math.min(sec, 120) / 60) * 10) / 10;
+  for (const d of Object.keys(mins)) if (today() - Number(d) > 60) delete mins[d];
+  saveSettings();
+};
+export const daysTime = () => settings.mins ?? {};
+
 export const countDone = () => {
   settings.doneCount = doneToday() + 1;
   settings.doneOn = today();

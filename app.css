@@ -119,22 +119,50 @@ main.study ~ #tabs{display:none}
 .head{display:flex;align-items:center;gap:12px;padding:2px 4px 2px 2px}
 .head h1{margin:0;font-size:27px;font-weight:700;letter-spacing:.01em;
   text-shadow:0 1px 4px rgba(255,255,255,.9)}
-.head .s{margin-left:auto;font-size:13px;color:var(--dim);white-space:nowrap;
-  text-shadow:0 1px 4px rgba(255,255,255,.9)}
-:root[data-theme="dark"] .head h1,:root[data-theme="dark"] .head .s{text-shadow:0 1px 4px rgba(6,12,28,.85)}
+/* It stands on her sky, not on a card: grey on that blue all but disappeared. */
+.head .s{margin-left:auto;font-size:13px;font-weight:600;color:var(--ink);opacity:.72;
+  white-space:nowrap;text-shadow:0 1px 4px rgba(255,255,255,.9)}
+/* Home says its name over two lines, the way she drew the logo: the name, and
+   under it what the app is for. */
+.head .t{display:flex;flex-direction:column;min-width:0}
+.head .sub{font-size:12px;color:var(--dim);text-shadow:0 1px 4px rgba(255,255,255,.9)}
+:root[data-theme="dark"] .head h1,:root[data-theme="dark"] .head .s,
+:root[data-theme="dark"] .head .sub{text-shadow:0 1px 4px rgba(6,12,28,.85)}
 
 /* The days she has studied.  A day with nothing in it keeps its place in the
    row, drawn as a grey stub, so the fortnight stays a fortnight. */
 .cap{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
   padding:12px 14px 2px;font-weight:700}
 .cap span{font-weight:400;font-size:12px;color:var(--dim)}
-.chart{display:flex;align-items:flex-end;gap:4px;height:110px;padding:8px 14px 10px}
+/* Her picker over the chart - "last 14 days" - reads as part of the line, not
+   as a form on a card. */
+.cap select{font:inherit;font-size:12px;font-weight:400;color:var(--dim);
+  padding:2px 4px;border-radius:8px;border:1px solid var(--line);background:var(--solid)}
+.chart{display:flex;align-items:flex-end;gap:4px;height:110px;padding:8px 14px 24px}
 .chart i{flex:1;min-width:4px;height:var(--h);min-height:3px;border-radius:4px 4px 0 0;
   background:var(--aqua);position:relative}
 .chart i.none{background:var(--line)}
 .chart i span{position:absolute;left:0;right:0;bottom:-14px;text-align:center;
   font-size:9px;color:var(--dim)}
-.chart{padding-bottom:24px}
+/* How many words a bar is worth, up the side of it, the way she drew it. */
+.plot{display:flex;gap:8px;padding:2px 14px 0}
+.plot .chart{flex:1;min-width:0;padding:8px 0 24px}
+.axis{flex:none;width:22px;height:110px;padding-bottom:24px;font-size:10px;color:var(--dim);
+  display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end}
+
+/* The month.  A day she studied is green - the more she did, the stronger -
+   and a day she did not keeps its place, so the shape of the month shows. */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:8px 12px 14px}
+.cal b{text-align:center;font-size:10px;font-weight:700;color:var(--dim);padding-bottom:2px}
+.cal i{aspect-ratio:1;display:grid;place-items:center;border-radius:9px;font-style:normal;
+  font-size:12px;color:var(--dim);background:var(--line)}
+.cal i:empty{background:none}
+.cal i.l1{background:#bfe7d8;color:#0f6b50}
+.cal i.l2{background:#6fd0ae;color:#0b4a37}
+.cal i.l3{background:var(--good);color:#fff;font-weight:700}
+.cal i.now{outline:2px solid var(--pink);outline-offset:1px}
+:root[data-theme="dark"] .cal i.l1{background:#1f5145;color:#bfe7d8}
+:root[data-theme="dark"] .cal i.l2{background:#2f7a63;color:#eafff6}
 
 /* A white card: everything she reads sits on one. */
 .pane{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shade)}
@@ -203,7 +231,9 @@ main.study ~ #tabs{display:none}
   text-transform:uppercase;letter-spacing:.08em}
 :root[data-theme="dark"] .grp{color:#ffc2de;background:#3a2448;border-color:#5b3a6f}
 .rows{padding:2px 14px}
-.rows div{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
+.rows div{display:flex;align-items:center;gap:10px;padding:9px 0;
+  border-bottom:1px solid var(--line);font-size:14px}
+.rows .ic{--s:24px}
 .rows div:last-child{border-bottom:0}
 .rows b{margin-left:auto;font-weight:700}
 
@@ -213,7 +243,11 @@ main.settings{background:var(--sky)}
 .set{display:flex;align-items:center;gap:11px;padding:11px 14px;border-bottom:1px solid var(--line)}
 .set:last-child{border-bottom:0}
 .set .n{flex:1;min-width:0}
-.set input[type=number]{width:74px;text-align:right}
+/* The phone's own little up/down arrows sat inside the box and looked like a
+   fault in the drawing; the number is typed, not clicked. */
+.set input[type=number]{width:74px;text-align:right;-moz-appearance:textfield}
+.set input[type=number]::-webkit-outer-spin-button,
+.set input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 /* Her switch, both halves of it painted - the knob is part of the picture. */
 .set .sw{width:54px;height:30px;flex:none;
   background:url(img/sw-off.webp) center/100% 100% no-repeat}
@@ -258,7 +292,7 @@ main.settings{background:var(--sky)}
 .chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
 .chips::-webkit-scrollbar{display:none}
 .chips button{flex:none}
-.chips button{padding:9px 16px;font-size:13px;font-weight:600;color:#4d7fa6;
+.chips button{padding:7px 12px;font-size:12px;font-weight:600;color:#4d7fa6;
   border:0 solid transparent;background:none;
   border-image:url(img/chip-off.webp) 0 30 fill / 0 16px / 0 stretch}
 .chips .on{color:#fff;font-weight:700;

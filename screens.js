@@ -1,6 +1,6 @@
 // What is on the screen: the list of boards, the two bars, and the card.
 import { $, esc } from './dom.js';
-import { progress, settings, lifetime, doneToday, countDone, uncountDone,
+import { progress, settings, lifetime, doneToday, countDone, uncountDone, countTime,
          saveProgress, flipStar, today } from './store.js';
 import { answer, nextIn, isMemorized } from './schedule.js';
 import { boardCards, pool, buildQueue, flipMark, learnable, reviewable } from './boards.js';
@@ -12,6 +12,9 @@ import { openBoard } from './page.js';
 import { ic } from './icons.js';
 
 let current = null, shown = false, revealed = false;
+// When the card on screen was dealt.  It is the only clock in the app: study
+// time is the time cards spend in front of her, nothing else.
+let shownAt = 0;
 export const currentCard = () => current;
 
 /** Out of the lesson, onto a screen with no card: the boards or a board's page. */
@@ -68,6 +71,7 @@ export function render() {
   keep(settings.deck, current);
   shown = false;
   revealed = false;
+  shownAt = Date.now();                   // a flip does not restart it
   draw();
   if (settings.autoPlay) play(current);   // the word speaks as soon as it is shown
 }
@@ -196,6 +200,7 @@ function moveOn(c, before, how) {
   // A word she forgot comes round once more; one she skipped is done with for
   // this lesson - she waved it past, and it must not turn up at the end either.
   if (how === 'again') again.push(c);
+  if (shownAt) { countTime((Date.now() - shownAt) / 1000); shownAt = 0; }
   if (counted(how)) countDone();
   render();
 }

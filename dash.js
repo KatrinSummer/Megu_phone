@@ -24,7 +24,7 @@ export function dash() {
   markTab('home');
   $('star').hidden = $('back').hidden = true;
   $('stats').hidden = true;
-  $('counts').innerHTML = '<b>Megu</b>';
+  $('counts').innerHTML = '';                   // the heading on the screen says it
   $('counts').title = 'Megu';
 
   const all = Object.values(progress);
@@ -35,10 +35,13 @@ export function dash() {
   const board = studyBoard();
   const fresh = learnable(board).length;
   const stars = all.filter((p) => p.star).length;
+  const pri = all.filter((p) => p.pri === 1).length;
   const done = doneToday();
 
   $('main').className = 'dash';
   $('main').innerHTML = `
+    <div class="head">${ic('home', '44px')}<span class="t"><h1>Megu</h1>
+      <span class="sub">Japanese, one word at a time</span></span></div>
     <div class="pane ring">
       ${ring(deck.cards, '158px', `<div class="mid"><span class="n">${deck.cards.length}</span>
         <span class="l">words</span>${done ? `<span class="l today">${done} today</span>` : ''}</div>`)}
@@ -54,7 +57,10 @@ export function dash() {
     <button class="tile" id="d-decks">${ic('deck')}
       <span class="n">Decks<span class="s">${deck.decks.length} boards</span></span><span class="go">›</span></button>
     <button class="tile" id="d-star">${ic('favorite')}
-      <span class="n">My favourites</span><span class="v">${stars}</span><span class="go">›</span></button>`;
+      <span class="n">My favourites</span><span class="v">${stars}</span><span class="go">›</span></button>
+    <button class="tile" id="d-pri">${ic('streak')}
+      <span class="n">Priorities<span class="s">the ones she asked for more often</span></span>
+      <span class="v">${pri}</span><span class="go">›</span></button>`;
 
   // The big button starts the lesson itself; everything else opens a page.
   $('d-start').addEventListener('click', () => {
@@ -68,5 +74,6 @@ export function dash() {
   $('d-known').addEventListener('click', () => openBoard('known'));
   $('d-hidden').addEventListener('click', () => openBoard('hidden'));
   $('d-star').addEventListener('click', () => openBoard('star'));
+  $('d-pri').addEventListener('click', () => openBoard('pri'));
   $('d-decks').addEventListener('click', () => { markTab('decks'); home(); });
 }

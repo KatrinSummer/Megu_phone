@@ -12,6 +12,9 @@ export const cardOf = (f) => (byFront ??= new Map(deck.cards.map((c) => [c.f, c]
 // count against this, or marking a word known would shrink the goalpost too.
 // There is no board of every word: she splits them into decks on purpose.
 export const boardCards = (id) => id === 'star' ? deck.cards.filter((c) => progress[c.f]?.star)
+  // The words she asked to see more often, gathered in one place - her concept
+  // calls them Priorities.
+  : id === 'pri' ? deck.cards.filter((c) => progress[c.f]?.pri === 1)
   : id === 'known' ? deck.cards.filter((c) => progress[c.f]?.known)
   : id === 'hidden' ? deck.cards.filter((c) => progress[c.f]?.hide)
   // Review: every word she has started, from every deck.

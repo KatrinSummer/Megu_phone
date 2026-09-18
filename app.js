@@ -31,16 +31,15 @@ import { onSwipe } from './swipe.js';
 import { openBoard } from './page.js';
 import { buildNav, markTab } from './nav.js';
 import { dash } from './dash.js';
-import { settingsPage } from './settings.js';
 import { ic } from './icons.js';
 
 buildNav();
 // Her icons in the header as well: the line drawings that were here are exactly
 // the old ones she asked to have replaced.  The bookmark keeps its own class,
 // which is why only what is inside the button is filled in.
-for (const [id, name] of [['back', 'back'], ['star', 'favorite'], ['menu', 'menu']]) $(id).innerHTML = ic(name);
-// The same settings the bottom bar opens: the old sheet is a screen now.
-$('menu').addEventListener('click', () => { markTab('settings'); settingsPage(); });
+// There is no Menu button any more: her concept has nothing in that corner, and
+// Settings has a tab of its own along the bottom.
+for (const [id, name] of [['back', 'back'], ['star', 'favorite']]) $(id).innerHTML = ic(name);
 // From a lesson back to its board's page; from the page back to the boards.
 $('back').addEventListener('click', () => ($('main').className === 'board' ? home() : openBoard(settings.deck)));
 $('star').addEventListener('click', toggleStar);

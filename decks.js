@@ -15,7 +15,8 @@ import { markTab } from './nav.js';
 
 /** Her icon for a board.  The four made-up ones have their own; a deck of hers
  *  takes the next picture off the list, so no two of them are the same flower. */
-const BOARD_ICONS = { learning: 'learning', star: 'favorite', known: 'archive', hidden: 'hidden' };
+const BOARD_ICONS = { learning: 'learning', star: 'favorite', pri: 'streak',
+                      known: 'archive', hidden: 'hidden' };
 const MINE = ['category', 'repeat', 'picture', 'streak', 'goal', 'language', 'theme', 'calendar'];
 const boardIcon = (id) => BOARD_ICONS[id]
   ?? MINE[deck.decks.findIndex((d) => d.id === id) % MINE.length] ?? 'deck';
@@ -38,15 +39,17 @@ function counts(id) {
 }
 const passes = (n) => filter === 'all' || n[filter] > 0;
 
-const note = (n) => (n.total
-  ? [`${n.total} words`, n.new && `${n.new} new`, n.due && `${n.due} due`].filter(Boolean).join(' · ')
-  : 'empty');
+// She drew one line under a board's name and it is the size of the board.  What
+// is new and what is due is what the filters and the ring are for.
+const note = (n) => (n.total ? `${n.total} words` : 'empty');
 
 export function home() {
   leave();
   markTab('decks');
   const some = (k) => Object.values(progress).some((p) => p[k]);
-  const ids = ['learning', 'star', ...deck.decks.map((d) => d.id),
+  const ids = ['learning', 'star',
+    ...(Object.values(progress).some((p) => p.pri === 1) ? ['pri'] : []),
+    ...deck.decks.map((d) => d.id),
     ...(some('known') ? ['known'] : []), ...(some('hide') ? ['hidden'] : [])];
   $('star').hidden = $('back').hidden = true;
   $('stats').hidden = true;
