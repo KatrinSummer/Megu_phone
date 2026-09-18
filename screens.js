@@ -169,10 +169,10 @@ function draw() {
     </div>
     <div class="row">
       ${revealed ? `
-        <button id="again">Forgot<span class="s">again</span></button>
-        <button id="good">Knew it<span class="s">${nextIn(c, 'good')}</span></button>
-        <button id="easy">Easy<span class="s">${nextIn(c, 'easy')}</span></button>`
-      : '<button id="reveal">Show</button>'}
+        <button id="again">${ic('again')}Forgot<span class="s">again</span></button>
+        <button id="good">${ic('gotit')}Knew it<span class="s">${nextIn(c, 'good')}</span></button>
+        <button id="easy">${ic('hint')}Easy<span class="s">${nextIn(c, 'easy')}</span></button>`
+      : `<button id="reveal">${ic('start')}Show</button>`}
       <button id="skip" aria-label="Skip this word" title="Skip: it does not come back in this lesson">
         <svg viewBox="0 0 24 24"><path d="M5 12h13M13 6.5l6 5.5-6 5.5"/></svg><span class="s">skip</span></button>
     </div>`;

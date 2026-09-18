@@ -18,6 +18,10 @@ export const NAMES = [
 ];
 export const COLS = 8;
 
+/** The hibiscus she puts on her buttons.  It is the same flower she drew for
+ *  Settings - one drawing, cut once, used wherever a button wants a flourish. */
+export const FLOWER = 'settings';
+
 const at = new Map(NAMES.map((n, i) => [n, [i % COLS, (i / COLS) | 0]]));
 
 /** One icon. `size` is a css length: the cell scales to it, and the sheet with it.

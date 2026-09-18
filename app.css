@@ -1,50 +1,52 @@
 /* How the app looks: her island, her icons.  The markup is in the screens;
    this file only dresses it.  It lives apart from index.html because the page
-   itself has to stay short enough to read in one go. */
+   itself has to stay short enough to read in one go.
+
+   Her island is an accent, not the ground.  It lies in the header, under the
+   number on Home, and - blurred - behind the column on a wide window.  What she
+   reads is always a white card on a pale sky, the way her own drawings show it:
+   the drawing is 416px wide, and stretched behind a whole screen it stopped
+   being a picture and became a smear. */
 :root{
-  /* Day.  The photo is the ground, so every surface above it is a pale sheet
-     the words can sit on: white alone over the sea is unreadable. */
   --sprite:url(img/sprite-day.webp);
   --shot:url(img/bg-day.jpg);
-  --sky:#bfe6f5;
-  --card:rgba(255,255,255,.88); --solid:#ffffff;
-  /* The card she reads from is nearly solid.  Left see-through, it stopped
-     looking like a card at all: the same island showed through it, in the same
-     place, and the wooden sign ran straight under the kana. */
-  --sheet:rgba(255,255,255,.96);
-  --line:rgba(96,132,170,.28);
+  --sky:#e9f7ff; --sky2:#fbfdff;
+  --card:#ffffff; --solid:#ffffff; --sheet:#ffffff;
+  /* What is laid over the island wherever words have to sit on it. */
+  --veil:linear-gradient(rgba(255,255,255,.60),rgba(255,255,255,.86));
+  --line:#d6e6f2;
+  --shade:0 2px 10px rgba(22,70,110,.07);
   --ink:#16324a; --dim:#5b7d99;
   --pink:#e2529a; --aqua:#16b0a6; --sun:#f0a52a;
   --good:#16a07a; --hard:#5b7d99; --again:#e2529a; --star:#eaa50f;
-  --warm:rgba(255,246,222,.92); --warm-line:rgba(233,183,84,.55);
+  --warm:#fff6de; --warm-line:#eccf7e;
   /* Her words inside a sentence: known, being learned, not started yet. */
   --w-know:#0f8a63; --w-learn:#cf6d10; --w-new:#7b8ea3;
 }
 :root[data-theme="dark"]{
   --sprite:url(img/sprite-night.webp);
   --shot:url(img/bg-night.jpg);
-  --sky:#0d1733;
-  --card:rgba(22,33,64,.80); --solid:#16213f;
-  --sheet:rgba(17,27,55,.97);
-  --line:rgba(150,185,255,.24);
+  --sky:#0d1830; --sky2:#121e40;
+  --card:#182a52; --solid:#182a52; --sheet:#16254a;
+  --veil:linear-gradient(rgba(11,21,46,.52),rgba(11,21,46,.84));
+  --line:#2a3f6e;
+  --shade:0 2px 10px rgba(0,0,0,.3);
   --ink:#eaf0ff; --dim:#9fb3d6;
   --pink:#ff8fc0; --aqua:#59d6cd; --sun:#ffc861;
   --good:#5fd6ae; --hard:#9fb3d6; --again:#ff8fc0; --star:#ffc861;
-  --warm:rgba(42,56,96,.85); --warm-line:rgba(150,185,255,.3);
+  --warm:#23355f; --warm-line:#3d548c;
   --w-know:#5fd6ae; --w-learn:#ffbe6b; --w-new:#a8b8d0;
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
 /* Nothing scrolls as a whole page - the lists and the card scroll inside
    themselves - so a sideways swipe has nothing to slide. */
 html,body{height:100%;overflow:hidden;overscroll-behavior:none}
-body{position:fixed;inset:0;margin:0;background:var(--sky);color:var(--ink);
+html{background:var(--sky)}
+body{position:fixed;inset:0;margin:0;color:var(--ink);
+  background:linear-gradient(180deg,var(--sky) 0%,var(--sky2) 45%);
   font:16px/1.5 -apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",system-ui,sans-serif;
   display:flex;flex-direction:column;
   padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left)}
-/* Her island, behind everything.  A fixed layer of its own, because a fixed
-   background on the body itself judders on an iPhone while a list scrolls. */
-body::before{content:'';position:fixed;inset:0;z-index:-1;
-  background:var(--shot) center/cover no-repeat}
 
 /* One icon off her sheet.  --x and --y are the cell, --s how big to draw it. */
 .ic{--s:28px;width:var(--s);height:var(--s);flex:none;display:inline-block;vertical-align:-.28em;
@@ -52,17 +54,19 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;
   background-size:calc(var(--s) * 8) calc(var(--s) * 6);
   background-position:calc(var(--x) * var(--s) * -1) calc(var(--y) * var(--s) * -1)}
 
+/* The header is her island, with a veil over it so the words on top stay read. */
 header{display:flex;align-items:center;gap:9px;padding:10px 14px;
-  background:var(--card);border-bottom:1px solid var(--line);
-  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+  border-bottom:1px solid var(--line);
+  background-image:var(--veil),var(--shot);
+  background-size:auto,cover;background-position:center,center 16%}
 header .grow{flex:1;min-width:0}
-.counts{font-size:13px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.counts{font-size:14px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .counts b{color:var(--ink);font-weight:700}
 /* padding:0 - the iPhone gives every button a padding of its own, which pushed
    the icon in a small round button off its centre. */
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
 .icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;
-  border:1px solid var(--line);background:var(--solid);flex:none}
+  border:1px solid var(--line);background:var(--card);flex:none;box-shadow:var(--shade)}
 .icon:active{background:var(--warm)}
 .icon .ic{--s:24px}
 .icon svg{width:21px;height:21px;display:block;fill:none;stroke:currentColor;
@@ -87,7 +91,6 @@ main.study{overflow:hidden;touch-action:pan-y}
 /* The bar she drew along the bottom.  It is gone during a lesson: the answers
    own that edge of the screen, and a tab under her thumb there is a mis-tap. */
 #tabs{display:flex;background:var(--card);border-top:1px solid var(--line);
-  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
   padding-bottom:env(safe-area-inset-bottom)}
 main.study ~ #tabs{display:none}
 #tabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;
@@ -96,14 +99,13 @@ main.study ~ #tabs{display:none}
 #tabs .on{color:var(--pink);font-weight:700}
 #tabs button:active{background:var(--warm)}
 
-/* A sheet of pale glass: everything she reads sits on one. */
-.pane{background:var(--card);border:1px solid var(--line);border-radius:18px;
-  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+/* A white card: everything she reads sits on one. */
+.pane{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shade)}
 
 /* A row that does something: icon, name, what it is worth, and an arrow. */
 .tile{display:flex;align-items:center;gap:11px;width:100%;text-align:left;
   padding:13px 14px;border-radius:16px;border:1px solid var(--line);background:var(--card);
-  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+  box-shadow:var(--shade)}
 .tile:active{background:var(--warm)}
 .tile .n{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tile .v{color:var(--dim);font-size:14px;white-space:nowrap}
@@ -111,23 +113,26 @@ main.study ~ #tabs{display:none}
 .tile:disabled{opacity:.5}
 .tile .s{display:block;font-size:12px;font-weight:400;color:var(--dim)}
 
-/* Home: how today stands. */
-.ring{display:flex;flex-direction:column;align-items:center;gap:2px;padding:16px 0 14px}
-.ring .n{font-size:40px;font-weight:700;line-height:1.05}
+/* Home: how today stands.  The number sits on her island, the way she drew it. */
+.ring{display:flex;flex-direction:column;align-items:center;gap:2px;padding:22px 0 20px;
+  background-image:var(--veil),var(--shot);
+  background-size:auto,cover;background-position:center,center 62%}
+.ring .n{font-size:44px;font-weight:700;line-height:1.05}
 .ring .l{font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em}
 .duo{display:flex;gap:10px}
 .duo button{flex:1;display:flex;align-items:center;gap:9px;padding:11px 12px;border-radius:16px;
-  border:1px solid var(--line);background:var(--card);text-align:left;
-  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+  border:1px solid var(--line);background:var(--card);text-align:left;box-shadow:var(--shade)}
 .duo b{font-size:19px;font-weight:700;line-height:1.1;display:block}
 .duo span{font-size:11px;color:var(--dim)}
 .duo button:active{background:var(--warm)}
-/* The one button the whole screen is built around. */
+/* Her Primary Button, off the sheet: a full pink pill, white and bold, the
+   round Start on one side and a hibiscus on the other. */
 .big{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;
-  padding:16px;border-radius:18px;border:0;font-size:17px;font-weight:700;color:#fff;
+  padding:15px 18px;border-radius:999px;border:0;font-size:17px;font-weight:700;color:#fff;
   background:linear-gradient(180deg,#ff7ab4,#e2529a);box-shadow:0 6px 18px rgba(226,82,154,.35)}
 .big:active{transform:translateY(1px)}
 .big .ic{--s:26px}
+.big .ic:last-child{--s:21px}
 
 /* Stats: the ring, what it is made of, and the plain numbers under it. */
 .wheel{display:flex;align-items:center;gap:16px;padding:16px 14px}
@@ -137,7 +142,11 @@ main.study ~ #tabs{display:none}
 .wheel .legend div{display:flex;align-items:center;gap:8px}
 .wheel .legend i.dot{width:10px;height:10px;border-radius:50%;flex:none}
 .wheel .legend b{margin-left:auto;font-weight:700}
-.grp{padding:4px 2px 2px;font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.07em}
+/* The little pink plate she writes a section's name on. */
+.grp{align-self:flex-start;padding:5px 13px;border-radius:999px;font-size:11px;font-weight:700;
+  color:#b93a76;background:#ffe3f0;border:1px solid #ffc9e2;
+  text-transform:uppercase;letter-spacing:.08em}
+:root[data-theme="dark"] .grp{color:#ffc2de;background:#3a2448;border-color:#5b3a6f}
 .rows{padding:2px 14px}
 .rows div{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
 .rows div:last-child{border-bottom:0}
@@ -148,7 +157,8 @@ main.study ~ #tabs{display:none}
 .set:last-child{border-bottom:0}
 .set .n{flex:1;min-width:0}
 .set input[type=number]{width:74px;text-align:right}
-.set .sw{width:52px;height:30px;border-radius:999px;background:var(--line);position:relative;flex:none}
+.set .sw{width:52px;height:30px;border-radius:999px;background:#cfe0ed;position:relative;flex:none}
+:root[data-theme="dark"] .set .sw{background:#2a3f6e}
 .set .sw::after{content:'';position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;
   background:#fff;transition:left .18s;box-shadow:0 1px 3px #0003}
 .set .sw.on{background:var(--aqua)}
@@ -158,8 +168,7 @@ main.study ~ #tabs{display:none}
 
 /* The board list. */
 .deck{display:flex;align-items:center;gap:11px;width:100%;padding:14px;border-radius:16px;
-  text-align:left;border:1px solid var(--line);background:var(--card);
-  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+  text-align:left;border:1px solid var(--line);background:var(--card);box-shadow:var(--shade)}
 .deck .n{flex:1;min-width:0;font-weight:600}
 .deck .s{font-size:13px;color:var(--dim);white-space:nowrap}
 .deck:disabled{opacity:.45}
@@ -172,12 +181,14 @@ main.study ~ #tabs{display:none}
 #learn .s{color:rgba(255,255,255,.85)}
 .go .s{display:block;font-size:12px;font-weight:400;color:var(--dim)}
 .go .note{margin:0;text-align:center}
+/* Her Tabs / Filters: the chosen one a pink pill, the rest pale blue ones. */
 .chips{display:flex;flex-wrap:wrap;gap:6px}
-.chips button{padding:7px 13px;border-radius:999px;border:1px solid var(--line);
-  background:var(--card);font-size:13px;color:var(--dim)}
-.chips .on{color:#fff;border-color:transparent;background:var(--pink);font-weight:700}
+.chips button{padding:7px 14px;border-radius:999px;border:0;
+  background:#e4f2fd;font-size:13px;font-weight:600;color:#4d7fa6}
+:root[data-theme="dark"] .chips button{background:#22345f;color:#9fb3d6}
+.chips .on{color:#fff;background:linear-gradient(180deg,#ff7ab4,#e2529a);font-weight:700}
 .words{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:0 12px;
-  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+  box-shadow:var(--shade)}
 .wd{display:grid;grid-template-columns:1fr auto;column-gap:10px;width:100%;text-align:left;
   padding:10px 2px;border-bottom:1px solid var(--line)}
 .wd:last-child{border-bottom:0}
@@ -185,14 +196,19 @@ main.study ~ #tabs{display:none}
 .wd .jp{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .wd .jp b{font-size:18px;font-weight:600}
 .wd .k{font-size:13px;color:var(--dim)}
-.wd .st{font-size:12px;color:var(--dim);align-self:center}
-.wd.learn .st{color:var(--w-learn)} .wd.know .st{color:var(--w-know)}
+/* Her little labels: "Due soon" on pink, "In 3 d" on cream. */
+.wd .st{align-self:center;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;
+  background:#eef4f8;color:var(--dim);white-space:nowrap}
+:root[data-theme="dark"] .wd .st{background:#22345f}
+.wd.learn .st{background:#fff2d6;color:#a8690a}
+:root[data-theme="dark"] .wd.learn .st{background:#4a3a1c;color:#ffbe6b}
+.wd.know .st{background:#dcf5ea;color:#0f8a63}
+:root[data-theme="dark"] .wd.know .st{background:#1e4a3c;color:#5fd6ae}
 .wd .e{grid-column:1/-1;font-size:13px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* The two bars and the round number, over the top of whatever screen she is on. */
 .stats{display:flex;align-items:center;gap:10px;padding:9px 14px;
-  background:var(--card);border-bottom:1px solid var(--line);
-  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+  background:var(--card);border-bottom:1px solid var(--line)}
 .stats[hidden]{display:none}
 .bar{flex:1;min-width:0}
 .bar .t{display:flex;justify-content:space-between;gap:6px;font-size:11px;color:var(--dim);
@@ -207,13 +223,12 @@ main.study ~ #tabs{display:none}
 .round .l{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em}
 .round .n{font-size:16px;font-weight:700}
 
-/* The card.  It is a sheet of glass over her island, the way she asked. */
+/* The card: a white sheet, nothing behind it to fight the word. */
 .card{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
   position:relative;padding:34px 18px 20px;text-align:center;
   display:flex;flex-direction:column;gap:14px;
   background:var(--sheet);border:1px solid var(--line);border-radius:22px;
-  box-shadow:0 8px 26px rgba(10,40,70,.18);
-  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+  box-shadow:0 6px 20px rgba(22,70,110,.10)}
 /* Centred while it fits, scrolled from its top when it does not. */
 .card>*{flex-shrink:0}
 .card>#know+*{margin-top:auto}
@@ -301,14 +316,17 @@ main.study ~ #tabs{display:none}
 .meta{font-size:12px;color:var(--dim)}
 
 /* The answers, and the wave past beside them. */
+/* Her round action buttons over the label: the pink X, the green tick, the
+   lamp - the same three she drew, one on each answer. */
 .row{display:flex;gap:9px}
-.row>button{flex:1;padding:15px 8px;border-radius:16px;border:1px solid var(--line);
-  background:var(--card);font-size:15px;font-weight:700;
-  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.row>button{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;
+  padding:10px 6px 11px;border-radius:20px;border:1px solid var(--line);
+  background:var(--card);font-size:14px;font-weight:700;box-shadow:var(--shade)}
 .row>button:active{transform:translateY(1px)}
-.row .s{display:block;font-size:11px;font-weight:400;color:var(--dim);margin-top:2px}
+.row .ic{--s:27px}
+.row .s{display:block;font-size:11px;font-weight:400;color:var(--dim)}
 #again{color:var(--again)} #good{color:var(--good)} #easy{color:var(--hard)}
-#reveal{padding:16px;border:0;color:#fff;font-size:16px;
+#reveal{border:0;color:#fff;font-size:17px;border-radius:999px;padding:13px 8px;
   background:linear-gradient(180deg,#5ad2c8,#16b0a6);box-shadow:0 6px 18px rgba(22,176,166,.3)}
 /* Narrow, and beside the answers: skipping is a wave past, not a fourth answer. */
 #skip{flex:0 0 56px;padding:15px 0;color:var(--dim)}
@@ -316,8 +334,7 @@ main.study ~ #tabs{display:none}
   stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 
 .done{text-align:center;padding:30px 18px;color:var(--dim);
-  background:var(--sheet);border:1px solid var(--line);border-radius:22px;
-  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+  background:var(--sheet);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shade)}
 .done h2{color:var(--ink);font-size:22px;margin:0 0 8px}
 .done table{margin:4px 0 14px}
 .done td:first-child{text-align:left}
@@ -325,17 +342,24 @@ main.study ~ #tabs{display:none}
 label{display:block;margin:12px 0 4px;font-size:13px;color:var(--dim)}
 input,select{padding:10px;border-radius:12px;border:1px solid var(--line);
   background:var(--solid);color:var(--ink);font:inherit}
-.wide{width:100%;padding:14px;margin-top:10px;border-radius:16px;
-  border:1px solid var(--line);background:var(--card);font-weight:700;
-  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+/* Her Secondary Button: a pale pink pill with pink writing on it. */
+.wide{width:100%;padding:14px;margin-top:10px;border-radius:999px;
+  border:1px solid #ffc9e2;background:#ffeef6;color:#c43d80;font-weight:700;box-shadow:var(--shade)}
+:root[data-theme="dark"] .wide{border-color:#5b3a6f;background:#33224a;color:#ffc2de}
+.wide .ic{--s:24px;margin-right:6px}
 .note{font-size:12px;color:var(--dim);margin-top:10px}
 table{width:100%;border-collapse:collapse;font-size:14px;margin-top:4px}
 td{padding:5px 0;border-bottom:1px solid var(--line)}
 td:last-child{text-align:right;font-weight:700}
 
-/* It is a phone app.  On a desktop window that same layout would smear across
-   1900px, so above a phone's width it becomes a centred column. */
+/* It is a phone app.  A wide window is not a phone: the app stays a column of
+   phone width on a calm field, and her island stays inside it - the drawing is
+   416px wide, and stretched across a monitor it stopped being a picture and
+   became a smear.  (A blurred copy of it behind the column would be nicer, but
+   a layer under the root element is not drawn here at all; it wants a
+   full-size background to be worth doing.) */
 @media (min-width:620px){
-  body{max-width:560px;margin:0 auto;
+  html{background:linear-gradient(180deg,var(--sky),var(--sky2))}
+  body{max-width:480px;margin:0 auto;box-shadow:0 0 40px rgba(8,40,70,.22);
     border-left:1px solid var(--line);border-right:1px solid var(--line)}
 }
