@@ -17,12 +17,15 @@ export function settingsPage() {
   markTab('settings');
   $('star').hidden = $('back').hidden = true;
   $('stats').hidden = true;
-  $('counts').innerHTML = '<b>Settings</b>';
+  $('counts').innerHTML = '';                   // the heading on the screen says it
   $('counts').title = 'Settings';
 
   const dark = settings.theme === 'dark';
-  $('main').className = 'page';
+  // She asked for this one on plain blue: a screen of switches is no place to
+  // read a beach through.
+  $('main').className = 'page settings';
   $('main').innerHTML = `
+    <div class="head">${ic('settings', '44px')}<h1>Settings</h1></div>
     <div class="grp">Learning</div>
     <div class="pane">
       <div class="set">${ic('goal')}<span class="n">New words at a time</span>

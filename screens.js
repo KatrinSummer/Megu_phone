@@ -3,15 +3,13 @@ import { $, esc } from './dom.js';
 import { progress, settings, lifetime, doneToday, countDone, uncountDone,
          saveProgress, flipStar, today } from './store.js';
 import { answer, nextIn, isMemorized } from './schedule.js';
-import { deck, boardCards, poolOf, pool, buildQueue, flipMark, isOutBoard,
-         learnable, reviewable, isNew, isDue } from './boards.js';
+import { boardCards, pool, buildQueue, flipMark, learnable, reviewable } from './boards.js';
 import { queue, again, first, lesson, nextCard, keep, forget } from './lesson.js';
 import { play, SPEAKER } from './sound.js';
 import { yomi, openWord } from './word.js';
 import { priButtons, bindPri } from './priority.js';
-import { openBoard, boardName } from './page.js';
+import { openBoard } from './page.js';
 import { ic } from './icons.js';
-import { markTab } from './nav.js';
 
 let current = null, shown = false, revealed = false;
 export const currentCard = () => current;
@@ -27,40 +25,6 @@ export function begin() {
   past.length = 0;                         // a swipe back never leaves the lesson
   buildQueue();
   render();
-}
-
-// ---------------------------------------------------------------- boards
-/** Her icon for a board. The made-up boards have one each; a deck of her own
- *  gets the deck icon, whatever she called it. */
-const BOARD_ICONS = { learning: 'learning', star: 'favorite', known: 'archive', hidden: 'hidden' };
-const boardIcon = (id) => BOARD_ICONS[id] ?? 'deck';
-
-// Nothing is reviewed until she picks a board, so the app opens on the list
-// rather than dropping her into whichever deck she chose last.
-export function home() {
-  leave();
-  markTab('decks');
-  const some = (k) => Object.values(progress).some((p) => p[k]);
-  const ids = ['learning', 'star', ...deck.decks.map((d) => d.id),
-    ...(some('known') ? ['known'] : []), ...(some('hide') ? ['hidden'] : [])];
-  $('star').hidden = $('back').hidden = true;
-  $('stats').hidden = true;
-  $('counts').innerHTML = `<b>${deck.cards.length}</b> words`;
-  $('counts').title = 'pick a board';
-  $('main').className = 'home';
-  $('main').innerHTML = ids.map((id) => {
-    const cards = poolOf(id);
-    const due = cards.filter(isDue).length;
-    const unseen = cards.filter(isNew).length;
-    const note = !cards.length ? 'empty'
-      : [!isOutBoard(id) && unseen && `${unseen} new`, !isOutBoard(id) && due && `${due} due`,
-        `${cards.length} words`].filter(Boolean).join(' · ');
-    return `<button class="deck" data-id="${esc(id)}" ${cards.length ? '' : 'disabled'}>
-      ${ic(boardIcon(id))}<span class="n">${esc(boardName(id))}</span><span class="s">${note}</span></button>`;
-  }).join('');
-  for (const b of document.querySelectorAll('.deck')) {
-    b.addEventListener('click', () => openBoard(b.dataset.id));
-  }
 }
 
 // ---------------------------------------------------------------- stats

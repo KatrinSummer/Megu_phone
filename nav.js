@@ -5,7 +5,7 @@
 // home().  The two names are hers, from the concept, and only look swapped here.
 import { $ } from './dom.js';
 import { ic } from './icons.js';
-import { home } from './screens.js';
+import { home } from './decks.js';
 import { dash } from './dash.js';
 import { statsPage } from './statsview.js';
 import { settingsPage, keepPerDay } from './settings.js';

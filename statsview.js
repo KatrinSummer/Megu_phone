@@ -1,8 +1,11 @@
-// Stats: what she has done with the whole library, in one ring and a list of
-// plain numbers.  Nothing here is measured - every number is counted from the
-// progress she already has, so there is nothing to keep up to date.
+// Stats, the way she drew it: the name of the screen, then either the ring and
+// what it is made of, or the days she has studied.
+//
+// Nothing here is measured - every number on Overview is counted from the
+// progress she already has.  Progress is the one thing that has to be written
+// down as it happens, and store.js does that, a tally a day.
 import { $ } from './dom.js';
-import { progress, doneToday, started } from './store.js';
+import { progress, doneToday, daysDone, started, today } from './store.js';
 import { deck, poolOf, isDue } from './boards.js';
 import { isMemorized } from './schedule.js';
 import { ic } from './icons.js';
@@ -10,13 +13,25 @@ import { leave } from './screens.js';
 import { markTab } from './nav.js';
 
 const R = 44, C = 2 * Math.PI * R;
+const TABS = [['overview', 'Overview'], ['progress', 'Progress']];
+let tab = 'overview';
+
+const DAYS = 14;
+/** The last two weeks, oldest first: [label, words done that day]. */
+function fortnight() {
+  const days = daysDone(), now = today();
+  return Array.from({ length: DAYS }, (_, i) => {
+    const d = now - (DAYS - 1 - i);
+    return [new Date(d * 86400000).getDate(), days[d] ?? 0];
+  });
+}
 
 export function statsPage() {
   leave();
   markTab('stats');
   $('star').hidden = $('back').hidden = true;
   $('stats').hidden = true;
-  $('counts').innerHTML = '<b>Stats</b>';
+  $('counts').innerHTML = '';                   // the heading on the screen says it
   $('counts').title = 'Stats';
 
   const all = Object.values(progress);
@@ -40,8 +55,11 @@ export function statsPage() {
     ['more often', all.filter((p) => p.pri === 1).length],
   ];
 
-  $('main').className = 'page';
-  $('main').innerHTML = `
+  const bars = fortnight();
+  const top = Math.max(10, ...bars.map(([, v]) => v));
+  const week = bars.slice(-7).reduce((s, [, v]) => s + v, 0);
+
+  const overview = `
     <div class="pane wheel">
       <svg viewBox="0 0 104 104" aria-label="${pct}% learned">
         <circle cx="52" cy="52" r="${R}" fill="none" stroke="var(--line)" stroke-width="12"/>
@@ -53,10 +71,31 @@ export function statsPage() {
       <div class="legend">${legend.map(([n, v, c]) =>
         `<div><i class="dot" style="background:${c}"></i>${n}<b>${v}</b></div>`).join('')}</div>
     </div>
-    <button class="tile" id="s-today">${ic('streak')}
-      <span class="n">Done today</span><span class="v">${doneToday()}</span></button>
-    <div class="grp">Everything counted</div>
     <div class="pane rows">${rows.map(([n, v]) => `<div>${n}<b>${v}</b></div>`).join('')}</div>`;
-  // Nothing to press: it is a number, not a way in.
-  $('s-today').disabled = true;
+
+  // The chart only knows about the days since this version arrived: before it,
+  // nothing was written down, so an empty fortnight is the truth and not a bug.
+  const words = `
+    <div class="pane">
+      <div class="cap">Words studied<span>last ${DAYS} days</span></div>
+      <div class="chart">${bars.map(([d, v]) =>
+        `<i class="${v ? '' : 'none'}" style="--h:${Math.round((v / top) * 100)}%"
+           title="${d}: ${v}"><span>${d}</span></i>`).join('')}</div>
+    </div>
+    <div class="duo">
+      <button id="s-week" disabled>${ic('chart')}<span><b>${week}</b><span>this week</span></span></button>
+      <button id="s-today" disabled>${ic('streak')}<span><b>${doneToday()}</b><span>today</span></span></button>
+    </div>`;
+
+  $('main').className = 'page';
+  $('main').innerHTML = `
+    <div class="head">${ic('stats', '44px')}<h1>Stats</h1>
+      <span class="s">${cards.length} words</span></div>
+    <div class="chips">${TABS.map(([k, name]) =>
+      `<button data-k="${k}"${k === tab ? ' class="on"' : ''}>${name}</button>`).join('')}</div>
+    ${tab === 'overview' ? overview : words}`;
+
+  for (const b of document.querySelectorAll('.chips button')) {
+    b.addEventListener('click', () => { tab = b.dataset.k; statsPage(); });
+  }
 }

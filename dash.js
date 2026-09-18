@@ -8,7 +8,9 @@ import { progress, settings, saveSettings, doneToday } from './store.js';
 import { deck, poolOf, learnable, isDue } from './boards.js';
 import { isMemorized } from './schedule.js';
 import { ic } from './icons.js';
-import { leave, begin, home } from './screens.js';
+import { ring } from './ring.js';
+import { leave, begin } from './screens.js';
+import { home } from './decks.js';
 import { openBoard } from './page.js';
 import { markTab } from './nav.js';
 
@@ -38,8 +40,8 @@ export function dash() {
   $('main').className = 'dash';
   $('main').innerHTML = `
     <div class="pane ring">
-      <span class="n">${deck.cards.length}</span><span class="l">words</span>
-      ${done ? `<span class="l" style="letter-spacing:0;text-transform:none">${done} done today</span>` : ''}
+      ${ring(deck.cards, '158px', `<div class="mid"><span class="n">${deck.cards.length}</span>
+        <span class="l">words</span>${done ? `<span class="l today">${done} today</span>` : ''}</div>`)}
     </div>
     <div class="duo">
       <button id="d-known">${ic('archive')}<span><b>${learned}</b><span>learned</span></span></button>

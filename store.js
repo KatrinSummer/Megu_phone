@@ -59,15 +59,29 @@ export const saveLesson = (l) => write(L_KEY, l);
 // It used to be a plain variable that buildQueue() reset, so opening the settings
 // sheet - or any reload - put the tally back to zero.
 export const doneToday = () => (settings.doneOn === today() ? settings.doneCount : 0);
+
+/** The same tally, kept day by day, so Stats can show the last two weeks.
+ *  Anything older than two months is dropped: it is a phone, and she never
+ *  looks back that far.  It starts the day this version arrives - there is no
+ *  history before it, because nothing was ever written down. */
+const countDay = (n) => {
+  const days = settings.days ??= {};
+  days[today()] = Math.max(0, (days[today()] ?? 0) + n);
+  for (const d of Object.keys(days)) if (today() - Number(d) > 60) delete days[d];
+};
+export const daysDone = () => settings.days ?? {};
+
 export const countDone = () => {
   settings.doneCount = doneToday() + 1;
   settings.doneOn = today();
+  countDay(1);
   saveSettings();
 };
 /** A swipe back took an answer away again. */
 export const uncountDone = () => {
   settings.doneCount = Math.max(0, doneToday() - 1);
   settings.doneOn = today();
+  countDay(-1);
   saveSettings();
 };
 
