@@ -113,8 +113,15 @@ main.study ~ #tabs{display:none}
 .tile:disabled{opacity:.5}
 .tile .s{display:block;font-size:12px;font-weight:400;color:var(--dim)}
 
-/* Home: how today stands.  The number sits on her island, the way she drew it. */
-.ring{display:flex;flex-direction:column;align-items:center;gap:2px;padding:22px 0 20px;
+/* Home: how today stands.  The number sits on the card she painted, flowers in
+   its corners - drawn whole, never sliced, or the flowers would smear. */
+.ring{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  aspect-ratio:591/303;border:0;box-shadow:var(--shade);
+  background:url(img/panel.webp) center/100% 100% no-repeat}
+/* Her card is painted for the day, and at night it glared white on the dark
+   screen.  Until there is a night one, the number sits on her night island. */
+:root[data-theme="dark"] .ring{aspect-ratio:auto;padding:22px 0 20px;box-shadow:none;
+  border:1px solid var(--line);border-radius:18px;
   background-image:var(--veil),var(--shot);
   background-size:auto,cover;background-position:center,center 62%}
 .ring .n{font-size:44px;font-weight:700;line-height:1.05}
@@ -125,14 +132,17 @@ main.study ~ #tabs{display:none}
 .duo b{font-size:19px;font-weight:700;line-height:1.1;display:block}
 .duo span{font-size:11px;color:var(--dim)}
 .duo button:active{background:var(--warm)}
-/* Her Primary Button, off the sheet: a full pink pill, white and bold, the
-   round Start on one side and a hibiscus on the other. */
-.big{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;
-  padding:15px 18px;border-radius:999px;border:0;font-size:17px;font-weight:700;color:#fff;
-  background:linear-gradient(180deg,#ff7ab4,#e2529a);box-shadow:0 6px 18px rgba(226,82,154,.35)}
+/* Her Primary Button, painted.  It is stretched as a nine-slice: the two ends
+   keep their shape and only the middle grows.  The play mark is painted into
+   the left end, so that end is never stretched and nothing is drawn over it -
+   which is why this button is the one that starts something. */
+/* The ends are drawn at a fixed size, so the button is given a height to match
+   the picture: let it grow and the play mark is stretched out of shape. */
+.big{display:flex;align-items:center;justify-content:center;width:100%;
+  height:58px;padding:0 24px 0 80px;font-size:17px;font-weight:700;color:#fff;
+  border:0 solid transparent;background:none;
+  border-image:url(img/btn-go.webp) 40 60 40 150 fill / 22px 32px 22px 80px / 0 stretch}
 .big:active{transform:translateY(1px)}
-.big .ic{--s:26px}
-.big .ic:last-child{--s:21px}
 
 /* Stats: the ring, what it is made of, and the plain numbers under it. */
 .wheel{display:flex;align-items:center;gap:16px;padding:16px 14px}
@@ -157,12 +167,10 @@ main.study ~ #tabs{display:none}
 .set:last-child{border-bottom:0}
 .set .n{flex:1;min-width:0}
 .set input[type=number]{width:74px;text-align:right}
-.set .sw{width:52px;height:30px;border-radius:999px;background:#cfe0ed;position:relative;flex:none}
-:root[data-theme="dark"] .set .sw{background:#2a3f6e}
-.set .sw::after{content:'';position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;
-  background:#fff;transition:left .18s;box-shadow:0 1px 3px #0003}
-.set .sw.on{background:var(--aqua)}
-.set .sw.on::after{left:25px}
+/* Her switch, both halves of it painted - the knob is part of the picture. */
+.set .sw{width:54px;height:30px;flex:none;
+  background:url(img/sw-off.webp) center/100% 100% no-repeat}
+.set .sw.on{background-image:url(img/sw-on.webp)}
 #note{font-size:12px;color:var(--dim);padding:0 14px 10px}
 #note:empty{display:none}
 
@@ -177,16 +185,23 @@ main.study ~ #tabs{display:none}
 /* A board's page: the two ways in, the filter, then every word on it. */
 .go .wide{margin-top:0}
 .go .wide+.wide{margin-top:10px}
-#learn{background:linear-gradient(180deg,#ff7ab4,#e2529a);color:#fff;border:0}
-#learn .s{color:rgba(255,255,255,.85)}
+/* Starting a lesson is the pink one, with her play mark painted on it.  It
+   carries a second line, so it is taller than the plain one and its ends are
+   drawn bigger to match - in the same proportion as the picture. */
+#learn{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:88px;padding:0 26px 0 118px;color:#fff;
+  border-image:url(img/btn-go.webp) 40 60 40 150 fill / 33px 49px 33px 122px / 0 stretch}
+#learn .s{color:rgba(255,255,255,.9)}
 .go .s{display:block;font-size:12px;font-weight:400;color:var(--dim)}
 .go .note{margin:0;text-align:center}
-/* Her Tabs / Filters: the chosen one a pink pill, the rest pale blue ones. */
+/* Her Tabs / Filters, painted: the chosen one her pink pill, the rest her pale
+   blue ones. */
 .chips{display:flex;flex-wrap:wrap;gap:6px}
-.chips button{padding:7px 14px;border-radius:999px;border:0;
-  background:#e4f2fd;font-size:13px;font-weight:600;color:#4d7fa6}
-:root[data-theme="dark"] .chips button{background:#22345f;color:#9fb3d6}
-.chips .on{color:#fff;background:linear-gradient(180deg,#ff7ab4,#e2529a);font-weight:700}
+.chips button{padding:9px 16px;font-size:13px;font-weight:600;color:#4d7fa6;
+  border:0 solid transparent;background:none;
+  border-image:url(img/chip-off.webp) 30 fill / 16px / 0 stretch}
+.chips .on{color:#fff;font-weight:700;
+  border-image-source:url(img/chip-on.webp);border-image-slice:34 fill}
 .words{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:0 12px;
   box-shadow:var(--shade)}
 .wd{display:grid;grid-template-columns:1fr auto;column-gap:10px;width:100%;text-align:left;
@@ -200,8 +215,8 @@ main.study ~ #tabs{display:none}
 .wd .st{align-self:center;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;
   background:#eef4f8;color:var(--dim);white-space:nowrap}
 :root[data-theme="dark"] .wd .st{background:#22345f}
-.wd.learn .st{background:#fff2d6;color:#a8690a}
-:root[data-theme="dark"] .wd.learn .st{background:#4a3a1c;color:#ffbe6b}
+/* Her own little label, the cream one, for a word with a day set on it. */
+.wd.learn .st{background:url(img/tag-cream.webp) center/100% 100% no-repeat;color:#a8690a}
 .wd.know .st{background:#dcf5ea;color:#0f8a63}
 :root[data-theme="dark"] .wd.know .st{background:#1e4a3c;color:#5fd6ae}
 .wd .e{grid-column:1/-1;font-size:13px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -342,10 +357,10 @@ main.study ~ #tabs{display:none}
 label{display:block;margin:12px 0 4px;font-size:13px;color:var(--dim)}
 input,select{padding:10px;border-radius:12px;border:1px solid var(--line);
   background:var(--solid);color:var(--ink);font:inherit}
-/* Her Secondary Button: a pale pink pill with pink writing on it. */
-.wide{width:100%;padding:14px;margin-top:10px;border-radius:999px;
-  border:1px solid #ffc9e2;background:#ffeef6;color:#c43d80;font-weight:700;box-shadow:var(--shade)}
-:root[data-theme="dark"] .wide{border-color:#5b3a6f;background:#33224a;color:#ffc2de}
+/* Her Secondary Button, painted the same way. */
+.wide{width:100%;padding:16px 22px;margin-top:10px;color:#c43d80;font-weight:700;
+  border:0 solid transparent;background:none;
+  border-image:url(img/btn-soft.webp) 36 fill / 21px / 0 stretch}
 .wide .ic{--s:24px;margin-right:6px}
 .note{font-size:12px;color:var(--dim);margin-top:10px}
 table{width:100%;border-collapse:collapse;font-size:14px;margin-top:4px}

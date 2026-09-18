@@ -7,7 +7,7 @@ import { $ } from './dom.js';
 import { progress, settings, saveSettings, doneToday } from './store.js';
 import { deck, poolOf, learnable, isDue } from './boards.js';
 import { isMemorized } from './schedule.js';
-import { ic, FLOWER } from './icons.js';
+import { ic } from './icons.js';
 import { leave, begin, home } from './screens.js';
 import { openBoard } from './page.js';
 import { markTab } from './nav.js';
@@ -48,7 +48,7 @@ export function dash() {
     <button class="tile" id="d-repeat">${ic('learning')}
       <span class="n">Repeat<span class="s">${started} started</span></span>
       <span class="v">${due || 'none'} due</span><span class="go">›</span></button>
-    <button class="big" id="d-start">${ic('start')}${fresh ? 'Start studying' : 'Open the board'}${ic(FLOWER)}</button>
+    <button class="big" id="d-start">${fresh ? 'Start studying' : 'Open the board'}</button>
     <button class="tile" id="d-decks">${ic('deck')}
       <span class="n">Decks<span class="s">${deck.decks.length} boards</span></span><span class="go">›</span></button>
     <button class="tile" id="d-star">${ic('favorite')}
