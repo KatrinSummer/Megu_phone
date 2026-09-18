@@ -6,261 +6,24 @@
 <meta name="robots" content="noindex,nofollow">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#ffffff">
-<!-- Read before the first paint, or a dark session starts with a white flash. -->
+<meta name="theme-color" content="#bfe6f5">
+<!-- Read before the first paint, or a dark session starts with a bright flash. -->
 <script>try{if(JSON.parse(localStorage.getItem('megu.settings.v1')||'{}').theme==='dark'){
   document.documentElement.dataset.theme='dark';
-  document.querySelector('meta[name=theme-color]').content='#191b28';}}catch{}</script>
+  document.querySelector('meta[name=theme-color]').content='#0d1733';}}catch{}</script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon.png">
+<link rel="stylesheet" href="app.css">
 <title>Megu</title>
-<style>
-  :root{
-    /* Day: white, with yellow saved for the two things that matter - the
-       bookmark and "Knew it".  The card is white too, so its border draws it. */
-    --bg:#ffffff; --card:#ffffff; --line:#dcdce4; --ink:#17171d; --dim:#67677a;
-    --good:#a07800; --hard:#67677a; --again:#67677a; --star:#c08a00;
-    /* The one warm thing on the resting screen, so the app reads yellow-white
-       and not merely white.  At night both fall back to the plain card. */
-    --warm:#fff8e3; --warm-line:#eccf7e;
-    /* Her words inside a sentence: known, being learned, not started yet. */
-    --w-know:#1e8a50; --w-learn:#d46b08; --w-new:#8a8a8a;
-  }
-  :root[data-theme="dark"]{
-    --bg:#191b28; --card:#232637; --line:#33374d; --ink:#e9eaf2; --dim:#9aa0b8;
-    --good:#4ec9a0; --hard:#e8b64c; --again:#e8746a; --star:#f0c04a;
-    --warm:var(--card); --warm-line:var(--line);
-    --w-know:#4ec9a0; --w-learn:#f0a04b; --w-new:#c4c4c4;
-  }
-  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
-  /* Nothing scrolls as a whole page - the board list and the card scroll inside
-     themselves - so a sideways swipe has nothing to slide.  On her phone it slid
-     the whole screen, header and all, a little off to one side. */
-  html,body{height:100%;overflow:hidden;overscroll-behavior:none}
-  body{position:fixed;inset:0}
-  body{margin:0;background:var(--bg);color:var(--ink);
-    font:16px/1.5 -apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",system-ui,sans-serif;
-    display:flex;flex-direction:column;
-    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
-
-  header{display:flex;align-items:center;gap:9px;padding:12px 14px;border-bottom:1px solid var(--line)}
-  header .grow{flex:1;min-width:0}
-  .counts{font-size:13px;color:var(--dim);white-space:nowrap;
-    overflow:hidden;text-overflow:ellipsis}
-  .counts b{color:var(--ink);font-weight:600}
-  /* padding:0 - the iPhone gives every button a wide padding of its own, which
-     pushed the icon in a small round button off its centre. */
-  button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
-  .icon{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;
-    border:1px solid var(--line);background:var(--card);flex:none}
-  .icon:active{background:var(--line)}
-  /* Drawn, not typed: the emoji fonts give every glyph its own height, which is
-     what made the three buttons sit at three different levels on the phone. */
-  .icon svg{width:21px;height:21px;display:block;fill:none;stroke:currentColor;
-    stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-  .starred svg{fill:currentColor}
-
-  main{flex:1;display:flex;flex-direction:column;justify-content:center;
-    padding:16px;gap:16px;overflow-y:auto;position:relative}
-  /* A long list of boards has to start at the top, not sit centred and clipped. */
-  main.home,main.board{justify-content:flex-start;gap:10px}
-  /* A board's page: the two ways in, the filter, then every word on it. */
-  .go .wide{margin-top:0;background:var(--card)}
-  .go .wide+.wide{margin-top:10px}
-  #learn{background:var(--warm);border-color:var(--warm-line)}
-  .go .s{display:block;font-size:12px;font-weight:400;color:var(--dim)}
-  .go .note{margin:0;text-align:center}
-  .chips{display:flex;flex-wrap:wrap;gap:6px}
-  .chips button{padding:6px 11px;border-radius:999px;border:1px solid var(--line);font-size:13px;color:var(--dim)}
-  .chips .on{color:var(--ink);border-color:var(--ink);font-weight:600}
-  .wd{display:grid;grid-template-columns:1fr auto;column-gap:10px;width:100%;text-align:left;
-    padding:9px 2px;border-bottom:1px solid var(--line)}
-  .wd:active{background:var(--warm)}
-  .wd .jp{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .wd .jp b{font-size:18px;font-weight:600}
-  .wd .k{font-size:13px;color:var(--dim)}
-  .wd .st{font-size:12px;color:var(--dim);align-self:center}
-  .wd.learn .st{color:var(--w-learn)} .wd.know .st{color:var(--w-know)}
-  .wd .e{grid-column:1/-1;font-size:13px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  /* On a card only the card scrolls: the buttons under it never move.  A swipe
-     across it is hers (next / back), not the browser's history gesture. */
-  main.study{overflow:hidden;touch-action:pan-y}
-  main>*{flex-shrink:0}
-  .deck{display:flex;justify-content:space-between;align-items:center;gap:12px;
-    width:100%;padding:16px;border-radius:14px;text-align:left;
-    border:1px solid var(--line);background:var(--card)}
-  .deck .n{font-weight:600}
-  .deck .s{font-size:13px;color:var(--dim);white-space:nowrap}
-  .deck:disabled{opacity:.45}
-  .deck:active{background:var(--warm)}
-  /* .icon sets its own display, so the plain [hidden] rule would lose to it. */
-  .icon[hidden]{display:none}
-
-  /* The two bars and the round number, the way her other app shows them. */
-  .stats{display:flex;align-items:center;gap:10px;padding:10px 16px;
-    border-bottom:1px solid var(--line)}
-  .stats[hidden]{display:none}
-  .bar{flex:1;min-width:0}
-  .bar .t{display:flex;justify-content:space-between;gap:6px;font-size:11px;color:var(--dim);
-    text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
-  .bar .t b{color:var(--ink);font-weight:600;text-transform:none;letter-spacing:0}
-  .track{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
-  .fill{height:100%;border-radius:3px;background:var(--star);transition:width .3s}
-  .mem .fill{background:var(--good)}
-  .round{flex:none;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    line-height:1.2;background:var(--card)}
-  .round .l{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em}
-  .round .n{font-size:16px;font-weight:600}
-
-  /* The eye ("not important") and under it the tick ("I know it") live in the
-     corner, out of the way of the card: rare presses, and a row of their own
-     only got in the way. */
-  #hide,#know{position:absolute;right:0;z-index:1;padding:7px;border-radius:10px;color:var(--dim)}
-  #hide{top:0} #know{top:40px}
-  #hide svg,#know svg{width:22px;height:22px;display:block;fill:none;stroke:currentColor;
-    stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-  #hide:active,#know:active{background:var(--line)}
-  #hide.on{color:var(--ink)}
-  #know.on{color:var(--good)}
-
-  /* No box: the word is the whole point, and a border around it only boxed in
-     the empty space that a short word leaves. */
-  .card{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;position:relative;
-    padding:40px 20px 24px;text-align:center;display:flex;flex-direction:column;gap:14px}
-  /* Centred while it fits, scrolled from its top when it does not.  Centring
-     with justify-content cut the top off a long card and slid its bottom under
-     the buttons. */
-  .card>*{flex-shrink:0}
-  .card>#know+*{margin-top:auto}
-  .card>:last-child{margin-bottom:auto}
-  /* Front: the word as it is written in kana, with its kanji small above it. */
-  .kanji{font-size:min(6.4vw,23px);font-weight:700;color:var(--dim);line-height:1.3;word-break:break-word}
-  .kana{font-size:min(13vw,46px);font-weight:600;line-height:1.25;word-break:break-word}
-  /* A whole phrase at that size is three lines of the screen. */
-  .kana.long{font-size:min(8.5vw,32px)}
-  /* Back: how it is read, then what it means. */
-  .back{display:flex;flex-direction:column;gap:9px}
-  .reading{font-size:17px;color:var(--dim);letter-spacing:.02em}
-  .english{font-size:19px;line-height:1.4;border-top:1px solid var(--line);padding-top:11px}
-  /* The word in use. Quieter than the meaning: it is there to be read, not tested. */
-  .ex{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:10px;
-    font-size:16px;line-height:1.5;color:var(--dim)}
-  /* Each sentence is its own button: a tap says it, and does not turn the card. */
-  .ex button{font:inherit;color:inherit;background:none;border:0;padding:4px 0;margin:0;
-    display:flex;gap:7px;align-items:flex-start;justify-content:flex-start;text-align:left;cursor:pointer;
-    width:100%}   /* left, not centred: a short sentence pushed its speaker inwards */
-  .ex button:disabled{cursor:default}
-  .ex button:focus:not(:focus-visible){outline:none}
-  .ex .lines{display:flex;flex-direction:column;gap:2px}
-  /* She reads kana: the kana line under the kanji, a gap between words. */
-  .ex .yomi{font-size:14px;word-spacing:.4em}
-  /* One word and its meaning per piece, so から|あげ is never cut in two. */
-  .ex .gloss{display:flex;flex-wrap:wrap;column-gap:12px;font-size:12px;line-height:1.45;opacity:.8}
-  .ex .gloss i{font-style:normal;opacity:.75}
-  .ex button:active:not(:disabled){opacity:.55}
-  .ex svg{flex:none;width:16px;height:16px;margin-top:5px;fill:none;stroke:currentColor;
-    stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-  /* Her other words in the kana line, dotted underneath - the way she likes it -
-     in the colour of how well she knows them.  The dots are that colour too: a
-     grey dotted line of its own vanished on the night theme. */
-  /* Dots drawn as a border, not an underline: an underline with a style in it
-     showed on the computer and not on her phone. */
-  .ex .w{font-weight:600;border-bottom:1.5px dotted currentColor;padding-bottom:1px}
-  .ex .w.know{color:var(--w-know)}
-  .ex .w.learn{color:var(--w-learn)}
-  .ex .w.new{color:var(--w-new)}
-  /* How often she wants the word: small, under everything else on the back. */
-  .pri{display:flex;justify-content:center;gap:6px}
-  .pri button{padding:6px 11px;border-radius:999px;border:1px solid var(--line);font-size:12px;color:var(--dim)}
-  .pri .on{color:var(--ink);border-color:var(--ink);font-weight:600}
-  #pop .pri{margin-top:8px}
-  #pop .pri button{flex:1;padding:7px 4px}
-  /* The word she tapped, in a box right above it, over a clear sheet that only
-     closes it - a tap beside the box must not turn the card or say anything. */
-  #pop{position:fixed;inset:0;z-index:5}
-  #pop .box{position:absolute;width:min(280px,calc(100vw - 16px));padding:12px 14px;border-radius:14px;
-    border:1px solid var(--line);background:var(--card);box-shadow:0 8px 28px #0003;line-height:1.4}
-  #pop .top{display:flex;align-items:center;gap:8px}
-  #pop .top b{font-size:22px;font-weight:600}
-  #pop .k{color:var(--dim)}
-  #pop .say{margin-left:auto;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
-    border:1px solid var(--line);color:var(--dim)}
-  #pop .say svg{width:17px;height:17px;fill:none;stroke:currentColor;
-    stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-  #pop .e{margin-top:4px}
-  #pop .m{font-size:12px;color:var(--dim)}
-  #pop .acts{display:flex;gap:8px;margin-top:10px}
-  #pop .acts button{flex:1;padding:9px 6px;border-radius:10px;border:1px solid var(--line);
-    font-size:13px;font-weight:600}
-  #pop .acts .on{color:var(--star);border-color:var(--star)}
-  /* Her thumb is on the word, not up in the header, so the sound is there too. */
-  #say{align-self:center;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;
-    border:1px solid var(--line);background:var(--card);color:var(--dim)}
-  #say svg{width:22px;height:22px;display:block;fill:none;stroke:currentColor;
-    stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-  #say:active{background:var(--warm)}
-  #warn{padding:10px 16px;font-size:13px;line-height:1.4;
-    background:#fdecec;color:#8a1c1c;border-bottom:1px solid #f0bcbc}
-  :root[data-theme="dark"] #warn{background:#3a2222;color:#f0b8b8;border-bottom-color:#5c3333}
-  #warn[hidden]{display:none}
-  .hidden{display:none}
-  .tap{font-size:13px;color:var(--dim)}
-  .meta{font-size:12px;color:var(--dim)}
-
-  .row{display:flex;gap:10px}
-  .row>button{flex:1;padding:15px 8px;border-radius:14px;border:1px solid var(--line);
-    background:var(--card);font-size:15px;font-weight:600}
-  .row>button:active{transform:translateY(1px)}
-  .row .s{display:block;font-size:11px;font-weight:400;color:var(--dim);margin-top:2px}
-  #again{color:var(--again)} #good{color:var(--good)} #easy{color:var(--hard)}
-  #reveal{padding:16px;background:var(--warm);border-color:var(--warm-line);font-size:16px}
-  /* Narrow, and beside the answers: skipping is a wave past, not a fourth answer. */
-  #skip{flex:0 0 56px;padding:15px 0;color:var(--dim)}
-  #skip svg{width:20px;height:20px;margin:0 auto;display:block;fill:none;stroke:currentColor;
-    stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-
-  .starred{color:var(--star);border-color:var(--star)}
-  .done{text-align:center;padding:40px 20px;color:var(--dim)}
-  .done h2{color:var(--ink);font-size:22px;margin:0 0 8px}
-  .done table{margin:4px 0 14px}
-  .done td:first-child{text-align:left}
-
-  dialog{border:1px solid var(--line);border-bottom:0;border-radius:18px 18px 0 0;background:var(--card);color:var(--ink);
-    padding:20px;width:100%;max-width:520px;margin:auto auto 0;
-    max-height:88vh;overflow-y:auto;overscroll-behavior:contain;
-    padding-bottom:calc(20px + env(safe-area-inset-bottom))}
-  dialog::backdrop{background:#0009}
-
-  /* It is a phone app, and on a phone the sheet slides up from the bottom and
-     the card fills the screen.  On a desktop window that same layout smears
-     across 1900px, so above a phone's width it becomes a centred column. */
-  @media (min-width:620px){
-    body{max-width:560px;margin:0 auto;
-      border-left:1px solid var(--line);border-right:1px solid var(--line)}
-    dialog{margin:auto;border:1px solid var(--line);border-radius:18px;max-height:84vh}
-  }
-  dialog h3{margin:0 0 14px;font-size:18px}
-  label{display:block;margin:12px 0 4px;font-size:13px;color:var(--dim)}
-  input,select{width:100%;padding:11px;border-radius:10px;border:1px solid var(--line);
-    background:var(--bg);color:var(--ink);font:inherit}
-  .wide{width:100%;padding:14px;margin-top:10px;border-radius:12px;
-    border:1px solid var(--line);background:var(--bg);font-weight:600}
-  .note{font-size:12px;color:var(--dim);margin-top:10px}
-  table{width:100%;border-collapse:collapse;font-size:14px;margin-top:4px}
-  td{padding:5px 0;border-bottom:1px solid var(--line)}
-  td:last-child{text-align:right;font-weight:600}
-</style>
 </head>
 <body>
 <header>
-  <button class="icon" id="back" aria-label="Back to the boards">
-    <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <!-- What goes inside these three is her own icon, put in by app.js: the sheet
+       they come from is a theme away, so it is not written out here. -->
+  <button class="icon" id="back" aria-label="Back to the boards"></button>
   <div class="grow"><div class="counts" id="counts">…</div></div>
-  <button class="icon" id="star" aria-label="Bookmark">
-    <svg viewBox="0 0 24 24"><path d="M12 3.6l2.6 5.3 5.8.9-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.9z"/></svg></button>
-  <button class="icon" id="menu" aria-label="Settings">
-    <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  <button class="icon" id="star" aria-label="Bookmark"></button>
+  <button class="icon" id="menu" aria-label="Settings"></button>
 </header>
 
 <!-- Only ever seen when the phone refuses to write: a save that fails in
@@ -271,7 +34,9 @@
 
 <main id="main"></main>
 
-<dialog id="sheet"></dialog>
+<!-- The four places the app has.  Filled in by nav.js. -->
+<nav id="tabs"></nav>
+
 <script src="app.js" type="module"></script>
 </body>
 </html>

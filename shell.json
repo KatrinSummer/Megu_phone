@@ -1,3 +1,5 @@
-[".", "index.html", "manifest.webmanifest", "icon.png", "deck.json",
- "app.js", "dom.js", "store.js", "schedule.js", "boards.js", "lesson.js","sound.js",
- "screens.js", "page.js", "word.js", "priority.js", "swipe.js", "backup.js", "menu.js"]
+[".", "index.html", "app.css", "manifest.webmanifest", "icon.png", "deck.json",
+ "img/sprite-day.webp", "img/sprite-night.webp", "img/bg-day.jpg", "img/bg-night.jpg",
+ "app.js", "dom.js", "store.js", "schedule.js", "boards.js", "lesson.js", "sound.js",
+ "icons.js", "nav.js", "dash.js", "screens.js", "page.js", "statsview.js", "settings.js",
+ "word.js", "priority.js", "swipe.js", "backup.js"]

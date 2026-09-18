@@ -1,8 +1,11 @@
 // Saying the word out loud. iOS will not play anything until she has touched
 // the screen once, which is the only reason this is not two lines.
+import { ic } from './icons.js';
+
 let audio = null, unlocked = false;
 
-export const SPEAKER = '<svg viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M15.5 8.6a5 5 0 010 6.8"/></svg>';
+/** Her speaker, the same one everywhere something can be said out loud. */
+export const SPEAKER = ic('audio');
 
 export function play(card) {
   if (!card?.a) return;

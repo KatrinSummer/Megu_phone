@@ -1,19 +1,23 @@
 // Megu review app. Everything lives on the phone; the network is only ever
 // used to back the progress up, never to show a card.
 //
-// dom.js       talking to the page
-// store.js     what is saved, and what happens when saving fails
-// schedule.js  when a word comes back
-// boards.js    which words she is shown, and in what order
-// lesson.js    the lesson she is in, and where a reload finds her
-// sound.js     saying the word out loud
-// screens.js   what is on the screen
-// page.js      a board's own page: its numbers, its two buttons, its words
-// word.js      a word of hers tapped inside a sentence
-// priority.js  how often she wants a word
-// swipe.js     which way her finger went
-// backup.js    moving progress between two phones
-// menu.js      the settings sheet
+// dom.js        talking to the page
+// store.js      what is saved, and what happens when saving fails
+// schedule.js   when a word comes back
+// boards.js     which words she is shown, and in what order
+// lesson.js     the lesson she is in, and where a reload finds her
+// sound.js      saying the word out loud
+// icons.js      her icons, off one sheet per theme
+// nav.js        the bar along the bottom
+// dash.js       Home: how today stands
+// screens.js    the board list and the card
+// page.js       a board's own page: its numbers, its two buttons, its words
+// statsview.js  Stats: the ring and the numbers under it
+// settings.js   Settings: the switches, the sound, the backup file
+// word.js       a word of hers tapped inside a sentence
+// priority.js   how often she wants a word
+// swipe.js      which way her finger went
+// backup.js     moving progress between two phones
 import { $ } from './dom.js';
 import { progress, settings, doneToday, lifetime, saveProgress } from './store.js';
 import { deck, setDeck, cardOf } from './boards.js';
@@ -22,11 +26,20 @@ import { answer, setPri } from './schedule.js';
 import { merge } from './backup.js';
 import { playing, sayOnFirstTap } from './sound.js';
 import { home, render, stats, currentCard, toggleStar, skip, back } from './screens.js';
-import { openMenu } from './menu.js';
 import { onSwipe } from './swipe.js';
 import { openBoard } from './page.js';
+import { buildNav, markTab } from './nav.js';
+import { dash } from './dash.js';
+import { settingsPage } from './settings.js';
+import { ic } from './icons.js';
 
-$('menu').addEventListener('click', openMenu);
+buildNav();
+// Her icons in the header as well: the line drawings that were here are exactly
+// the old ones she asked to have replaced.  The bookmark keeps its own class,
+// which is why only what is inside the button is filled in.
+for (const [id, name] of [['back', 'back'], ['star', 'favorite'], ['menu', 'menu']]) $(id).innerHTML = ic(name);
+// The same settings the bottom bar opens: the old sheet is a screen now.
+$('menu').addEventListener('click', () => { markTab('settings'); settingsPage(); });
 // From a lesson back to its board's page; from the page back to the boards.
 $('back').addEventListener('click', () => ($('main').className === 'board' ? home() : openBoard(settings.deck)));
 $('star').addEventListener('click', toggleStar);
@@ -38,7 +51,7 @@ fetch('deck.json').then((r) => r.json()).then((d) => {
   setDeck(d);
   // Back in the lesson she was in today, if the app was closed on her mid-way.
   const id = resume(cardOf);
-  if (id) { settings.deck = id; render(); } else home();
+  if (id) { settings.deck = id; markTab('decks'); render(); } else dash();
 });
 
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
@@ -50,7 +63,7 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catc
 // it asks about all of them: any one of them is enough to make it out of date.
 async function stamp() {
   const files = await (await fetch('shell.json', { cache: 'no-cache' })).json();
-  const watched = ['shell.json', ...files.filter((f) => /\.(js|html|json)$/.test(f))];
+  const watched = ['shell.json', ...files.filter((f) => /\.(js|html|json|css)$/.test(f))];
   const tags = await Promise.all(watched.map(async (f) => {
     // HEAD skips the worker's fetch handler entirely and costs only headers.
     const r = await fetch(f, { method: 'HEAD', cache: 'no-cache' });
@@ -73,7 +86,7 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) chec
 // Only on a local machine: lets scripts/check-pwa.mjs test the schedule and the
 // merge for real instead of poking at the screen.
 if (['127.0.0.1', 'localhost'].includes(location.hostname)) {
-  window.megu = { merge, answer, setPri, stats, home, checkForUpdate, saveProgress, doneToday, lifetime,
+  window.megu = { merge, answer, setPri, stats, home, dash, checkForUpdate, saveProgress, doneToday, lifetime,
                   get progress() { return progress; }, get deck() { return deck; },
                   get audioSrc() { return playing(); }, get current() { return currentCard(); },
                   get queue() { return queue; }, get again() { return again; } };

@@ -6,6 +6,8 @@ import { progress, settings, saveSettings, today } from './store.js';
 import { deck, boardCards, learnable, reviewable, isDue, isOutBoard } from './boards.js';
 import { stats, leave, begin } from './screens.js';
 import { openWord, stateOf } from './word.js';
+import { ic } from './icons.js';
+import { markTab } from './nav.js';
 
 const NAMES = { learning: 'Review', star: 'Bookmarks', known: 'Marked as known', hidden: 'Hidden' };
 export const boardName = (id) => NAMES[id] ?? deck.decks.find((d) => d.id === id)?.name ?? id;
@@ -26,6 +28,7 @@ let filter = 'all', filterOf = null;
 
 export function openBoard(id) {
   leave();
+  markTab('decks');
   if (id !== filterOf) { filter = 'all'; filterOf = id; }
   settings.deck = id;
   saveSettings();
@@ -39,9 +42,9 @@ export function openBoard(id) {
   const learn = learnable(id).length, rev = reviewable(id), due = rev.filter(isDue).length;
   const count = (k) => (k === 'all' ? cards.length : kinds.filter((x) => x === k).length);
   const go = isOutBoard(id) ? '<div class="note">Tap a word to put it back into the round.</div>' : `
-    ${learn ? `<button class="wide" id="learn">Learn ${Math.min(n, learn)} new
+    ${learn ? `<button class="wide" id="learn">${ic('start')} Learn ${Math.min(n, learn)} new
       <span class="s">${learn} new on this board</span></button>` : ''}
-    ${rev.length ? `<button class="wide" id="review">Review ${Math.min(n, rev.length)}
+    ${rev.length ? `<button class="wide" id="review">${ic('learning')} Review ${Math.min(n, rev.length)}
       <span class="s">${due ? `${due} due` : 'nothing due'} · ${rev.length} started</span></button>` : ''}`;
   $('main').className = 'board';
   $('main').innerHTML = `<div class="go">${go}</div>

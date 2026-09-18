@@ -10,6 +10,8 @@ import { play, SPEAKER } from './sound.js';
 import { yomi, openWord } from './word.js';
 import { priButtons, bindPri } from './priority.js';
 import { openBoard, boardName } from './page.js';
+import { ic } from './icons.js';
+import { markTab } from './nav.js';
 
 let current = null, shown = false, revealed = false;
 export const currentCard = () => current;
@@ -28,10 +30,16 @@ export function begin() {
 }
 
 // ---------------------------------------------------------------- boards
+/** Her icon for a board. The made-up boards have one each; a deck of her own
+ *  gets the deck icon, whatever she called it. */
+const BOARD_ICONS = { learning: 'learning', star: 'favorite', known: 'archive', hidden: 'hidden' };
+const boardIcon = (id) => BOARD_ICONS[id] ?? 'deck';
+
 // Nothing is reviewed until she picks a board, so the app opens on the list
 // rather than dropping her into whichever deck she chose last.
 export function home() {
   leave();
+  markTab('decks');
   const some = (k) => Object.values(progress).some((p) => p[k]);
   const ids = ['learning', 'star', ...deck.decks.map((d) => d.id),
     ...(some('known') ? ['known'] : []), ...(some('hide') ? ['hidden'] : [])];
@@ -48,7 +56,7 @@ export function home() {
       : [!isOutBoard(id) && unseen && `${unseen} new`, !isOutBoard(id) && due && `${due} due`,
         `${cards.length} words`].filter(Boolean).join(' · ');
     return `<button class="deck" data-id="${esc(id)}" ${cards.length ? '' : 'disabled'}>
-      <span class="n">${esc(boardName(id))}</span><span class="s">${note}</span></button>`;
+      ${ic(boardIcon(id))}<span class="n">${esc(boardName(id))}</span><span class="s">${note}</span></button>`;
   }).join('');
   for (const b of document.querySelectorAll('.deck')) {
     b.addEventListener('click', () => openBoard(b.dataset.id));
@@ -111,6 +119,8 @@ function summary() {
   const rev = settings.mode === 'review', id = settings.deck;
   const left = (rev ? reviewable(id).filter((c) => progress[c.f]?.seen !== today()) : learnable(id)).length;
   const more = Math.min(settings.perDay, left);
+  // The lesson is over, so the bar along the bottom comes back with the summary.
+  $('main').className = 'page';
   $('main').innerHTML = `<div class="done"><h2>${how.length ? 'Lesson done' : 'Done for today'}</h2>
     ${how.length ? `<table>${rows.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('')}</table>` : ''}
     ${missed.length ? `<div class="note">Forgot: ${missed.map(esc).join(' · ')}</div>` : ''}
@@ -140,8 +150,7 @@ function draw() {
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.3 12.3l2.5 2.5 5-5.2"/></svg></button>
       ${c.k ? `<div class="kanji">${esc(c.k)}</div>` : ''}
       <div class="kana${[...c.f].length > 7 ? ' long' : ''}">${esc(c.f)}</div>
-      <button id="say" aria-label="Say it" title="Say it">
-        <svg viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M15.5 8.6a5 5 0 010 6.8"/><path d="M18.5 5.6a9 9 0 010 12.8"/></svg></button>
+      <button id="say" aria-label="Say it" title="Say it">${SPEAKER}</button>
       ${shown ? `<div class="back">
           <div class="reading">${esc(c.r)}</div>
           <div class="english">${esc(c.e)}</div>
