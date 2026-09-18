@@ -2,16 +2,17 @@
    this file only dresses it.  It lives apart from index.html because the page
    itself has to stay short enough to read in one go.
 
-   Her island is an accent, not the ground.  It lies in the header, under the
-   number on Home, and - blurred - behind the column on a wide window.  What she
-   reads is always a white card on a pale sky, the way her own drawings show it:
-   the drawing is 416px wide, and stretched behind a whole screen it stopped
-   being a picture and became a smear. */
+   Her island is the ground the app stands on.  She drew it full size and tall -
+   the scene along the top, sand all the way down - so it covers a phone screen
+   without being stretched out of shape, and her cards sit on it. */
 :root{
   --sprite:url(img/sprite-day.webp);
   --shot:url(img/bg-day.jpg);
   --sky:#e9f7ff; --sky2:#fbfdff;
+  /* A card is solid.  Even a tenth of the island coming through it put the hut
+     and the sea behind her words, and that is where they were hardest to read. */
   --card:#ffffff; --solid:#ffffff; --sheet:#ffffff;
+  --bar:rgba(255,255,255,.90);
   /* What is laid over the island wherever words have to sit on it. */
   --veil:linear-gradient(rgba(255,255,255,.60),rgba(255,255,255,.86));
   --line:#d6e6f2;
@@ -28,6 +29,7 @@
   --shot:url(img/bg-night.jpg);
   --sky:#0d1830; --sky2:#121e40;
   --card:#182a52; --solid:#182a52; --sheet:#16254a;
+  --bar:rgba(16,27,56,.92);
   --veil:linear-gradient(rgba(11,21,46,.52),rgba(11,21,46,.84));
   --line:#2a3f6e;
   --shade:0 2px 10px rgba(0,0,0,.3);
@@ -42,33 +44,40 @@
    themselves - so a sideways swipe has nothing to slide. */
 html,body{height:100%;overflow:hidden;overscroll-behavior:none}
 html{background:var(--sky)}
+/* Her island, whole, behind everything.  It is anchored at the top, where the
+   sea and the palms are; below that it is sand, so a taller screen only shows
+   more beach instead of pulling the drawing about. */
 body{position:fixed;inset:0;margin:0;color:var(--ink);
-  background:linear-gradient(180deg,var(--sky) 0%,var(--sky2) 45%);
+  background:var(--shot) center top/cover no-repeat,var(--sky);
   font:16px/1.5 -apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",system-ui,sans-serif;
   display:flex;flex-direction:column;
   padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left)}
 
 /* One icon off her sheet.  --x and --y are the cell, --s how big to draw it. */
-.ic{--s:28px;width:var(--s);height:var(--s);flex:none;display:inline-block;vertical-align:-.28em;
+.ic{--s:32px;width:var(--s);height:var(--s);flex:none;display:inline-block;vertical-align:-.28em;
   background-image:var(--sprite);background-repeat:no-repeat;
   background-size:calc(var(--s) * 8) calc(var(--s) * 6);
   background-position:calc(var(--x) * var(--s) * -1) calc(var(--y) * var(--s) * -1)}
 
-/* The header is her island, with a veil over it so the words on top stay read. */
-header{display:flex;align-items:center;gap:9px;padding:10px 14px;
-  border-bottom:1px solid var(--line);
-  background-image:var(--veil),var(--shot);
-  background-size:auto,cover;background-position:center,center 16%}
+/* The header stands on the sky of her island, so it is only the buttons and the
+   name - no plate, no line under it. */
+header{display:flex;align-items:center;gap:9px;padding:10px 14px}
 header .grow{flex:1;min-width:0}
-.counts{font-size:14px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.counts{font-size:14px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  text-shadow:0 1px 3px rgba(255,255,255,.85)}
 .counts b{color:var(--ink);font-weight:700}
+:root[data-theme="dark"] .counts{text-shadow:0 1px 3px rgba(6,12,28,.8)}
 /* padding:0 - the iPhone gives every button a padding of its own, which pushed
    the icon in a small round button off its centre. */
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
-.icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;
-  border:1px solid var(--line);background:var(--card);flex:none;box-shadow:var(--shade)}
+/* The header stands on her island now, and her Menu is three pale bars with no
+   outline: over the palms they stopped being a button at all.  So they get a
+   white plate - a bigger one than before, with the drawing well inside it
+   instead of pressed against the frame. */
+.icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;flex:none;
+  border:1px solid var(--line);background:var(--card);box-shadow:var(--shade)}
 .icon:active{background:var(--warm)}
-.icon .ic{--s:24px}
+.icon .ic{--s:28px}
 .icon svg{width:21px;height:21px;display:block;fill:none;stroke:currentColor;
   stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .starred{color:var(--star);border-color:var(--star)}
@@ -90,12 +99,13 @@ main.study{overflow:hidden;touch-action:pan-y}
 
 /* The bar she drew along the bottom.  It is gone during a lesson: the answers
    own that edge of the screen, and a tab under her thumb there is a mis-tap. */
-#tabs{display:flex;background:var(--card);border-top:1px solid var(--line);
+#tabs{display:flex;background:var(--bar);border-top:1px solid var(--line);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
   padding-bottom:env(safe-area-inset-bottom)}
 main.study ~ #tabs{display:none}
 #tabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;
-  padding:6px 0 4px;font-size:10px;letter-spacing:.02em;color:var(--dim)}
-#tabs .ic{--s:27px}
+  padding:6px 0 4px;font-size:11px;letter-spacing:.02em;color:var(--dim)}
+#tabs .ic{--s:34px}
 #tabs .on{color:var(--pink);font-weight:700}
 #tabs button:active{background:var(--warm)}
 
@@ -107,6 +117,7 @@ main.study ~ #tabs{display:none}
   padding:13px 14px;border-radius:16px;border:1px solid var(--line);background:var(--card);
   box-shadow:var(--shade)}
 .tile:active{background:var(--warm)}
+.tile .ic{--s:38px}
 .tile .n{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tile .v{color:var(--dim);font-size:14px;white-space:nowrap}
 .tile .go{color:var(--dim);font-size:19px;line-height:1}
@@ -119,16 +130,16 @@ main.study ~ #tabs{display:none}
   aspect-ratio:591/303;border:0;box-shadow:var(--shade);
   background:url(img/panel.webp) center/100% 100% no-repeat}
 /* Her card is painted for the day, and at night it glared white on the dark
-   screen.  Until there is a night one, the number sits on her night island. */
-:root[data-theme="dark"] .ring{aspect-ratio:auto;padding:22px 0 20px;box-shadow:none;
-  border:1px solid var(--line);border-radius:18px;
-  background-image:var(--veil),var(--shot);
-  background-size:auto,cover;background-position:center,center 62%}
+   screen.  Until there is a night one, the number sits on a plain dark card -
+   putting her island on it too only drew the same beach twice. */
+:root[data-theme="dark"] .ring{aspect-ratio:auto;padding:22px 0 20px;
+  border:1px solid var(--line);border-radius:18px;background:var(--card)}
 .ring .n{font-size:44px;font-weight:700;line-height:1.05}
 .ring .l{font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em}
 .duo{display:flex;gap:10px}
 .duo button{flex:1;display:flex;align-items:center;gap:9px;padding:11px 12px;border-radius:16px;
   border:1px solid var(--line);background:var(--card);text-align:left;box-shadow:var(--shade)}
+.duo .ic{--s:38px}
 .duo b{font-size:19px;font-weight:700;line-height:1.1;display:block}
 .duo span{font-size:11px;color:var(--dim)}
 .duo button:active{background:var(--warm)}
@@ -338,7 +349,7 @@ main.study ~ #tabs{display:none}
   padding:10px 6px 11px;border-radius:20px;border:1px solid var(--line);
   background:var(--card);font-size:14px;font-weight:700;box-shadow:var(--shade)}
 .row>button:active{transform:translateY(1px)}
-.row .ic{--s:27px}
+.row .ic{--s:32px}
 .row .s{display:block;font-size:11px;font-weight:400;color:var(--dim)}
 #again{color:var(--again)} #good{color:var(--good)} #easy{color:var(--hard)}
 #reveal{border:0;color:#fff;font-size:17px;border-radius:999px;padding:13px 8px;
@@ -368,13 +379,10 @@ td{padding:5px 0;border-bottom:1px solid var(--line)}
 td:last-child{text-align:right;font-weight:700}
 
 /* It is a phone app.  A wide window is not a phone: the app stays a column of
-   phone width on a calm field, and her island stays inside it - the drawing is
-   416px wide, and stretched across a monitor it stopped being a picture and
-   became a smear.  (A blurred copy of it behind the column would be nicer, but
-   a layer under the root element is not drawn here at all; it wants a
-   full-size background to be worth doing.) */
+   phone width, and now that her island is drawn full size it goes around that
+   column too - the same drawing, at the size of the window. */
 @media (min-width:620px){
-  html{background:linear-gradient(180deg,var(--sky),var(--sky2))}
-  body{max-width:480px;margin:0 auto;box-shadow:0 0 40px rgba(8,40,70,.22);
+  html{background:var(--shot) center top/cover no-repeat,var(--sky)}
+  body{max-width:480px;margin:0 auto;box-shadow:0 0 50px rgba(8,40,70,.35);
     border-left:1px solid var(--line);border-right:1px solid var(--line)}
 }
