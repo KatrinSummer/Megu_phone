@@ -21,7 +21,12 @@ export const currentCard = () => current;
 export function leave() {
   current = null;
   forget();                                // so the boards, not a lesson, open next time
+  ground(false);                           // plain blue; Home and the card ask for the island
 }
+
+/** Her island behind everything, or plain blue.  One switch, so no screen can
+ *  end up half on the beach: the header and the bar stand on it too. */
+export const ground = (on) => document.body.classList.toggle('island', on);
 
 /** The lesson or review the page's button asked for. */
 export function begin() {
@@ -58,6 +63,7 @@ export function render() {
   const all = pool();
   $('star').hidden = $('back').hidden = false;
   $('main').className = 'study';
+  ground(true);                            // a card stands on her island - her call
   current = nextCard();
   // What is left of the lesson, this card included: it goes down at every card,
   // whatever her answer. Short enough to survive any font beside the buttons.

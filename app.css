@@ -52,11 +52,16 @@ html{background:var(--sky)}
 /* Her island, whole, behind everything.  It is anchored at the top, where the
    sea and the palms are; below that it is sand, so a taller screen only shows
    more beach instead of pulling the drawing about. */
-body{position:fixed;inset:0;margin:0;color:var(--ink);
-  background:var(--shot) center top/cover no-repeat,var(--sky);
+/* Her island is not the ground of every screen: she asked for it on Home and
+   behind a card, and for plain blue everywhere else - a screen of switches, of
+   numbers or of boards is no place to read a beach through.  It is set on the
+   body and not on <main>, or the strip under the header would keep showing the
+   beach while the screen below it was blue. */
+body{position:fixed;inset:0;margin:0;color:var(--ink);background:var(--sky);
   font:16px/1.5 -apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",system-ui,sans-serif;
   display:flex;flex-direction:column;
   padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left)}
+body.island{background:var(--shot) center top/cover no-repeat,var(--sky)}
 
 /* One icon off her sheet.  --x and --y are the cell, --s how big to draw it. */
 .ic{--s:32px;width:var(--s);height:var(--s);flex:none;display:inline-block;vertical-align:-.28em;
@@ -237,9 +242,8 @@ main.study ~ #tabs{display:none}
 .rows div:last-child{border-bottom:0}
 .rows b{margin-left:auto;font-weight:700}
 
-/* Settings: the same rows, with something to change on the right.  This screen
-   stands on plain blue rather than on the island - her call. */
-main.settings{background:var(--sky)}
+/* Settings: the same rows, with something to change on the right.  Like every
+   screen but Home and the card, it stands on plain blue - see body.island. */
 .set{display:flex;align-items:center;gap:11px;padding:11px 14px;border-bottom:1px solid var(--line)}
 .set:last-child{border-bottom:0}
 .set .n{flex:1;min-width:0}

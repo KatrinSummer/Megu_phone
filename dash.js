@@ -9,7 +9,7 @@ import { deck, poolOf, learnable, isDue } from './boards.js';
 import { isMemorized } from './schedule.js';
 import { ic } from './icons.js';
 import { ring } from './ring.js';
-import { leave, begin } from './screens.js';
+import { leave, begin, ground } from './screens.js';
 import { home } from './decks.js';
 import { openBoard } from './page.js';
 import { markTab } from './nav.js';
@@ -21,6 +21,7 @@ const studyBoard = () => (learnable(settings.deck).length ? settings.deck
 
 export function dash() {
   leave();
+  ground(true);                                 // Home is the one screen she keeps on the island
   markTab('home');
   $('star').hidden = $('back').hidden = true;
   $('stats').hidden = true;
