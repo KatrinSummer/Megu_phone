@@ -13,6 +13,15 @@ const NAMES = { learning: 'Review', star: 'Bookmarks', pri: 'Priorities',
                 known: 'Marked as known', hidden: 'Hidden' };
 export const boardName = (id) => NAMES[id] ?? deck.decks.find((d) => d.id === id)?.name ?? id;
 
+/** Her icon for a board.  The made-up ones have their own; a deck of hers takes
+ *  the next picture off the list, so no two of them are the same flower.  It
+ *  lives here, beside the board's name, and the list borrows both. */
+const ICONS = { learning: 'learning', star: 'favorite', pri: 'streak',
+                known: 'archive', hidden: 'hidden' };
+const MINE = ['category', 'repeat', 'picture', 'streak', 'goal', 'language', 'theme', 'calendar'];
+export const boardIcon = (id) => ICONS[id]
+  ?? MINE[deck.decks.findIndex((d) => d.id === id) % MINE.length] ?? 'deck';
+
 /** The filter a word falls under: hidden, know (memorized or ticked), learn, new. */
 const kindOf = (c) => (progress[c.f]?.hide ? 'hidden' : stateOf(c));
 const KINDS = [['all', 'All'], ['new', 'New'], ['learn', 'Learning'], ['know', 'Memorized'], ['hidden', 'Hidden']];
@@ -35,7 +44,9 @@ export function openBoard(id) {
   saveSettings();
   $('star').hidden = true;
   $('back').hidden = false;
-  $('counts').innerHTML = `<b>${esc(boardName(id))}</b>`;
+  // The board's name is in her big heading on the screen now, so the header
+  // keeps quiet: it was saying the same word twice, one line above the other.
+  $('counts').innerHTML = '';
   $('counts').title = boardName(id);
   stats();
 
@@ -48,7 +59,12 @@ export function openBoard(id) {
     ${rev.length ? `<button class="wide" id="review">${ic('learning')} Review ${Math.min(n, rev.length)}
       <span class="s">${due ? `${due} due` : 'nothing due'} · ${rev.length} started</span></button>` : ''}`;
   $('main').className = 'board';
-  $('main').innerHTML = `<div class="go">${go}</div>
+  // The board says its own name on the screen, the way every other screen does
+  // and the way she drew it - not only in small letters up in the header.
+  $('main').innerHTML = `
+    <div class="head">${ic(boardIcon(id), '44px')}<h1>${esc(boardName(id))}</h1>
+      <span class="s">${cards.length} words</span></div>
+    <div class="go">${go}</div>
     <div class="chips">${KINDS.filter(([k]) => k === 'all' || count(k)).map(([k, name]) =>
       `<button data-k="${k}"${k === filter ? ' class="on"' : ''}>${name} ${count(k)}</button>`).join('')}</div>
     <div class="words">${cards.map((c, i) => filter !== 'all' && kinds[i] !== filter ? '' :

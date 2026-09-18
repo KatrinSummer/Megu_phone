@@ -10,16 +10,8 @@ import { isMemorized } from './schedule.js';
 import { ic } from './icons.js';
 import { ring } from './ring.js';
 import { leave } from './screens.js';
-import { openBoard, boardName } from './page.js';
+import { openBoard, boardName, boardIcon } from './page.js';
 import { markTab } from './nav.js';
-
-/** Her icon for a board.  The four made-up ones have their own; a deck of hers
- *  takes the next picture off the list, so no two of them are the same flower. */
-const BOARD_ICONS = { learning: 'learning', star: 'favorite', pri: 'streak',
-                      known: 'archive', hidden: 'hidden' };
-const MINE = ['category', 'repeat', 'picture', 'streak', 'goal', 'language', 'theme', 'calendar'];
-const boardIcon = (id) => BOARD_ICONS[id]
-  ?? MINE[deck.decks.findIndex((d) => d.id === id) % MINE.length] ?? 'deck';
 
 const FILTERS = [['all', 'All'], ['new', 'New'], ['learn', 'Learning'], ['know', 'Learned'], ['due', 'Due']];
 // The filter is remembered while the app is open, the same as a board's own.
