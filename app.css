@@ -8,6 +8,9 @@
 :root{
   --sprite:url(img/sprite-day.webp);
   --shot:url(img/bg-day.jpg);
+  /* Her second drawing: the bare sky with palm leaves in the corner.  It is the
+     ground of every screen that is not Home, where the island itself stands. */
+  --sky-art:url(img/bg-sky.jpg);
   --sky:#e9f7ff; --sky2:#fbfdff;
   /* A card is solid.  Even a tenth of the island coming through it put the hut
      and the sea behind her words, and that is where they were hardest to read. */
@@ -26,10 +29,16 @@
   --w-know:#0f8a63; --w-learn:#cf6d10; --w-new:#7b8ea3;
   /* The ring: learned, not learned yet, put aside. */
   --fresh:#2f9ae0; --gone:#c3d3e0;
+  /* Her four states, in her colours: blue for the ones she knows, light green
+     for the ones she is learning, almost white for the ones not started, grey
+     for the ones she put away. */
+  --r-know:#2f9ae0; --r-learn:#7ad3a4; --r-new:#e2f2fb; --r-hid:#c3d3e0;
 }
 :root[data-theme="dark"]{
   --sprite:url(img/sprite-night.webp);
   --shot:url(img/bg-night.jpg);
+  /* Her sky is painted for the day.  After dark the screens keep plain blue. */
+  --sky-art:none;
   --sky:#0d1830; --sky2:#121e40;
   --card:#182a52; --solid:#182a52; --sheet:#16254a;
   --bar:rgba(16,27,56,.92);
@@ -43,6 +52,7 @@
   --warm:#23355f; --warm-line:#3d548c;
   --w-know:#5fd6ae; --w-learn:#ffbe6b; --w-new:#a8b8d0;
   --fresh:#5fb5ff; --gone:#46597f;
+  --r-know:#5fb5ff; --r-learn:#6fd0ae; --r-new:#2c4a7a; --r-hid:#46597f;
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
 /* Nothing scrolls as a whole page - the lists and the card scroll inside
@@ -57,7 +67,8 @@ html{background:var(--sky)}
    numbers or of boards is no place to read a beach through.  It is set on the
    body and not on <main>, or the strip under the header would keep showing the
    beach while the screen below it was blue. */
-body{position:fixed;inset:0;margin:0;color:var(--ink);background:var(--sky);
+body{position:fixed;inset:0;margin:0;color:var(--ink);
+  background:var(--sky-art) center top/cover no-repeat,var(--sky);
   font:16px/1.5 -apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",system-ui,sans-serif;
   display:flex;flex-direction:column;
   padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left)}
@@ -68,6 +79,8 @@ body.island{background:var(--shot) center top/cover no-repeat,var(--sky)}
   background-image:var(--sprite);background-repeat:no-repeat;
   background-size:calc(var(--s) * 8) calc(var(--s) * 6);
   background-position:calc(var(--x) * var(--s) * -1) calc(var(--y) * var(--s) * -1)}
+/* One she drew outside the sheet - the gear - is a file of its own. */
+.ic.own{background-image:var(--own);background-size:100% 100%;background-position:0 0}
 
 /* The header stands on the sky of her island, so it is only the buttons and the
    name - no plate, no line under it. */
@@ -114,8 +127,8 @@ main.study{overflow:hidden;touch-action:pan-y}
   padding-bottom:env(safe-area-inset-bottom)}
 main.study ~ #tabs{display:none}
 #tabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;
-  padding:7px 0 5px;font-size:12px;letter-spacing:.02em;color:var(--dim)}
-#tabs .ic{--s:40px}
+  padding:7px 0 5px;font-size:13px;letter-spacing:.02em;color:var(--dim)}
+#tabs .ic{--s:46px}
 #tabs .on{color:var(--pink);font-weight:700}
 #tabs button:active{background:var(--warm)}
 
@@ -177,23 +190,23 @@ main.study ~ #tabs{display:none}
   padding:13px 14px;border-radius:16px;border:1px solid var(--line);background:var(--card);
   box-shadow:var(--shade)}
 .tile:active{background:var(--warm)}
-.tile .ic{--s:46px}
-.tile .n{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tile .ic{--s:54px}
+.tile .n{flex:1;min-width:0;font-size:17px;font-weight:600;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tile .v{color:var(--dim);font-size:14px;white-space:nowrap}
 .tile .go{color:var(--dim);font-size:19px;line-height:1}
 .tile:disabled{opacity:.5}
 .tile .s{display:block;font-size:12px;font-weight:400;color:var(--dim)}
 
-/* Home: how today stands.  The number sits on the card she painted, flowers in
-   its corners - drawn whole, never sliced, or the flowers would smear. */
+/* Home: how today stands.  No plate under it and nothing beside it - she asked
+   for the left of her island left bare, the hut and the sea showing, and only
+   the ring over on the right.  The writing in it stands on the drawing, so it
+   carries a glow instead of a card. */
 .ring{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
-  aspect-ratio:591/303;border:0;box-shadow:var(--shade);
-  background:url(img/panel.webp) center/100% 100% no-repeat}
-/* Her card is painted for the day, and at night it glared white on the dark
-   screen.  Until there is a night one, the number sits on a plain dark card -
-   putting her island on it too only drew the same beach twice. */
-:root[data-theme="dark"] .ring{aspect-ratio:auto;padding:22px 0 20px;
-  border:1px solid var(--line);border-radius:18px;background:var(--card)}
+  align-self:flex-end;width:60%;padding:34px 4px 10px}
+.ring .n,.ring .l{text-shadow:0 1px 5px rgba(255,255,255,.95)}
+:root[data-theme="dark"] .ring .n,:root[data-theme="dark"] .ring .l{
+  text-shadow:0 1px 5px rgba(6,12,28,.9)}
 /* The ring itself, with the number sitting in its hole. */
 .donut{position:relative;width:var(--d);height:var(--d);flex:none;display:grid;place-items:center}
 .donut svg{width:100%;height:100%;display:block}
@@ -206,9 +219,9 @@ main.study ~ #tabs{display:none}
 .duo{display:flex;gap:10px}
 .duo button{flex:1;display:flex;align-items:center;gap:9px;padding:11px 12px;border-radius:16px;
   border:1px solid var(--line);background:var(--card);text-align:left;box-shadow:var(--shade)}
-.duo .ic{--s:44px}
-.duo b{font-size:19px;font-weight:700;line-height:1.1;display:block}
-.duo span{font-size:11px;color:var(--dim)}
+.duo .ic{--s:52px}
+.duo b{font-size:22px;font-weight:700;line-height:1.1;display:block}
+.duo span{font-size:12px;color:var(--dim)}
 .duo button:active{background:var(--warm)}
 /* Her Primary Button, painted.  It is stretched as a nine-slice: the two ends
    keep their shape and only the middle grows.  The play mark is painted into
@@ -217,7 +230,7 @@ main.study ~ #tabs{display:none}
 /* The ends are drawn at a fixed size, so the button is given a height to match
    the picture: let it grow and the play mark is stretched out of shape. */
 .big{display:flex;align-items:center;justify-content:center;width:100%;
-  height:58px;padding:0 24px 0 80px;font-size:17px;font-weight:700;color:#fff;
+  height:62px;padding:0 24px 0 80px;font-size:20px;font-weight:700;color:#fff;
   border:0 solid transparent;background:none;
   border-image:url(img/btn-go.webp) 40 60 40 150 fill / 22px 32px 22px 80px / 0 stretch}
 .big:active{transform:translateY(1px)}
@@ -267,7 +280,7 @@ main.study ~ #tabs{display:none}
    on it underneath, with an arrow at the end. */
 .deck{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border-radius:18px;
   text-align:left;border:1px solid var(--line);background:var(--card);box-shadow:var(--shade)}
-.deck .ic{--s:46px}
+.deck .ic{--s:54px}
 .deck .n{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;
   font-size:17px;font-weight:700;overflow:hidden;text-overflow:ellipsis}
 .deck .s{font-size:13px;font-weight:400;color:var(--dim);white-space:nowrap}

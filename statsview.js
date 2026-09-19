@@ -50,11 +50,10 @@ export function statsPage() {
   const fresh = cards.length - know - learn - hid;
   const pct = cards.length ? Math.round((know / cards.length) * 100) : 0;
 
-  // The same colours her ring uses, in the same order: green what she has
-  // learned, blue what she has not, grey what she waved off.  Learning is the
-  // green on its way to blue, so it takes the colour in between.
-  const legend = [['Learned', know, 'var(--good)'], ['Learning', learn, 'var(--aqua)'],
-    ['New', fresh, 'var(--fresh)'], ['Hidden', hid, 'var(--gone)']];
+  // The same four colours her ring uses, in the same order, so a colour means
+  // one thing wherever she meets it.
+  const legend = [['Learned', know, 'var(--r-know)'], ['Learning', learn, 'var(--r-learn)'],
+    ['New', fresh, 'var(--r-new)'], ['Hidden', hid, 'var(--r-hid)']];
   const rows = [
     ['words in all', cards.length], ['started', all.filter(started).length],
     ['due for review', poolOf('learning').filter(isDue).length],
@@ -69,7 +68,7 @@ export function statsPage() {
     <div class="pane wheel">
       <svg viewBox="0 0 104 104" aria-label="${pct}% learned">
         <circle cx="52" cy="52" r="${R}" fill="none" stroke="var(--line)" stroke-width="12"/>
-        <circle cx="52" cy="52" r="${R}" fill="none" stroke="var(--good)" stroke-width="12"
+        <circle cx="52" cy="52" r="${R}" fill="none" stroke="var(--r-know)" stroke-width="12"
           stroke-linecap="round" stroke-dasharray="${(C * pct) / 100} ${C}"/>
         <text x="52" y="52" transform="rotate(90 52 52)" text-anchor="middle" dominant-baseline="central"
           class="pct" fill="var(--ink)">${pct}%</text>

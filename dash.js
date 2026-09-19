@@ -41,7 +41,7 @@ export function dash() {
 
   $('main').className = 'dash';
   $('main').innerHTML = `
-    <div class="pane ring">
+    <div class="ring">
       ${ring(deck.cards, '158px', `<div class="mid"><span class="n">${deck.cards.length}</span>
         <span class="l">words</span>${done ? `<span class="l today">${done} today</span>` : ''}</div>`)}
     </div>

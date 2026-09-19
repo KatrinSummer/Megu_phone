@@ -53,7 +53,7 @@ export function home() {
   const rows = ids.map((id) => [id, counts(id)]).filter(([, n]) => passes(n));
   $('main').className = 'home';
   $('main').innerHTML = `
-    <div class="head">${ic('category', '44px')}<h1>Decks</h1>
+    <div class="head">${ic('repeat', '52px')}<h1>Decks</h1>
       <span class="s">${deck.decks.length} boards</span></div>
     <div class="chips">${FILTERS.map(([k, name]) =>
       `<button data-k="${k}"${k === filter ? ' class="on"' : ''}>${name}</button>`).join('')}</div>

@@ -14,7 +14,7 @@ const TABS = [
   ['home', 'Home', 'home', () => dash()],
   ['decks', 'Decks', 'repeat', () => home()],
   ['stats', 'Stats', 'stats', () => statsPage()],
-  ['settings', 'Settings', 'settings', () => settingsPage()],
+  ['settings', 'Settings', 'gear', () => settingsPage()],
 ];
 
 /** Which tab is lit. A board's page and a lesson belong to Decks, so the bar

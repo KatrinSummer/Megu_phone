@@ -20,10 +20,19 @@ export const COLS = 8;
 
 const at = new Map(NAMES.map((n, i) => [n, [i % COLS, (i / COLS) | 0]]));
 
+/** A picture of hers that is not on the sheet, and has a file to itself.  The
+ *  gear is the one: her sheet draws Settings as a flower, but the phone she
+ *  drew has a gear down in the bar, and that is the one she asked for. */
+const OWN = { gear: 'img/gear.webp' };
+
 /** One icon. `size` is a css length: the cell scales to it, and the sheet with it.
  *  A name that is not on the sheet draws nothing rather than a slice of its
  *  neighbour, so a typo is visible instead of quietly wrong. */
 export function ic(name, size = '') {
+  if (OWN[name]) {
+    return `<i class="ic own" aria-hidden="true"
+      style="--own:url(${OWN[name]})${size ? `;--s:${size}` : ''}"></i>`;
+  }
   const cell = at.get(name);
   if (!cell) return '';
   const [x, y] = cell;
