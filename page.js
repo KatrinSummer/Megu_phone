@@ -62,7 +62,7 @@ export function openBoard(id) {
   // The board says its own name on the screen, the way every other screen does
   // and the way she drew it - not only in small letters up in the header.
   $('main').innerHTML = `
-    <div class="head">${ic(boardIcon(id), '44px')}<h1>${esc(boardName(id))}</h1>
+    <div class="head">${ic(boardIcon(id))}<h1>${esc(boardName(id))}</h1>
       <span class="s">${cards.length} words</span></div>
     <div class="go">${go}</div>
     <div class="chips">${KINDS.filter(([k]) => k === 'all' || count(k)).map(([k, name]) =>

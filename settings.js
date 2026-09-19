@@ -25,7 +25,7 @@ export function settingsPage() {
   // read a beach through.
   $('main').className = 'page settings';
   $('main').innerHTML = `
-    <div class="head">${ic('settings', '44px')}<h1>Settings</h1></div>
+    <div class="head">${ic('gear')}<h1>Settings</h1></div>
     <div class="grp">Learning</div>
     <div class="pane">
       <div class="set">${ic('goal')}<span class="n">New words at a time</span>

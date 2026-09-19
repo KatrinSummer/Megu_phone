@@ -41,7 +41,7 @@ export function ring(cards, size, middle = '') {
         ${arc(know, 'var(--r-know)')}${arc(learn, 'var(--r-learn)')}
         ${arc(fresh, 'var(--r-new)')}${arc(hid, 'var(--r-hid)')}
       </g>
-      <circle cx="52" cy="52" r="${R + 6}" fill="none" stroke="var(--r-edge)" stroke-width="1.5"/>
-      <circle cx="52" cy="52" r="${R - 6}" fill="none" stroke="var(--r-edge)" stroke-width="1.5"/>
+      <circle cx="52" cy="52" r="${R + 6}" fill="none" stroke="var(--r-edge)" stroke-width="2.4"/>
+      <circle cx="52" cy="52" r="${R - 6}" fill="none" stroke="var(--r-edge)" stroke-width="2.4"/>
     </svg>${middle}</div>`;
 }

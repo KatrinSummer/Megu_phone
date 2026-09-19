@@ -112,7 +112,7 @@ export function statsPage() {
 
   $('main').className = 'page';
   $('main').innerHTML = `
-    <div class="head">${ic('stats', '44px')}<h1>Stats</h1>
+    <div class="head">${ic('stats')}<h1>Stats</h1>
       <span class="s">${cards.length} words</span></div>
     <div class="chips">${TABS.map(([k, name]) =>
       `<button data-k="${k}"${k === tab ? ' class="on"' : ''}>${name}</button>`).join('')}</div>

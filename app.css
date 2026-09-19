@@ -138,6 +138,10 @@ main.study ~ #tabs{display:none}
 /* The name of the screen, the way she drew it: her icon, the word in big
    letters, and what it counts on the right. */
 .head{display:flex;align-items:center;gap:12px;padding:2px 4px 2px 2px}
+/* Every screen's heading wears the same size of icon, so the name of the screen
+   sits at the same height wherever she is - one of them a few pixels bigger and
+   the line jumped as she moved between them. */
+.head .ic{--s:48px}
 .head h1{margin:0;font-size:27px;font-weight:700;letter-spacing:.01em;
   text-shadow:0 1px 4px rgba(255,255,255,.9)}
 /* It stands on her sky, not on a card: grey on that blue all but disappeared. */
@@ -248,13 +252,16 @@ main.study ~ #tabs{display:none}
 .wheel .pct{font-size:22px;font-weight:700}
 .wheel .legend{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;font-size:14px}
 .wheel .legend div{display:flex;align-items:center;gap:8px}
-.wheel .legend i.dot{width:10px;height:10px;border-radius:50%;flex:none}
+/* The dot for the words she has not started is white, and a white dot on a
+   white card is no dot at all: every one of them carries a faint edge. */
+.wheel .legend i.dot{width:10px;height:10px;border-radius:50%;flex:none;
+  box-shadow:0 0 0 1px rgba(22,70,110,.22)}
 .wheel .legend b{margin-left:auto;font-weight:700}
 /* The little pink plate she writes a section's name on - hers, painted, not one
    drawn in CSS.  Sliced at half its height (58/2), the same rule as the pills. */
 .grp{align-self:flex-start;padding:6px 15px;font-size:11px;font-weight:700;
   color:#b93a76;border:0 solid transparent;background:none;
-  border-image:url(img/tag-pink.webp) 0 29 fill / 0 14px / 0 stretch;
+  border-image:url(img/tag-pink.webp) 0 30 fill / 0 14px / 0 stretch;
   text-transform:uppercase;letter-spacing:.08em}
 /* The plate stays the pink she painted after dark, so the writing on it has to
    stay dark too. */
@@ -323,13 +330,14 @@ main.study ~ #tabs{display:none}
 .chips button{padding:7px 12px;font-size:12px;font-weight:600;color:#4d7fa6;
   border:0 solid transparent;background:none;
 /* The end of a pill is a half-circle, so the slice that keeps its shape is half
-   the picture's height: chip-off is 71x69 and chip-on 110x71.  Cutting less
-   than that (30 was the old number) leaves a piece of the curve in the middle
-   band, and the middle band is stretched - which flattened the pill and read as
-   a button with its ends chopped off. */
-  border-image:url(img/chip-off.webp) 0 34 fill / 0 16px / 0 stretch}
+   the picture's height: chip-off is 92x72 and chip-on 122x73.  Cutting less
+   than that leaves a piece of the curve in the middle band, and the middle band
+   is stretched - which flattened the pill and read as a button with its ends
+   chopped off.  The pictures themselves were chopped too, until the cut learned
+   to follow her paint outwards instead of trusting a box measured by eye. */
+  border-image:url(img/chip-off.webp) 0 36 fill / 0 17px / 0 stretch}
 .chips .on{color:#fff;font-weight:700;
-  border-image-source:url(img/chip-on.webp);border-image-slice:0 35 fill}
+  border-image-source:url(img/chip-on.webp);border-image-slice:0 36 fill}
 .words{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:0 12px;
   box-shadow:var(--shade)}
 .wd{display:grid;grid-template-columns:1fr auto;column-gap:10px;width:100%;text-align:left;
@@ -347,7 +355,7 @@ main.study ~ #tabs{display:none}
    149x59 and the row gives it about 42x23: stretched whole, her rounded ends
    were squashed to a third of the width she drew them at, so it is sliced. */
 .wd.learn .st{background:none;border:0 solid transparent;color:#a8690a;
-  border-image:url(img/tag-cream.webp) 0 29 fill / 0 11px / 0 stretch}
+  border-image:url(img/tag-cream.webp) 0 30 fill / 0 12px / 0 stretch}
 .wd.know .st{background:#dcf5ea;color:#0f8a63}
 :root[data-theme="dark"] .wd.know .st{background:#1e4a3c;color:#5fd6ae}
 .wd .e{grid-column:1/-1;font-size:13px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -491,7 +499,7 @@ input,select{padding:10px;border-radius:12px;border:1px solid var(--line);
 /* Her Secondary Button, painted the same way. */
 .wide{width:100%;padding:16px 22px;margin-top:10px;color:#c43d80;font-weight:700;
   border:0 solid transparent;background:none;
-  border-image:url(img/btn-soft.webp) 36 fill / 21px / 0 stretch}
+  border-image:url(img/btn-soft.webp) 0 50 fill / 0 25px / 0 stretch}
 .wide .ic{--s:24px;margin-right:6px}
 .note{font-size:12px;color:var(--dim);margin-top:10px}
 table{width:100%;border-collapse:collapse;font-size:14px;margin-top:4px}
