@@ -36,10 +36,12 @@ export function ring(cards, size, middle = '') {
   return `<div class="donut" style="--d:${size}">
     <svg viewBox="0 0 104 104"
       aria-label="${know} known, ${learn} being learned, ${fresh} not started, ${hid} put aside">
-      <circle cx="52" cy="52" r="${R}" fill="none" stroke="var(--line)" stroke-width="12"/>
+      <circle cx="52" cy="52" r="${R}" fill="none" stroke="var(--r-new)" stroke-width="12"/>
       <g transform="rotate(-90 52 52)">
         ${arc(know, 'var(--r-know)')}${arc(learn, 'var(--r-learn)')}
         ${arc(fresh, 'var(--r-new)')}${arc(hid, 'var(--r-hid)')}
       </g>
+      <circle cx="52" cy="52" r="${R + 6}" fill="none" stroke="var(--r-edge)" stroke-width="1.5"/>
+      <circle cx="52" cy="52" r="${R - 6}" fill="none" stroke="var(--r-edge)" stroke-width="1.5"/>
     </svg>${middle}</div>`;
 }

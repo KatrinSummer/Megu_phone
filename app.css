@@ -32,7 +32,9 @@
   /* Her four states, in her colours: blue for the ones she knows, light green
      for the ones she is learning, almost white for the ones not started, grey
      for the ones she put away. */
-  --r-know:#2f9ae0; --r-learn:#7ad3a4; --r-new:#e2f2fb; --r-hid:#c3d3e0;
+  --r-know:#2f9ae0; --r-learn:#7ad3a4; --r-new:#ffffff; --r-hid:#c3d3e0;
+  /* White on her sky needs an edge, or the ring melts into the clouds. */
+  --r-edge:#7ec8ea;
 }
 :root[data-theme="dark"]{
   --sprite:url(img/sprite-night.webp);
@@ -52,7 +54,8 @@
   --warm:#23355f; --warm-line:#3d548c;
   --w-know:#5fd6ae; --w-learn:#ffbe6b; --w-new:#a8b8d0;
   --fresh:#5fb5ff; --gone:#46597f;
-  --r-know:#5fb5ff; --r-learn:#6fd0ae; --r-new:#2c4a7a; --r-hid:#46597f;
+  --r-know:#5fb5ff; --r-learn:#6fd0ae; --r-new:#e8f3ff; --r-hid:#46597f;
+  --r-edge:#5f8fc4;
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
 /* Nothing scrolls as a whole page - the lists and the card scroll inside
@@ -216,6 +219,10 @@ main.study ~ #tabs{display:none}
 /* Not .done: that is the card at the end of a lesson, and the checks find the
    end of a lesson by looking for it. */
 .ring .l.today{text-transform:none;letter-spacing:0;color:var(--good);font-weight:700;margin-top:3px}
+/* On a screen taller than her rows need, the spare room goes above them, not
+   under them: the ring stays up on the sky and everything she taps sits down by
+   her thumb.  When the rows do fill the screen the auto margin is simply nil. */
+.dash .duo{margin-top:auto}
 .duo{display:flex;gap:10px}
 .duo button{flex:1;display:flex;align-items:center;gap:9px;padding:11px 12px;border-radius:16px;
   border:1px solid var(--line);background:var(--card);text-align:left;box-shadow:var(--shade)}
