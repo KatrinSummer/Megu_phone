@@ -13,12 +13,25 @@ import { leave, begin, ground } from './screens.js';
 import { home } from './decks.js';
 import { openBoard, cameIn } from './page.js';
 import { pickBoard } from './pick.js';
+import { pickCount } from './perday.js';
 import { markTab } from './nav.js';
 
 /** The board the big button starts.  Her last one while it still has new words
  *  in it, otherwise the newest lesson, which is the one she is usually after. */
 const studyBoard = () => (learnable(settings.deck).length ? settings.deck
   : learnable('last').length ? 'last' : settings.deck);
+
+/** The little handle on the big button: how many words a lesson deals.  A plain
+ *  gear, not one of her drawings - beside her jungle a second picture would be
+ *  one picture too many. */
+// Drawn, not typed: the ⚙ character comes out of the phone as its own coloured
+// emoji - a small dark machine sitting on her pink paint - whatever is asked of
+// it.  This is a plain outline in the colour of the button's own letters.
+const COG = `<span class="cog" id="d-cog" role="button" tabindex="0" aria-label="How many words">
+  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/>
+    <path d="M19.4 13.5a7.6 7.6 0 000-3l2-1.6-2-3.4-2.4 1a7.6 7.6 0 00-2.6-1.5L14 2h-4l-.4 2.6a7.6
+      7.6 0 00-2.6 1.5l-2.4-1-2 3.4 2 1.6a7.6 7.6 0 000 3l-2 1.6 2 3.4 2.4-1a7.6 7.6 0 002.6
+      1.5L10 22h4l.4-2.6a7.6 7.6 0 002.6-1.5l2.4 1 2-3.4z"/></svg></span>`;
 
 export function dash() {
   leave();
@@ -50,8 +63,8 @@ export function dash() {
       <button id="d-hidden">${ic('hidden')}<span><b>${hid}</b><span>hidden</span></span></button>
     </div>
     <button class="big" id="d-start">${due
-      ? `<span class="t">Repeat</span>${ic('learning')}<span class="v">${due}</span>`
-      : `<span class="t">Start Adventure</span>${ic('jungle')}<span class="v">?</span>`}</button>
+      ? `<span class="t">Repeat</span><span class="r">${ic('learning')}<span class="v">${due}</span>${COG}</span>`
+      : `<span class="t">Start Adventure</span><span class="r"><span class="v">?</span>${ic('jungle')}${COG}</span>`}</button>
     <button class="tile" id="d-jungle">${ic('jungle')}
       <span class="n">Jungle<span class="s">15 to 30 words from every board</span></span>
       <span class="go">›</span></button>
@@ -73,6 +86,11 @@ export function dash() {
     cameIn('home');                                // she started here, so back is here
     if (!due && !fresh) return pickBoard();       // nothing new here: which board?
     begin();
+  });
+  // The gear rides on the button, so its tap must not start a lesson as well.
+  $('d-cog').addEventListener('click', (e) => {
+    e.stopPropagation();
+    pickCount(dash);                               // Home counts again once it closes
   });
   // A run through the jungle: words from every board, mostly ones she is meeting
   // for the first time.  It belongs to no board, so it leaves her last one alone.

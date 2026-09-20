@@ -6,5 +6,5 @@
  "img/sw-on.webp", "img/sw-off.webp", "img/tag-pink.webp", "img/tag-cream.webp",
  "app.js", "dom.js", "store.js", "schedule.js", "boards.js", "lesson.js", "sound.js",
  "icons.js", "ring.js", "nav.js", "dash.js", "decks.js", "screens.js", "page.js",
- "statsview.js", "calendar.js", "settings.js", "jungle.js", "pick.js",
+ "statsview.js", "calendar.js", "settings.js", "jungle.js", "pick.js", "perday.js",
  "word.js", "priority.js", "swipe.js", "backup.js"]
