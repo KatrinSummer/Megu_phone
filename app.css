@@ -38,6 +38,8 @@
 }
 :root[data-theme="dark"]{
   --sprite:url(img/sprite-night.webp);
+  /* How far a day drawing is turned down after dark - one knob for all of them. */
+  --dim-art:brightness(.9) saturate(.9);
   --shot:url(img/bg-night.jpg);
   /* Her sky is painted for the day.  After dark the screens keep plain blue. */
   --sky-art:url(img/bg-sky-night.jpg);
@@ -87,10 +89,10 @@ body.island{background:var(--shot) center top/cover no-repeat,var(--sky)}
 /* One of her day drawings kept after dark, turned down the same way her own
    files are: her night sheet draws it worse than her day sheet does. */
 :root[data-theme="dark"] .ic.day{background-image:url(img/sprite-day.webp);
-  filter:brightness(.72) saturate(.72)}
+  filter:var(--dim-art)}
 /* Her own files are painted for daylight - beside the night sheet they glare.
    Turned down instead of drawn twice: one picture, two lights. */
-:root[data-theme="dark"] .ic.own{filter:brightness(.72) saturate(.72)}
+:root[data-theme="dark"] .ic.own{filter:var(--dim-art)}
 
 /* The header stands on the sky of her island, so it is only the buttons and the
    name - no plate, no line under it. */
