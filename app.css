@@ -144,8 +144,12 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 header:has(#finish:not([hidden])) .grow{max-width:calc(50% - 90px)}
 #star{margin-left:auto}
 
+/* overflow-anchor: when something opens in the middle of the screen the phone
+   likes to keep what is *under* it where it was and scroll the rest away, so
+   the beach slid up off the top instead of the boards moving down.  Anchoring
+   off: what is above the sign stays put and what is below it is pushed. */
 main{flex:1;display:flex;flex-direction:column;justify-content:center;
-  padding:14px;gap:12px;overflow-y:auto;position:relative}
+  padding:14px;gap:12px;overflow-y:auto;overflow-anchor:none;position:relative}
 /* A long list has to start at the top, not sit centred and clipped. */
 main.home,main.board,main.dash,main.page{justify-content:flex-start;gap:10px}
 main>*{flex-shrink:0}
@@ -300,9 +304,7 @@ main.study ~ #tabs{display:none}
 
 /* What a gear drops out: the word count under the big button, her pictures
    under a board's name.  It slides, because she asked for something that comes
-   out and goes back in - a grid row grown from nothing to the height the box
-   turns out to have, which is the one way a height that was never typed
-   anywhere can be animated at all. */
+   out and goes back in. */
 .drop{opacity:0;transition:opacity .18s ease,margin-bottom .26s ease}
 /* The box that does the clipping carries nothing of its own - no padding, no
    height: a padded box cannot shrink to nothing, and rolled up it left as much
@@ -319,32 +321,32 @@ main.study ~ #tabs{display:none}
 
 /* The sign itself: her wooden board with the leaves, drawn once at this size so
    nothing is stretched on the phone but the grain of the planks. */
-.cnt{display:flex;align-items:center;gap:6px;min-height:72px;padding:10px 14px;color:#5a3a1c;
+/* The line is centred on the planks, and the padding is the leafy ends of the
+   sign: her words start where the wood does and never climb onto a leaf. */
+.cnt{display:flex;align-items:center;justify-content:center;gap:6px;min-height:72px;
+  padding:10px 22px;color:#5a3a1c;
   background:url(img/plank.webp) 0 0/100% 100% no-repeat}
 :root[data-theme="dark"] .cnt{filter:var(--dim-art)}
-/* One line, whatever the phone's font: the row has to hold a name, a chip and
-   three buttons across 390 pixels. */
-/* Her word on the sign: big enough to read at arm's length, and drawn round
-   with cream so the letters do not sink into the grain of the wood. */
-.cnt .n{flex:none;min-width:0;font-size:17px;font-weight:700;white-space:nowrap;
+/* Her words on the sign: big enough to read at arm's length, and drawn round
+   with cream so the letters do not sink into the grain of the wood.  The size
+   follows the width of the phone - as big as the wood allows, and never so big
+   that the one line it makes stops fitting between the leaves. */
+.cnt .n{flex:none;min-width:0;font-size:clamp(17px,4.6vw,21px);font-weight:700;white-space:nowrap;
   text-shadow:0 1px 0 rgba(255,248,232,.95),0 -1px 0 rgba(255,248,232,.7),
     1px 0 0 rgba(255,248,232,.7),-1px 0 0 rgba(255,248,232,.7)}
-/* The sign reads as one line - Discover ... 20 ... words - so the last word of
-   it sits at the far end of the plank and the rest gathers by the first. */
-.cnt .end{margin-left:auto}
 /* Random or a number of her own, on the chip she drew - the same picture the
    filters along every screen wear, so it is a chip here too and not a box. */
-.cnt .pick{width:auto;height:auto;padding:9px 12px;font-size:14px;font-weight:700;
+.cnt .pick{width:auto;height:auto;padding:8px 10px;font-size:14px;font-weight:700;
   color:#4d7fa6;border:0 solid transparent;border-radius:0;background:none;
   border-image:url(img/chip-off.webp) 0 36 fill / 0 17px / 0 stretch}
 .cnt .pick.on{color:#fff;border-image-source:url(img/chip-on.webp);border-image-slice:0 36 fill}
 /* With Random on, the number is still there to read - it is simply not what
    the lesson is counting by. */
 .drop.rand b,.drop.rand #c-less,.drop.rand #c-more{opacity:.45}
-.cnt button{width:36px;height:36px;flex:none;border-radius:50%;font-size:21px;font-weight:700;
+.cnt button{width:32px;height:32px;flex:none;border-radius:50%;font-size:19px;font-weight:700;
   color:#a8562a;background:rgba(255,252,244,.8);border:1px solid rgba(120,80,40,.3)}
 .cnt button:active{background:#fff}
-.cnt b{font-size:22px;font-weight:700;min-width:34px;text-align:center}
+.cnt b{font-size:20px;font-weight:700;min-width:26px;text-align:center}
 /* The same sign, taller, holding every picture a board can wear.  Three rows of
    them are on screen and the rest is a scroll - the page under it must not be
    pushed off the phone by a list of drawings. */

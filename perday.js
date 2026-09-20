@@ -13,7 +13,7 @@ export const countRow = () => `<div class="drop" id="d-count"><div><div class="c
   <button id="c-less" aria-label="Fewer words">−</button>
   <b id="c-n">${settings.perDay}</b>
   <button id="c-more" aria-label="More words">+</button>
-  <span class="n end">words</span></div></div></div>`;
+  <span class="n">words</span></div></div></div>`;
 
 /** Only this strip and the button's own number change while she picks: nothing
  *  else on Home depends on the count, so nothing else is drawn again. */
