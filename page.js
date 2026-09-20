@@ -65,9 +65,11 @@ export function openBoard(id, where = from) {
   const learn = learnable(id).length, rev = reviewable(id), due = rev.filter(isDue).length;
   const count = (k) => (k === 'all' ? cards.length : kinds.filter((x) => x === k).length);
   const go = isOutBoard(id) ? '<div class="note">Tap a word to put it back into the round.</div>' : `
-    ${rev.length ? `<button class="wide" id="review">${ic('learning')} Review ${Math.min(n, rev.length)}
+    ${rev.length ? `<button class="wide" id="review">${ic('learning')} ${
+      settings.rand ? 'Review' : `Review ${Math.min(n, rev.length)}`}
       <span class="s">${due ? `${due} due` : 'nothing due'} · ${rev.length} started</span></button>` : ''}
-    ${learn ? `<button class="wide" id="learn">Learn ${Math.min(n, learn)} new
+    ${learn ? `<button class="wide" id="learn">${
+      settings.rand ? 'Learn new words' : `Learn ${Math.min(n, learn)} new`}
       <span class="s">${learn} new on this board</span></button>` : ''}`;
   $('main').className = 'board';
   // The board says its own name on the screen, the way every other screen does

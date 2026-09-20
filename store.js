@@ -16,8 +16,15 @@ export let progress = read(P_KEY, {});
 export const setProgress = (p) => { progress = p; };
 
 // mode: what the board's page last started, a lesson of new words or a review.
-export const settings = { deck: 'last', mode: 'learn', perDay: 20, autoPlay: true, theme: 'light',
-                          doneOn: 0, doneCount: 0, ...read(S_KEY, {}) };
+export const settings = { deck: 'last', mode: 'learn', perDay: 20, rand: false, autoPlay: true,
+                          theme: 'light', doneOn: 0, doneCount: 0, ...read(S_KEY, {}) };
+
+/** How many words a lesson deals: the number she set, or - with Random on - a
+ *  handful between 15 and 30, the same spread as a run through the jungle.
+ *  Asked once, when the lesson is built, so the count cannot change under her. */
+const RLOW = 15, RHIGH = 30;
+export const lessonSize = () => (settings.rand
+  ? RLOW + Math.floor(Math.random() * (RHIGH - RLOW + 1)) : settings.perDay);
 
 /** The eye used to mean "I know it"; now it means "not important". She chose
  *  to have everything she had marked with it hidden, not counted as known. */

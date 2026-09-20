@@ -8,7 +8,7 @@ import { queue, again, first, lesson, nextCard, keep, forget } from './lesson.js
 import { play, SPEAKER } from './sound.js';
 import { yomi, openWord } from './word.js';
 import { priButtons, bindPri } from './priority.js';
-import { openBoard } from './page.js';
+import { openBoard, cameFromHome } from './page.js';
 // Home, for the end of a jungle run.  Home leads here and this leads back; both
 // only ever call the other from a button, so neither waits on the other to load.
 import { dash } from './dash.js';
@@ -101,6 +101,9 @@ function summary() {
   const missed = [...first].filter(([, v]) => v === 'again').map(([f]) => f);
   // What is left: a review has the words not seen today, a lesson its new words.
   const rev = settings.mode === 'review', wild = settings.mode === 'jungle', id = settings.deck;
+  // Where the way back leads: a jungle run belongs to no board, and a lesson
+  // started at Home never came through a board's page.
+  const toHome = wild || cameFromHome();
   const left = wild ? deck.cards.filter((c) => !isOut(c)).length
     : (rev ? reviewable(id).filter((c) => progress[c.f]?.seen !== today()) : learnable(id)).length;
   const more = wild ? Number(left > 0) : Math.min(settings.perDay, left);
@@ -115,11 +118,13 @@ function summary() {
     <div>${wild ? `${left} words are out there in the jungle.`
       : rev ? `${left} more to review today.` : left ? `${left} new words left on this board.`
       : 'Every word of this board has been started: review them from its page.'}</div>
-    <button class="wide" id="boards">${wild ? 'Back home' : 'Back to the board'}</button>
+    <button class="wide" id="boards">${toHome ? 'Back home' : 'Back to the board'}</button>
     ${more ? `<button class="wide" id="more">${wild ? 'Into the jungle again'
+      : settings.rand ? (rev ? 'Review more' : 'Show more new words')
       : rev ? `Review ${more} more` : `Show ${more} more new words`}</button>` : ''}</div>`;
-  // The jungle came from Home and belongs to no board, so that is the way back.
-  $('boards').addEventListener('click', () => (wild ? dash() : openBoard(id)));
+  // Back the way she came in: the jungle belongs to no board, and a lesson
+  // started at Home never came through a board's page either.
+  $('boards').addEventListener('click', () => (toHome ? dash() : openBoard(id)));
   $('more')?.addEventListener('click', begin);
 }
 

@@ -13,7 +13,7 @@ import { leave, begin, ground } from './screens.js';
 import { home } from './decks.js';
 import { openBoard, cameIn } from './page.js';
 import { pickBoard } from './pick.js';
-import { pickCount } from './perday.js';
+import { countRow, bindCount } from './perday.js';
 import { markTab } from './nav.js';
 
 /** The board the big button starts.  Her last one while it still has new words
@@ -64,7 +64,8 @@ export function dash() {
     </div>
     <button class="big" id="d-start">${due
       ? `<span class="t">Repeat</span><span class="r">${ic('learning')}<span class="v">${due}</span>${COG}</span>`
-      : `<span class="t">Start Adventure</span><span class="r"><span class="v">?</span>${ic('jungle')}${COG}</span>`}</button>
+      : `<span class="t">Start Adventure</span><span class="r"><span class="v" id="d-v">${settings.rand ? '?' : settings.perDay}</span>${ic('jungle')}${COG}</span>`}</button>
+    ${countRow()}
     <button class="tile" id="d-jungle">${ic('jungle')}
       <span class="n">Jungle<span class="s">15 to 30 words from every board</span></span>
       <span class="go">›</span></button>
@@ -90,8 +91,9 @@ export function dash() {
   // The gear rides on the button, so its tap must not start a lesson as well.
   $('d-cog').addEventListener('click', (e) => {
     e.stopPropagation();
-    pickCount(dash);                               // Home counts again once it closes
+    $('d-count').hidden = !$('d-count').hidden;    // right under the button, where she drew it
   });
+  bindCount();
   // A run through the jungle: words from every board, mostly ones she is meeting
   // for the first time.  It belongs to no board, so it leaves her last one alone.
   $('d-jungle').addEventListener('click', () => {

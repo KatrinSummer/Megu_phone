@@ -25,22 +25,23 @@ const at = new Map(NAMES.map((n, i) => [n, [i % COLS, (i / COLS) | 0]]));
  *  a gear down in the bar.  The books for the boards and the jungle for the
  *  random run she drew later, on a sheet of their own. */
 const OWN = { gear: 'img/gear.webp', decks: 'img/decks.webp', jungle: 'img/jungle.webp' };
-/** By day only, and the name off the sheet to wear after dark: she asked for the
- *  books on the light screens and her own night icon at night. */
-const BY_DAY = { decks: 'repeat' };
+/** Her night sheet draws these worse than her day sheet, so
+ *  after dark they are taken off the day one and turned down to suit the night. */
+const DAYLIT = new Set(['hidden']);
 
 /** One icon. `size` is a css length: the cell scales to it, and the sheet with it.
  *  A name that is not on the sheet draws nothing rather than a slice of its
  *  neighbour, so a typo is visible instead of quietly wrong. */
 export function ic(name, size = '') {
   const night = document.documentElement.dataset.theme === 'dark';
-  const own = night && BY_DAY[name] ? null : OWN[name];
+  const own = OWN[name];
   if (own) {
     return `<i class="ic own" aria-hidden="true"
       style="--own:url(${own})${size ? `;--s:${size}` : ''}"></i>`;
   }
-  const cell = at.get(BY_DAY[name] ?? name);
+  const cell = at.get(name);
   if (!cell) return '';
   const [x, y] = cell;
-  return `<i class="ic" aria-hidden="true" style="--x:${x};--y:${y}${size ? `;--s:${size}` : ''}"></i>`;
+  const lit = night && DAYLIT.has(name) ? ' day' : '';
+  return `<i class="ic${lit}" aria-hidden="true" style="--x:${x};--y:${y}${size ? `;--s:${size}` : ''}"></i>`;
 }
