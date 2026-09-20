@@ -40,7 +40,7 @@
   --sprite:url(img/sprite-night.webp);
   --shot:url(img/bg-night.jpg);
   /* Her sky is painted for the day.  After dark the screens keep plain blue. */
-  --sky-art:none;
+  --sky-art:url(img/bg-sky-night.jpg);
   --sky:#0d1830; --sky2:#121e40;
   --card:#182a52; --solid:#182a52; --sheet:#16254a;
   --bar:rgba(16,27,56,.92);
@@ -84,6 +84,9 @@ body.island{background:var(--shot) center top/cover no-repeat,var(--sky)}
   background-position:calc(var(--x) * var(--s) * -1) calc(var(--y) * var(--s) * -1)}
 /* One she drew outside the sheet - the gear - is a file of its own. */
 .ic.own{background-image:var(--own);background-size:100% 100%;background-position:0 0}
+/* Her own files are painted for daylight - beside the night sheet they glare.
+   Turned down instead of drawn twice: one picture, two lights. */
+:root[data-theme="dark"] .ic.own{filter:brightness(.72) saturate(.72)}
 
 /* The header stands on the sky of her island, so it is only the buttons and the
    name - no plate, no line under it. */
@@ -240,7 +243,7 @@ main.study ~ #tabs{display:none}
    which is why this button is the one that starts something. */
 /* The ends are drawn at a fixed size, so the button is given a height to match
    the picture: let it grow and the play mark is stretched out of shape. */
-.big{display:flex;align-items:center;gap:10px;width:92%;align-self:center;
+.big{display:flex;align-items:center;gap:10px;width:100%;
   height:68px;padding:0 22px 0 70px;font-size:20px;font-weight:700;color:#fff;
   border:0 solid transparent;background:none;
   border-image:url(img/btn-go.webp) 40 60 40 150 fill / 24px 32px 24px 80px / 0 stretch}
