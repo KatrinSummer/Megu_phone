@@ -7,7 +7,7 @@ import { $ } from './dom.js';
 import { progress, settings, saveSettings, doneToday } from './store.js';
 import { deck, poolOf, learnable, isDue } from './boards.js';
 import { isMemorized } from './schedule.js';
-import { ic } from './icons.js';
+import { ic, COG } from './icons.js';
 import { ring } from './ring.js';
 import { leave, begin, ground } from './screens.js';
 import { home } from './decks.js';
@@ -24,14 +24,7 @@ const studyBoard = () => (learnable(settings.deck).length ? settings.deck
 /** The little handle on the big button: how many words a lesson deals.  A plain
  *  gear, not one of her drawings - beside her jungle a second picture would be
  *  one picture too many. */
-// Drawn, not typed: the ⚙ character comes out of the phone as its own coloured
-// emoji - a small dark machine sitting on her pink paint - whatever is asked of
-// it.  This is a plain outline in the colour of the button's own letters.
-const COG = `<span class="cog" id="d-cog" role="button" tabindex="0" aria-label="How many words">
-  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/>
-    <path d="M19.4 13.5a7.6 7.6 0 000-3l2-1.6-2-3.4-2.4 1a7.6 7.6 0 00-2.6-1.5L14 2h-4l-.4 2.6a7.6
-      7.6 0 00-2.6 1.5l-2.4-1-2 3.4 2 1.6a7.6 7.6 0 000 3l-2 1.6 2 3.4 2.4-1a7.6 7.6 0 002.6
-      1.5L10 22h4l.4-2.6a7.6 7.6 0 002.6-1.5l2.4 1 2-3.4z"/></svg></span>`;
+const COUNT = COG('d-cog', 'How many words');
 
 export function dash() {
   leave();
@@ -63,8 +56,8 @@ export function dash() {
       <button id="d-hidden">${ic('hidden')}<span><b>${hid}</b><span>hidden</span></span></button>
     </div>
     <button class="big" id="d-start">${due
-      ? `<span class="t">Repeat</span><span class="r">${ic('learning')}<span class="v">${due}</span>${COG}</span>`
-      : `<span class="t">Start Adventure</span><span class="r"><span class="v" id="d-v">${settings.rand ? '?' : settings.perDay}</span>${ic('jungle')}${COG}</span>`}</button>
+      ? `<span class="t">Repeat</span><span class="r">${ic('learning')}<span class="v">${due}</span>${COUNT}</span>`
+      : `<span class="t">Start Adventure</span><span class="r"><span class="v" id="d-v">${settings.rand ? '?' : settings.perDay}</span>${ic('jungle')}${COUNT}</span>`}</button>
     ${countRow()}
     <button class="tile" id="d-jungle">${ic('jungle')}
       <span class="n">Jungle<span class="s">15 to 30 words from every board</span></span>
@@ -91,7 +84,7 @@ export function dash() {
   // The gear rides on the button, so its tap must not start a lesson as well.
   $('d-cog').addEventListener('click', (e) => {
     e.stopPropagation();
-    $('d-count').hidden = !$('d-count').hidden;    // right under the button, where she drew it
+    $('d-count').classList.toggle('on');           // slides out right under the button, where she drew it
   });
   bindCount();
   // A run through the jungle: words from every board, mostly ones she is meeting

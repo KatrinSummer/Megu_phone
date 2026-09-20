@@ -2,9 +2,11 @@
  "img/sprite-day.webp", "img/sprite-night.webp", "img/bg-day.jpg", "img/bg-night.jpg",
  "img/bg-sky.jpg", "img/bg-sky-night.jpg",
  "img/gear.webp", "img/decks.webp", "img/jungle.webp",
+ "img/boards.webp", "img/plank.webp", "img/wood.webp",
  "img/btn-go.webp", "img/btn-soft.webp", "img/chip-on.webp", "img/chip-off.webp",
  "img/sw-on.webp", "img/sw-off.webp", "img/tag-pink.webp", "img/tag-cream.webp",
  "app.js", "dom.js", "store.js", "schedule.js", "boards.js", "lesson.js", "sound.js",
  "icons.js", "ring.js", "nav.js", "dash.js", "decks.js", "screens.js", "page.js",
  "statsview.js", "calendar.js", "settings.js", "jungle.js", "pick.js", "perday.js",
+ "boardart.js",
  "word.js", "priority.js", "swipe.js", "backup.js"]

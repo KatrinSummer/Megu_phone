@@ -5,7 +5,8 @@ import { $, esc } from './dom.js';
 import { settings, saveSettings } from './store.js';
 import { deck, learnable, poolOf } from './boards.js';
 import { begin } from './screens.js';
-import { openBoard, boardName, boardIcon } from './page.js';
+import { openBoard, boardName } from './page.js';
+import { boardIcon } from './boardart.js';
 import { ic } from './icons.js';
 
 export function pickBoard() {

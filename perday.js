@@ -6,13 +6,13 @@ import { settings, saveSettings } from './store.js';
 
 const LOW = 5, HIGH = 50, STEP = 5;
 
-/** Drawn straight into Home, under the button, and hidden until the gear. */
-export const countRow = () => `<div class="cnt" id="d-count" hidden>
+/** Drawn straight into Home, under the button, rolled up until the gear. */
+export const countRow = () => `<div class="drop" id="d-count"><div class="cnt">
   <span class="n">Word count</span>
   <button class="pick" id="c-rand">Random</button>
   <button id="c-less" aria-label="Fewer words">−</button>
   <b id="c-n">${settings.perDay}</b>
-  <button id="c-more" aria-label="More words">+</button></div>`;
+  <button id="c-more" aria-label="More words">+</button></div></div>`;
 
 /** Only this strip and the button's own number change while she picks: nothing
  *  else on Home depends on the count, so nothing else is drawn again. */

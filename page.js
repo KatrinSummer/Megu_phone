@@ -6,21 +6,13 @@ import { progress, settings, saveSettings, today } from './store.js';
 import { deck, boardCards, learnable, reviewable, isDue, isOutBoard } from './boards.js';
 import { stats, leave, begin } from './screens.js';
 import { openWord, stateOf } from './word.js';
-import { ic } from './icons.js';
+import { ic, COG } from './icons.js';
+import { boardIcon, canPick, artRow, bindArt } from './boardart.js';
 import { markTab } from './nav.js';
 
 const NAMES = { learning: 'Review', star: 'Bookmarks', pri: 'Priorities',
                 known: 'Marked as known', hidden: 'Hidden' };
 export const boardName = (id) => NAMES[id] ?? deck.decks.find((d) => d.id === id)?.name ?? id;
-
-/** Her icon for a board.  The made-up ones have their own; a deck of hers takes
- *  the next picture off the list, so no two of them are the same flower.  It
- *  lives here, beside the board's name, and the list borrows both. */
-const ICONS = { learning: 'learning', star: 'favorite', pri: 'streak',
-                known: 'archive', hidden: 'hidden' };
-const MINE = ['category', 'repeat', 'picture', 'streak', 'goal', 'language', 'theme', 'calendar'];
-export const boardIcon = (id) => ICONS[id]
-  ?? MINE[deck.decks.findIndex((d) => d.id === id) % MINE.length] ?? 'deck';
 
 /** The filter a word falls under: hidden, know (memorized or ticked), learn, new. */
 const kindOf = (c) => (progress[c.f]?.hide ? 'hidden' : stateOf(c));
@@ -75,8 +67,10 @@ export function openBoard(id, where = from) {
   // The board says its own name on the screen, the way every other screen does
   // and the way she drew it - not only in small letters up in the header.
   $('main').innerHTML = `
-    <div class="head">${ic(boardIcon(id))}<h1>${esc(boardName(id))}</h1>
-      <span class="s">${cards.length} words</span></div>
+    <div class="head"><span id="b-icon">${ic(boardIcon(id))}</span><h1>${esc(boardName(id))}</h1>
+      <span class="s">${cards.length} words</span>
+      ${canPick(id) ? COG('b-cog', 'Board icon') : ''}</div>
+    ${canPick(id) ? artRow(id) : ''}
     <div class="go">${go}</div>
     <div class="chips">${KINDS.filter(([k]) => k === 'all' || count(k)).map(([k, name]) =>
       `<button data-k="${k}"${k === filter ? ' class="on"' : ''}>${name} ${count(k)}</button>`).join('')}</div>
@@ -87,6 +81,12 @@ export function openBoard(id, where = from) {
 
   for (const m of ['learn', 'review']) {
     $(m)?.addEventListener('click', () => { settings.mode = m; saveSettings(); begin(); });
+  }
+  // The gear beside the board's name: her drawings slide out under it, and the
+  // one she taps is this board's from then on - here, in the list, everywhere.
+  if (canPick(id)) {
+    $('b-cog').addEventListener('click', () => $('b-art').classList.toggle('on'));
+    bindArt(id, (name) => { $('b-icon').innerHTML = ic(name); });
   }
   for (const b of document.querySelectorAll('.chips button')) {
     b.addEventListener('click', () => { filter = b.dataset.k; openBoard(id); });

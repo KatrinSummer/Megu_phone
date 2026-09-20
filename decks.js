@@ -10,7 +10,8 @@ import { isMemorized } from './schedule.js';
 import { ic } from './icons.js';
 import { ring } from './ring.js';
 import { leave } from './screens.js';
-import { openBoard, boardName, boardIcon } from './page.js';
+import { openBoard, boardName } from './page.js';
+import { boardIcon } from './boardart.js';
 import { markTab } from './nav.js';
 
 const FILTERS = [['all', 'All'], ['new', 'New'], ['learn', 'Learning'], ['know', 'Learned'], ['due', 'Due']];

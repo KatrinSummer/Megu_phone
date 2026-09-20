@@ -86,6 +86,11 @@ body.island{background:var(--shot) center top/cover no-repeat,var(--sky)}
   background-position:calc(var(--x) * var(--s) * -1) calc(var(--y) * var(--s) * -1)}
 /* One she drew outside the sheet - the gear - is a file of its own. */
 .ic.own{background-image:var(--own);background-size:100% 100%;background-position:0 0}
+/* Her board pictures are a sheet of their own, four rows deep, and painted for
+   daylight like the rest of her own drawings. */
+.ic.bd{background-image:url(img/boards.webp);
+  background-size:calc(var(--s) * 8) calc(var(--s) * 4)}
+:root[data-theme="dark"] .ic.bd{filter:var(--dim-art)}
 /* One of her day drawings kept after dark, turned down the same way her own
    files are: her night sheet draws it worse than her day sheet does. */
 :root[data-theme="dark"] .ic.day{background-image:url(img/sprite-day.webp);
@@ -167,6 +172,12 @@ main.study ~ #tabs{display:none}
    sits at the same height wherever she is - one of them a few pixels bigger and
    the line jumped as she moved between them. */
 .head .ic{--s:48px}
+/* The handle on a board's picture, at the end of its name's line. */
+.head .cog{display:grid;place-items:center;width:34px;height:34px;flex:none;
+  color:var(--ink);opacity:.6}
+.head .cog svg{width:22px;height:22px;display:block;fill:none;stroke:currentColor;
+  stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.head .cog:active{opacity:1}
 .head h1{margin:0;font-size:27px;font-weight:700;letter-spacing:.01em;
   text-shadow:0 1px 4px rgba(255,255,255,.9)}
 /* It stands on her sky, not on a card: grey on that blue all but disappeared. */
@@ -287,24 +298,45 @@ main.study ~ #tabs{display:none}
 .big .v{min-width:14px;text-align:right;text-shadow:0 1px 2px rgba(180,20,90,.35)}
 .big:active{transform:translateY(1px)}
 
-/* The word count, dropping out from under the big button - where she drew it,
-   not up from the bottom edge of the screen.  Fewer, the number, more. */
-.cnt{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:18px;
-  background:var(--card);border:1px solid var(--line);box-shadow:var(--shade)}
+/* What a gear drops out: the word count under the big button, her pictures
+   under a board's name.  It slides, because she asked for something that comes
+   out and goes back in - a grid row grown from nothing to the height the box
+   turns out to have, which is the one way a height that was never typed
+   anywhere can be animated at all. */
+.drop{display:grid;grid-template-rows:0fr;opacity:0;
+  transition:grid-template-rows .22s ease,opacity .18s ease,margin-bottom .22s ease}
+.drop>*{overflow:hidden;min-height:0}
+.drop.on{grid-template-rows:1fr;opacity:1}
+/* Rolled up it is still sitting between two of the screen's gaps: one of them goes. */
+.drop:not(.on){margin-bottom:-10px}
+
+/* The sign itself: her wooden board with the leaves, drawn once at this size so
+   nothing is stretched on the phone but the grain of the planks. */
+.cnt{display:flex;align-items:center;gap:8px;min-height:72px;padding:10px 20px;color:#5a3a1c;
+  background:url(img/plank.webp) 0 0/100% 100% no-repeat}
+:root[data-theme="dark"] .cnt{filter:var(--dim-art)}
 /* One line, whatever the phone's font: the row has to hold a name, a chip and
    three buttons across 390 pixels. */
 .cnt .n{flex:1;min-width:0;font-size:14px;font-weight:700;white-space:nowrap}
 /* Random or a number of her own: the chosen one wears her pink. */
-.cnt .pick{width:auto;height:36px;padding:0 12px;border-radius:14px;font-size:14px;
-  color:var(--dim);background:var(--solid)}
+.cnt .pick{width:auto;height:36px;padding:0 12px;border-radius:14px;font-size:14px;font-weight:700;
+  color:#5a3a1c;background:rgba(255,252,244,.75);border:1px solid rgba(120,80,40,.3)}
 .cnt .pick.on{color:#fff;background:var(--pink);border-color:var(--pink)}
 /* With Random on, the number is still there to read - it is simply not what
    the lesson is counting by. */
-.cnt.rand b,.cnt.rand #c-less,.cnt.rand #c-more{opacity:.4}
+.drop.rand b,.drop.rand #c-less,.drop.rand #c-more{opacity:.45}
 .cnt button{width:38px;height:38px;flex:none;border-radius:50%;font-size:21px;font-weight:700;
-  color:var(--pink);border:1px solid var(--line);background:var(--solid);box-shadow:var(--shade)}
-.cnt button:active{background:var(--warm)}
+  color:#a8562a;background:rgba(255,252,244,.8);border:1px solid rgba(120,80,40,.3)}
+.cnt button:active{background:#fff}
 .cnt b{font-size:22px;font-weight:700;min-width:42px;text-align:center}
+/* The same sign, taller, holding every picture a board can wear.  Three rows of
+   them are on screen and the rest is a scroll - the page under it must not be
+   pushed off the phone by a list of drawings. */
+.cnt.art{flex-direction:column;align-items:stretch;gap:8px;padding:14px 16px;border-radius:18px;
+  background:url(img/wood.webp) center/cover;box-shadow:0 2px 10px rgba(60,35,10,.22)}
+.cnt .pics{display:flex;flex-wrap:wrap;gap:6px;max-height:174px;overflow-y:auto}
+.cnt .pics button{width:54px;height:54px;border-radius:15px;background:rgba(255,252,244,.5)}
+.cnt .pics button.on{background:var(--pink);border-color:var(--pink)}
 
 /* Stats: the ring, what it is made of, and the plain numbers under it. */
 .wheel{display:flex;align-items:center;gap:16px;padding:16px 14px}
