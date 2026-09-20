@@ -263,15 +263,13 @@ main.study ~ #tabs{display:none}
 /* Not .done: that is the card at the end of a lesson, and the checks find the
    end of a lesson by looking for it. */
 .ring .l.today{text-transform:none;letter-spacing:0;color:var(--good);font-weight:700;margin-top:3px}
-/* On a screen taller than her rows need, the spare room goes under the sign and
-   over her boards: they sit down by her thumb and the ring stays up on the sky.
-   It sits *here* and not over the pair of tiles, where it used to, because room
-   above the sign is room the sign eats: it opened by shrinking that gap, so
-   nothing below it moved and everything above it climbed towards the ring
-   instead - which is what she kept seeing and no phone-sized window could show,
-   there being no spare room on a phone to take.  When the rows do fill the
-   screen the auto margin is simply nil. */
-.dash #d-jungle{margin-top:auto}
+/* On a screen taller than her rows need, the spare room is nobody's: it lies at
+   the end of them, under the last board.  It used to be held open between two
+   rows - over the pair of tiles, and then under the sign - and either way it was
+   room the sign could eat: the sign opened by shrinking the gap, so nothing
+   below it moved and everything above it climbed, and the gap it left behind was
+   a hole in the beach.  Whoever holds the spare room hands it to the sign, so
+   nobody holds it.  A phone has none of it to hand over either way. */
 .duo{display:flex;gap:10px}
 .duo button{flex:1;display:flex;align-items:center;gap:9px;padding:11px 12px;border-radius:16px;
   border:1px solid var(--line);background:var(--card);text-align:left;box-shadow:var(--shade)}
