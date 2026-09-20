@@ -304,6 +304,9 @@ main.study ~ #tabs{display:none}
 .big .cog:active{opacity:1}
 .big .v{min-width:14px;text-align:right;text-shadow:0 1px 2px rgba(180,20,90,.35)}
 .big:active{transform:translateY(1px)}
+/* The gear is inside the button, so a tap on it was pressing the button down
+   under her finger as well - the button jumped for something it never did. */
+.big:has(.cog:active){transform:none}
 
 /* What a gear drops out: the word count under the big button, her pictures
    under a board's name.  It slides, because she asked for something that comes
@@ -318,7 +321,11 @@ main.study ~ #tabs{display:none}
    only a ceiling - taller than any sign here, so nothing is ever cut by it. */
 .drop>div{overflow:hidden;max-height:0;transition:max-height .26s ease}
 .drop.on{opacity:1}
-.drop.on>div{max-height:480px}
+/* The ceiling is near the height the sign really is.  Far above it, the sign
+   was open long before the clock ran out and shut only in the last of it: it
+   hung there and then snapped, which is the jerk she saw. */
+.drop.on>div{max-height:120px}
+.drop#b-art.on>div{max-height:480px}
 /* Rolled up it is still sitting between two of the screen's gaps: one of them goes. */
 .drop:not(.on){margin-bottom:-10px}
 
@@ -326,30 +333,38 @@ main.study ~ #tabs{display:none}
    nothing is stretched on the phone but the grain of the planks. */
 /* The line is centred on the planks, and the padding is the leafy ends of the
    sign: her words start where the wood does and never climb onto a leaf. */
-.cnt{display:flex;align-items:center;justify-content:center;gap:5px;min-height:72px;
-  padding:10px 20px;color:#5a3a1c;
+/* Nothing on this line may be squeezed: the first thing flex chose to shrink was
+   the number, and its box came out narrower than the number in it. */
+.cnt{display:flex;align-items:center;justify-content:center;gap:4px;min-height:72px;
+  padding:10px 12px;color:#5a3a1c;
   background:url(img/plank.webp) 0 0/100% 100% no-repeat}
 :root[data-theme="dark"] .cnt{filter:var(--dim-art)}
 /* Her words on the sign: big enough to read at arm's length, and drawn round
    with cream so the letters do not sink into the grain of the wood.  The size
    follows the width of the phone - as big as the wood allows, and never so big
    that the one line it makes stops fitting between the leaves. */
-.cnt .n{flex:none;min-width:0;font-size:clamp(17px,4.6vw,21px);font-weight:700;white-space:nowrap;
+.cnt .n{flex:none;min-width:0;font-size:clamp(16px,4.3vw,20px);font-weight:700;white-space:nowrap;
   text-shadow:0 1px 0 rgba(255,248,232,.95),0 -1px 0 rgba(255,248,232,.7),
     1px 0 0 rgba(255,248,232,.7),-1px 0 0 rgba(255,248,232,.7)}
 /* Random or a number of her own, on the chip she drew - the same picture the
    filters along every screen wear, so it is a chip here too and not a box. */
-.cnt .pick{width:auto;height:auto;padding:7px 8px;font-size:13px;font-weight:700;
+.cnt .pick{flex:none;width:auto;height:auto;padding:7px 8px;font-size:13px;font-weight:700;
   color:#4d7fa6;border:0 solid transparent;border-radius:0;background:none;
   border-image:url(img/chip-off.webp) 0 36 fill / 0 17px / 0 stretch}
 .cnt .pick.on{color:#fff;border-image-source:url(img/chip-on.webp);border-image-slice:0 36 fill}
 /* With Random on, the number is still there to read - it is simply not what
    the lesson is counting by. */
 .drop.rand b,.drop.rand #c-less,.drop.rand #c-more{opacity:.45}
-.cnt button{width:30px;height:30px;flex:none;border-radius:50%;font-size:18px;font-weight:700;
+.cnt button{width:28px;height:28px;flex:none;border-radius:50%;font-size:18px;font-weight:700;
   color:#a8562a;background:rgba(255,252,244,.8);border:1px solid rgba(120,80,40,.3)}
-.cnt button:active{background:#fff}
-.cnt b{font-size:20px;font-weight:700;min-width:24px;text-align:center}
+/* Not the chips: they are her drawing, and a white plate flashing behind one
+   for the length of a tap is a white square on the wood. */
+.cnt button:not(.pick):active{background:#fff}
+/* The number sits in a little box of its own, like everything else on the line
+   she can press - it is the thing the minus and the plus are moving. */
+.cnt b{flex:none;font-size:20px;font-weight:700;min-width:20px;text-align:center;
+  padding:3px 7px;border-radius:12px;
+  background:rgba(255,248,232,.8);border:1px solid rgba(120,80,40,.3)}
 /* The same sign, taller, holding every picture a board can wear.  Three rows of
    them are on screen and the rest is a scroll - the page under it must not be
    pushed off the phone by a list of drawings. */
