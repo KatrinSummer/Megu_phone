@@ -285,7 +285,7 @@ main.study ~ #tabs{display:none}
 /* What it starts and the gear travel together on the right of it, so the order
    inside them is hers to choose without the spacing moving. */
 .big .r{margin-left:auto;display:flex;align-items:center;gap:7px}
-.big .ic{--s:33px}
+.big .ic{--s:42px}
 /* Her name for it stays on one line: with the gear there as well, "Start
    Adventure" was breaking in two. */
 .big .t{white-space:nowrap}
@@ -305,30 +305,39 @@ main.study ~ #tabs{display:none}
    anywhere can be animated at all. */
 .drop{display:grid;grid-template-rows:0fr;opacity:0;
   transition:grid-template-rows .22s ease,opacity .18s ease,margin-bottom .22s ease}
-.drop>*{overflow:hidden;min-height:0}
+/* The box that does the clipping carries nothing of its own - no padding, no
+   height: a padded box cannot shrink to nothing, and rolled up it left as much
+   empty beach behind it as the sign takes when it is out. */
+.drop>div{overflow:hidden;min-height:0}
 .drop.on{grid-template-rows:1fr;opacity:1}
 /* Rolled up it is still sitting between two of the screen's gaps: one of them goes. */
 .drop:not(.on){margin-bottom:-10px}
 
 /* The sign itself: her wooden board with the leaves, drawn once at this size so
    nothing is stretched on the phone but the grain of the planks. */
-.cnt{display:flex;align-items:center;gap:8px;min-height:72px;padding:10px 20px;color:#5a3a1c;
+.cnt{display:flex;align-items:center;gap:6px;min-height:72px;padding:10px 14px;color:#5a3a1c;
   background:url(img/plank.webp) 0 0/100% 100% no-repeat}
 :root[data-theme="dark"] .cnt{filter:var(--dim-art)}
 /* One line, whatever the phone's font: the row has to hold a name, a chip and
    three buttons across 390 pixels. */
-.cnt .n{flex:1;min-width:0;font-size:14px;font-weight:700;white-space:nowrap}
-/* Random or a number of her own: the chosen one wears her pink. */
-.cnt .pick{width:auto;height:36px;padding:0 12px;border-radius:14px;font-size:14px;font-weight:700;
-  color:#5a3a1c;background:rgba(255,252,244,.75);border:1px solid rgba(120,80,40,.3)}
-.cnt .pick.on{color:#fff;background:var(--pink);border-color:var(--pink)}
+/* Her word on the sign: big enough to read at arm's length, and drawn round
+   with cream so the letters do not sink into the grain of the wood. */
+.cnt .n{flex:1;min-width:0;font-size:17px;font-weight:700;white-space:nowrap;
+  text-shadow:0 1px 0 rgba(255,248,232,.95),0 -1px 0 rgba(255,248,232,.7),
+    1px 0 0 rgba(255,248,232,.7),-1px 0 0 rgba(255,248,232,.7)}
+/* Random or a number of her own, on the chip she drew - the same picture the
+   filters along every screen wear, so it is a chip here too and not a box. */
+.cnt .pick{width:auto;height:auto;padding:9px 12px;font-size:14px;font-weight:700;
+  color:#4d7fa6;border:0 solid transparent;border-radius:0;background:none;
+  border-image:url(img/chip-off.webp) 0 36 fill / 0 17px / 0 stretch}
+.cnt .pick.on{color:#fff;border-image-source:url(img/chip-on.webp);border-image-slice:0 36 fill}
 /* With Random on, the number is still there to read - it is simply not what
    the lesson is counting by. */
 .drop.rand b,.drop.rand #c-less,.drop.rand #c-more{opacity:.45}
-.cnt button{width:38px;height:38px;flex:none;border-radius:50%;font-size:21px;font-weight:700;
+.cnt button{width:36px;height:36px;flex:none;border-radius:50%;font-size:21px;font-weight:700;
   color:#a8562a;background:rgba(255,252,244,.8);border:1px solid rgba(120,80,40,.3)}
 .cnt button:active{background:#fff}
-.cnt b{font-size:22px;font-weight:700;min-width:42px;text-align:center}
+.cnt b{font-size:22px;font-weight:700;min-width:34px;text-align:center}
 /* The same sign, taller, holding every picture a board can wear.  Three rows of
    them are on screen and the rest is a scroll - the page under it must not be
    pushed off the phone by a list of drawings. */
