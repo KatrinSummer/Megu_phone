@@ -25,6 +25,7 @@ export function leave() {
   current = null;
   forget();                                // so the boards, not a lesson, open next time
   ground(false);                           // plain blue; Home and the card ask for the island
+  $('finish').hidden = true;               // nothing to finish off a card
 }
 
 /** Her island behind everything, or plain blue.  One switch, so no screen can
@@ -66,7 +67,11 @@ export function stats() {
 // ---------------------------------------------------------------- card
 export function render() {
   const all = pool();
-  $('star').hidden = $('back').hidden = false;
+  $('star').hidden = false;
+  // In a lesson the arrow is out and her Finish stands in its place: from a card
+  // there is nowhere back to, only an end.
+  $('back').hidden = true;
+  $('finish').hidden = false;
   $('main').className = 'study';
   ground(true);                            // a card stands on her island - her call
   current = nextCard();
@@ -99,7 +104,10 @@ function summary() {
   const left = wild ? deck.cards.filter((c) => !isOut(c)).length
     : (rev ? reviewable(id).filter((c) => progress[c.f]?.seen !== today()) : learnable(id)).length;
   const more = wild ? Number(left > 0) : Math.min(settings.perDay, left);
-  // The lesson is over, so the bar along the bottom comes back with the summary.
+  // The lesson is over, so the bar along the bottom comes back with the summary -
+  // and with it the arrow, in place of the Finish that has nothing left to end.
+  $('finish').hidden = true;
+  $('back').hidden = false;
   $('main').className = 'page';
   $('main').innerHTML = `<div class="done"><h2>${how.length ? 'Lesson done' : 'Done for today'}</h2>
     ${how.length ? `<table>${rows.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('')}</table>` : ''}
@@ -113,6 +121,16 @@ function summary() {
   // The jungle came from Home and belongs to no board, so that is the way back.
   $('boards').addEventListener('click', () => (wild ? dash() : openBoard(id)));
   $('more')?.addEventListener('click', begin);
+}
+
+/** Her Finish in the header: the lesson stops on this card, and the end of it is
+ *  shown as though the last card had just been answered. The card on screen is
+ *  left exactly as it was - stopping is not an answer. */
+export function finish() {
+  if (!current) return;
+  queue.length = 0;
+  again.length = 0;
+  render();                                // no cards left: render shows the summary
 }
 
 function draw() {

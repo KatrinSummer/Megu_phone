@@ -25,7 +25,7 @@ import { queue, again, resume } from './lesson.js';
 import { answer, setPri } from './schedule.js';
 import { merge } from './backup.js';
 import { playing, sayOnFirstTap } from './sound.js';
-import { render, stats, currentCard, toggleStar, skip, back } from './screens.js';
+import { render, stats, currentCard, toggleStar, skip, back, finish } from './screens.js';
 import { home } from './decks.js';
 import { onSwipe } from './swipe.js';
 import { openBoard, cameFromHome } from './page.js';
@@ -47,6 +47,8 @@ $('back').addEventListener('click', () => {
   if (cameFromHome()) dash(); else home();
 });
 $('star').addEventListener('click', toggleStar);
+// In a lesson the arrow steps aside for this: end it here and see how it went.
+$('finish').addEventListener('click', finish);
 // Like turning a page: the finger goes left to the next card, right to the last.
 onSwipe($('main'), { left: skip, right: back });
 sayOnFirstTap(currentCard);
