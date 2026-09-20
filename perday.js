@@ -1,4 +1,4 @@
-// "Word count" - the strip that drops out from under Home's big button when the
+// "Discover ... words" - the strip that slides out from under Home's big button when the
 // little gear on it is tapped: Random, or a number of her own.  The number is
 // the same one as *New words at a time* in the settings.
 import { $ } from './dom.js';
@@ -8,11 +8,12 @@ const LOW = 5, HIGH = 50, STEP = 5;
 
 /** Drawn straight into Home, under the button, rolled up until the gear. */
 export const countRow = () => `<div class="drop" id="d-count"><div><div class="cnt">
-  <span class="n">Word count</span>
+  <span class="n">Discover</span>
   <button class="pick" id="c-rand">Random</button>
   <button id="c-less" aria-label="Fewer words">−</button>
   <b id="c-n">${settings.perDay}</b>
-  <button id="c-more" aria-label="More words">+</button></div></div></div>`;
+  <button id="c-more" aria-label="More words">+</button>
+  <span class="n end">words</span></div></div></div>`;
 
 /** Only this strip and the button's own number change while she picks: nothing
  *  else on Home depends on the count, so nothing else is drawn again. */
