@@ -43,8 +43,10 @@ for (const [id, name] of [['back', 'back'], ['star', 'favorite']]) $(id).innerHT
 // From a lesson back to its board's page; from the page back where she came in
 // from - Home when she opened the board from one of its rows, the list otherwise.
 $('back').addEventListener('click', () => {
+  // Started at Home - its button, or the jungle - so back is Home, board or no board.
+  if (cameFromHome()) return dash();
   if ($('main').className !== 'board') return openBoard(settings.deck);
-  if (cameFromHome()) dash(); else home();
+  home();
 });
 $('star').addEventListener('click', toggleStar);
 // In a lesson the arrow steps aside for this: end it here and see how it went.

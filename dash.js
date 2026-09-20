@@ -11,7 +11,7 @@ import { ic } from './icons.js';
 import { ring } from './ring.js';
 import { leave, begin, ground } from './screens.js';
 import { home } from './decks.js';
-import { openBoard } from './page.js';
+import { openBoard, cameIn } from './page.js';
 import { pickBoard } from './pick.js';
 import { markTab } from './nav.js';
 
@@ -70,6 +70,7 @@ export function dash() {
     settings.deck = due ? 'learning' : board;
     settings.mode = due ? 'review' : 'learn';
     saveSettings();
+    cameIn('home');                                // she started here, so back is here
     if (!due && !fresh) return pickBoard();       // nothing new here: which board?
     begin();
   });
@@ -78,6 +79,7 @@ export function dash() {
   $('d-jungle').addEventListener('click', () => {
     settings.mode = 'jungle';
     saveSettings();
+    cameIn('home');
     begin();
   });
   // Opened from Home, so the back arrow brings her back to Home.

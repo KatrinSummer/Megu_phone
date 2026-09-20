@@ -117,10 +117,13 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 /* .icon sets its own display, so the plain [hidden] rule would lose to it. */
 .icon[hidden]{display:none}
 /* Her Finish, standing in the middle of the header while a lesson is on - in
-   the middle of the header itself, not of what is left beside the counts. */
+   the middle of the header itself, not of what is left beside the counts.  It
+   is her painted button, the same one that starts a lesson: the same picture
+   with its ends cut in the same proportion, small enough for a header. */
 #finish{position:absolute;left:50%;transform:translateX(-50%);
-  padding:10px 22px;border-radius:16px;font-size:15px;font-weight:700;color:#fff;
-  background:var(--pink);box-shadow:var(--shade)}
+  height:46px;padding:0 18px 0 56px;font-size:16px;font-weight:700;color:#fff;
+  border:0 solid transparent;background:none;
+  border-image:url(img/btn-go.webp) 40 60 40 150 fill / 16px 22px 16px 54px / 0 stretch}
 #finish:active{transform:translateX(-50%) translateY(1px)}
 /* It stands over the header, so the count beside it is kept short enough not to
    run under it - "12 once more · 10 ✓" is longer than "20 to go · 5 ✓". The
@@ -333,7 +336,10 @@ main.study ~ #tabs{display:none}
   height:88px;padding:0 26px 0 118px;color:#fff;
   border-image:url(img/btn-go.webp) 40 60 40 150 fill / 33px 49px 33px 122px / 0 stretch}
 #learn .s{color:rgba(255,255,255,.9)}
-.go .s{display:block;font-size:12px;font-weight:400;color:var(--dim)}
+/* The two ways into a board are big painted buttons, and 12px under them read
+   as a footnote: both lines are given the size of something to press. */
+.go .wide{font-size:18px}
+.go .s{display:block;font-size:14px;font-weight:400;color:var(--dim)}
 .go .note{margin:0;text-align:center}
 /* Her Tabs / Filters, painted: the chosen one her pink pill, the rest her pale
    blue ones. */

@@ -40,6 +40,9 @@ let filter = 'all', filterOf = null;
  *  "hidden" on Home and landing in the board list is not going back. */
 let from = 'decks';
 export const cameFromHome = () => from === 'home';
+/** For a lesson started without opening a board at all - Home's own button and
+ *  the jungle - so the way back out of it is the way she came in. */
+export const cameIn = (where) => { from = where; };
 
 /** `where` is 'home' or 'decks'; left out, the board keeps the way in it had -
  *  coming back from its own lesson is not a new way in. */
@@ -62,10 +65,10 @@ export function openBoard(id, where = from) {
   const learn = learnable(id).length, rev = reviewable(id), due = rev.filter(isDue).length;
   const count = (k) => (k === 'all' ? cards.length : kinds.filter((x) => x === k).length);
   const go = isOutBoard(id) ? '<div class="note">Tap a word to put it back into the round.</div>' : `
-    ${learn ? `<button class="wide" id="learn">Learn ${Math.min(n, learn)} new
-      <span class="s">${learn} new on this board</span></button>` : ''}
     ${rev.length ? `<button class="wide" id="review">${ic('learning')} Review ${Math.min(n, rev.length)}
-      <span class="s">${due ? `${due} due` : 'nothing due'} · ${rev.length} started</span></button>` : ''}`;
+      <span class="s">${due ? `${due} due` : 'nothing due'} · ${rev.length} started</span></button>` : ''}
+    ${learn ? `<button class="wide" id="learn">Learn ${Math.min(n, learn)} new
+      <span class="s">${learn} new on this board</span></button>` : ''}`;
   $('main').className = 'board';
   // The board says its own name on the screen, the way every other screen does
   // and the way she drew it - not only in small letters up in the header.
