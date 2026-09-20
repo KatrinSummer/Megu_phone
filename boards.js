@@ -1,6 +1,7 @@
 // Which words she is shown, and in what order.
 import { progress, settings, today, fresh, saveProgress, started } from './store.js';
 import { startLesson, drop } from './lesson.js';
+import { jungleRun } from './jungle.js';
 
 export const deck = { cards: [], decks: [] };
 export const setDeck = (d) => Object.assign(deck, d);
@@ -68,9 +69,12 @@ const byDue = (a, b) => {
   return (p?.seen === today()) - (q?.seen === today()) || (p?.due ?? 0) - (q?.due ?? 0);
 };
 
-/** What the page's button started: `settings.mode` is 'learn' or 'review'. */
+/** What the button she pressed started: `settings.mode` is 'learn', 'review' or
+ *  'jungle'. */
 export function buildQueue() {
   const id = settings.deck, n = settings.perDay;
+  // The jungle belongs to no board: a run out of every word still in the round.
+  if (settings.mode === 'jungle') return refill(jungleRun(deck.cards.filter((c) => !isOut(c))));
   // A review: n of her started words, whether their day has come or not.
   if (settings.mode === 'review') {
     return refill(withFavourites(reviewable(id).sort(byDue).slice(0, n)).slice(0, n));

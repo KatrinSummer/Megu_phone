@@ -12,7 +12,7 @@ import { settingsPage, keepPerDay } from './settings.js';
 
 const TABS = [
   ['home', 'Home', 'home', () => dash()],
-  ['decks', 'Decks', 'repeat', () => home()],
+  ['decks', 'Decks', 'decks', () => home()],
   ['stats', 'Stats', 'stats', () => statsPage()],
   ['settings', 'Settings', 'gear', () => settingsPage()],
 ];

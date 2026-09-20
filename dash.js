@@ -12,6 +12,7 @@ import { ring } from './ring.js';
 import { leave, begin, ground } from './screens.js';
 import { home } from './decks.js';
 import { openBoard } from './page.js';
+import { pickBoard } from './pick.js';
 import { markTab } from './nav.js';
 
 /** The board the big button starts.  Her last one while it still has new words
@@ -32,7 +33,6 @@ export function dash() {
   const learned = deck.cards.filter((c) => isMemorized(c) || progress[c.f]?.known).length;
   const hid = all.filter((p) => p.hide).length;
   const due = poolOf('learning').filter(isDue).length;
-  const started = poolOf('learning').length;
   const board = studyBoard();
   const fresh = learnable(board).length;
   const stars = all.filter((p) => p.star).length;
@@ -49,11 +49,12 @@ export function dash() {
       <button id="d-known">${ic('archive')}<span><b>${learned}</b><span>learned</span></span></button>
       <button id="d-hidden">${ic('hidden')}<span><b>${hid}</b><span>hidden</span></span></button>
     </div>
-    <button class="tile" id="d-repeat">${ic('learning')}
-      <span class="n">Repeat<span class="s">${started} started</span></span>
-      <span class="v">${due || 'none'} due</span><span class="go">›</span></button>
-    <button class="big" id="d-start">${fresh ? 'Start studying' : 'Open the board'}</button>
-    <button class="tile" id="d-decks">${ic('deck')}
+    <button class="big" id="d-start">${due ? `Repeat ${Math.min(settings.perDay, due)}`
+      : 'Start studying'}</button>
+    <button class="tile" id="d-jungle">${ic('jungle')}
+      <span class="n">Jungle<span class="s">15 to 30 words from every board</span></span>
+      <span class="go">›</span></button>
+    <button class="tile" id="d-decks">${ic('decks')}
       <span class="n">Decks<span class="s">${deck.decks.length} boards</span></span><span class="go">›</span></button>
     <button class="tile" id="d-star">${ic('favorite')}
       <span class="n">My favourites</span><span class="v">${stars}</span><span class="go">›</span></button>
@@ -61,15 +62,23 @@ export function dash() {
       <span class="n">Priorities<span class="s">the ones she asked for more often</span></span>
       <span class="v">${pri}</span><span class="go">›</span></button>`;
 
-  // The big button starts the lesson itself; everything else opens a page.
+  // Her one pink button, and it reads the day: anything due is a repeat and
+  // needs no button of its own; otherwise it is a lesson where she was last; and
+  // with nothing new left there, it asks her which board to open.
   $('d-start').addEventListener('click', () => {
-    settings.deck = board;
-    if (!fresh) return openBoard(board);
-    settings.mode = 'learn';
+    settings.deck = due ? 'learning' : board;
+    settings.mode = due ? 'review' : 'learn';
+    saveSettings();
+    if (!due && !fresh) return pickBoard();
+    begin();
+  });
+  // A run through the jungle: words from every board, mostly ones she is meeting
+  // for the first time.  It belongs to no board, so it leaves her last one alone.
+  $('d-jungle').addEventListener('click', () => {
+    settings.mode = 'jungle';
     saveSettings();
     begin();
   });
-  $('d-repeat').addEventListener('click', () => openBoard('learning'));
   $('d-known').addEventListener('click', () => openBoard('known'));
   $('d-hidden').addEventListener('click', () => openBoard('hidden'));
   $('d-star').addEventListener('click', () => openBoard('star'));

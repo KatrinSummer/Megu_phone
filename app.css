@@ -460,6 +460,13 @@ main.study ~ #tabs{display:none}
 #pop .acts button{flex:1;padding:9px 6px;border-radius:12px;border:1px solid var(--line);
   font-size:13px;font-weight:600}
 #pop .acts .on{color:var(--star);border-color:var(--star)}
+/* "Which board?" - the same clear sheet, but this one belongs to no word on the
+   screen, so it sits in the middle of it. */
+#pop.mid{display:grid;place-items:center;padding:16px}
+#pop.mid .box{position:static;width:min(340px,100%);max-height:78vh;overflow:auto}
+#pop .list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+#pop .list .tile{gap:9px;padding:9px 10px}
+#pop .list .ic{--s:40px}
 
 #warn{padding:10px 16px;font-size:13px;line-height:1.4;
   background:#fdecec;color:#8a1c1c;border-bottom:1px solid #f0bcbc}

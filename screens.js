@@ -3,12 +3,15 @@ import { $, esc } from './dom.js';
 import { progress, settings, lifetime, doneToday, countDone, uncountDone, countTime,
          saveProgress, flipStar, today } from './store.js';
 import { answer, nextIn, isMemorized } from './schedule.js';
-import { boardCards, pool, buildQueue, flipMark, learnable, reviewable } from './boards.js';
+import { deck, boardCards, pool, buildQueue, flipMark, learnable, reviewable, isOut } from './boards.js';
 import { queue, again, first, lesson, nextCard, keep, forget } from './lesson.js';
 import { play, SPEAKER } from './sound.js';
 import { yomi, openWord } from './word.js';
 import { priButtons, bindPri } from './priority.js';
 import { openBoard } from './page.js';
+// Home, for the end of a jungle run.  Home leads here and this leads back; both
+// only ever call the other from a button, so neither waits on the other to load.
+import { dash } from './dash.js';
 import { ic } from './icons.js';
 
 let current = null, shown = false, revealed = false;
@@ -42,7 +45,9 @@ export function begin() {
 // screen, not the board: how many times it has come up in all.
 export function stats() {
   const id = settings.deck;
-  const cards = boardCards(id).filter((c) => id === 'hidden' || !progress[c.f]?.hide);
+  // A jungle run is dealt from every board at once, so the bars count them all.
+  const cards = (settings.mode === 'jungle' ? deck.cards : boardCards(id))
+    .filter((c) => id === 'hidden' || !progress[c.f]?.hide);
   const mem = cards.filter(isMemorized).length;
   const learn = cards.filter((c) => progress[c.f] && !isMemorized(c)).length;
   const pct = (n) => (cards.length ? Math.round((n / cards.length) * 100) : 0);
@@ -90,19 +95,23 @@ function summary() {
     ['Forgot', n('again')], ['Skipped', n('skip')]].filter(([, v], i) => !i || v);
   const missed = [...first].filter(([, v]) => v === 'again').map(([f]) => f);
   // What is left: a review has the words not seen today, a lesson its new words.
-  const rev = settings.mode === 'review', id = settings.deck;
-  const left = (rev ? reviewable(id).filter((c) => progress[c.f]?.seen !== today()) : learnable(id)).length;
-  const more = Math.min(settings.perDay, left);
+  const rev = settings.mode === 'review', wild = settings.mode === 'jungle', id = settings.deck;
+  const left = wild ? deck.cards.filter((c) => !isOut(c)).length
+    : (rev ? reviewable(id).filter((c) => progress[c.f]?.seen !== today()) : learnable(id)).length;
+  const more = wild ? Number(left > 0) : Math.min(settings.perDay, left);
   // The lesson is over, so the bar along the bottom comes back with the summary.
   $('main').className = 'page';
   $('main').innerHTML = `<div class="done"><h2>${how.length ? 'Lesson done' : 'Done for today'}</h2>
     ${how.length ? `<table>${rows.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('')}</table>` : ''}
     ${missed.length ? `<div class="note">Forgot: ${missed.map(esc).join(' · ')}</div>` : ''}
-    <div>${rev ? `${left} more to review today.` : left ? `${left} new words left on this board.`
+    <div>${wild ? `${left} words are out there in the jungle.`
+      : rev ? `${left} more to review today.` : left ? `${left} new words left on this board.`
       : 'Every word of this board has been started: review them from its page.'}</div>
-    <button class="wide" id="boards">Back to the board</button>
-    ${more ? `<button class="wide" id="more">${rev ? `Review ${more} more` : `Show ${more} more new words`}</button>` : ''}</div>`;
-  $('boards').addEventListener('click', () => openBoard(id));
+    <button class="wide" id="boards">${wild ? 'Back home' : 'Back to the board'}</button>
+    ${more ? `<button class="wide" id="more">${wild ? 'Into the jungle again'
+      : rev ? `Review ${more} more` : `Show ${more} more new words`}</button>` : ''}</div>`;
+  // The jungle came from Home and belongs to no board, so that is the way back.
+  $('boards').addEventListener('click', () => (wild ? dash() : openBoard(id)));
   $('more')?.addEventListener('click', begin);
 }
 

@@ -7,7 +7,7 @@ import { deck, buildQueue } from './boards.js';
 import { saveFile, loadFile } from './backup.js';
 import { ic } from './icons.js';
 import { leave, render } from './screens.js';
-import { markTab } from './nav.js';
+import { markTab, buildNav } from './nav.js';
 import { dash } from './dash.js';
 
 const say = (m) => { $('note').textContent = m; };
@@ -66,6 +66,7 @@ export function settingsPage() {
     settings.theme = settings.theme === 'dark' ? 'light' : 'dark';
     saveSettings();                       // saved at once, so a force-quit keeps it
     applyTheme();
+    buildNav();                           // the bar wears a day icon she drew for it
     settingsPage();                       // her icons and her island change with it
   });
   $('auto').addEventListener('click', () => {
