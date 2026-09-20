@@ -59,13 +59,13 @@ export function home() {
       `<button data-k="${k}"${k === filter ? ' class="on"' : ''}>${name}</button>`).join('')}</div>
     ${rows.map(([id, n]) => `<button class="deck" data-id="${esc(id)}" ${n.total ? '' : 'disabled'}>
       ${ic(boardIcon(id))}<span class="n">${esc(boardName(id))}<span class="s">${note(n)}</span></span>
-      ${ring(poolOf(id), '42px')}<span class="go">›</span></button>`).join('')
+      ${ring(poolOf(id), '42px', '', 18)}<span class="go">›</span></button>`).join('')
       || '<div class="note">No board has anything under this filter.</div>'}`;
 
   for (const b of document.querySelectorAll('.chips button')) {
     b.addEventListener('click', () => { filter = b.dataset.k; home(); });
   }
   for (const b of document.querySelectorAll('.deck')) {
-    b.addEventListener('click', () => openBoard(b.dataset.id));
+    b.addEventListener('click', () => openBoard(b.dataset.id, 'decks'));
   }
 }

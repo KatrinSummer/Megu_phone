@@ -33,7 +33,7 @@ export function pickBoard() {
       settings.deck = id;
       saveSettings();
       // A board with nothing new left opens its own page, where she can review it.
-      if (!learnable(id).length) return openBoard(id);
+      if (!learnable(id).length) return openBoard(id, 'home');
       settings.mode = 'learn';
       begin();
     });

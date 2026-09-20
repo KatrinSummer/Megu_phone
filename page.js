@@ -36,7 +36,15 @@ function when(c, kind) {
 // The filter stays while she goes in and out of the same board's lessons.
 let filter = 'all', filterOf = null;
 
-export function openBoard(id) {
+/** Where she came in from, so the back arrow puts her back there.  Tapping
+ *  "hidden" on Home and landing in the board list is not going back. */
+let from = 'decks';
+export const cameFromHome = () => from === 'home';
+
+/** `where` is 'home' or 'decks'; left out, the board keeps the way in it had -
+ *  coming back from its own lesson is not a new way in. */
+export function openBoard(id, where = from) {
+  from = where;
   leave();
   markTab('decks');
   if (id !== filterOf) { filter = 'all'; filterOf = id; }

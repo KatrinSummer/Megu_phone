@@ -28,7 +28,7 @@ import { playing, sayOnFirstTap } from './sound.js';
 import { render, stats, currentCard, toggleStar, skip, back } from './screens.js';
 import { home } from './decks.js';
 import { onSwipe } from './swipe.js';
-import { openBoard } from './page.js';
+import { openBoard, cameFromHome } from './page.js';
 import { buildNav, markTab } from './nav.js';
 import { dash } from './dash.js';
 import { ic } from './icons.js';
@@ -40,8 +40,12 @@ buildNav();
 // There is no Menu button any more: her concept has nothing in that corner, and
 // Settings has a tab of its own along the bottom.
 for (const [id, name] of [['back', 'back'], ['star', 'favorite']]) $(id).innerHTML = ic(name);
-// From a lesson back to its board's page; from the page back to the boards.
-$('back').addEventListener('click', () => ($('main').className === 'board' ? home() : openBoard(settings.deck)));
+// From a lesson back to its board's page; from the page back where she came in
+// from - Home when she opened the board from one of its rows, the list otherwise.
+$('back').addEventListener('click', () => {
+  if ($('main').className !== 'board') return openBoard(settings.deck);
+  if (cameFromHome()) dash(); else home();
+});
 $('star').addEventListener('click', toggleStar);
 // Like turning a page: the finger goes left to the next card, right to the last.
 onSwipe($('main'), { left: skip, right: back });

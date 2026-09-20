@@ -49,8 +49,9 @@ export function dash() {
       <button id="d-known">${ic('archive')}<span><b>${learned}</b><span>learned</span></span></button>
       <button id="d-hidden">${ic('hidden')}<span><b>${hid}</b><span>hidden</span></span></button>
     </div>
-    <button class="big" id="d-start">${due ? `Repeat ${Math.min(settings.perDay, due)}`
-      : 'Start studying'}</button>
+    <button class="big" id="d-start">${due
+      ? `<span class="t">Repeat</span>${ic('learning')}<span class="v">${due}</span>`
+      : `<span class="t">Start Adventure</span>${ic('jungle')}<span class="v">?</span>`}</button>
     <button class="tile" id="d-jungle">${ic('jungle')}
       <span class="n">Jungle<span class="s">15 to 30 words from every board</span></span>
       <span class="go">›</span></button>
@@ -69,7 +70,7 @@ export function dash() {
     settings.deck = due ? 'learning' : board;
     settings.mode = due ? 'review' : 'learn';
     saveSettings();
-    if (!due && !fresh) return pickBoard();
+    if (!due && !fresh) return pickBoard();       // nothing new here: which board?
     begin();
   });
   // A run through the jungle: words from every board, mostly ones she is meeting
@@ -79,9 +80,10 @@ export function dash() {
     saveSettings();
     begin();
   });
-  $('d-known').addEventListener('click', () => openBoard('known'));
-  $('d-hidden').addEventListener('click', () => openBoard('hidden'));
-  $('d-star').addEventListener('click', () => openBoard('star'));
-  $('d-pri').addEventListener('click', () => openBoard('pri'));
+  // Opened from Home, so the back arrow brings her back to Home.
+  $('d-known').addEventListener('click', () => openBoard('known', 'home'));
+  $('d-hidden').addEventListener('click', () => openBoard('hidden', 'home'));
+  $('d-star').addEventListener('click', () => openBoard('star', 'home'));
+  $('d-pri').addEventListener('click', () => openBoard('pri', 'home'));
   $('d-decks').addEventListener('click', () => { markTab('decks'); home(); });
 }
