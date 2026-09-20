@@ -118,17 +118,19 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .icon[hidden]{display:none}
 /* Her Finish, standing in the middle of the header while a lesson is on - in
    the middle of the header itself, not of what is left beside the counts.  It
-   is her painted button, the same one that starts a lesson: the same picture
-   with its ends cut in the same proportion, small enough for a header. */
+   is her painted button, the same one that starts a lesson, small enough for a
+   header.  The whole picture is drawn at its own proportion (429x108), not cut
+   into ends and a middle like the big one: at this size the middle would be
+   squeezed four times harder than the ends, and her gloss broke at both seams. */
 #finish{position:absolute;left:50%;transform:translateX(-50%);
-  height:46px;padding:0 18px 0 56px;font-size:16px;font-weight:700;color:#fff;
-  border:0 solid transparent;background:none;
-  border-image:url(img/btn-go.webp) 40 60 40 150 fill / 16px 22px 16px 54px / 0 stretch}
+  height:38px;width:151px;padding:0 14px 0 52px;text-align:center;
+  font-size:15px;font-weight:700;color:#fff;
+  background:url(img/btn-go.webp) 0 0/100% 100% no-repeat}
 #finish:active{transform:translateX(-50%) translateY(1px)}
 /* It stands over the header, so the count beside it is kept short enough not to
    run under it - "12 once more · 10 ✓" is longer than "20 to go · 5 ✓". The
    count then stops filling the header, so the star is held to its edge by hand. */
-header:has(#finish:not([hidden])) .grow{max-width:38%}
+header:has(#finish:not([hidden])) .grow{max-width:calc(50% - 90px)}
 #star{margin-left:auto}
 
 main{flex:1;display:flex;flex-direction:column;justify-content:center;
