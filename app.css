@@ -372,6 +372,13 @@ main.dash.talking>.talk{display:flex;margin-top:auto}
 main.fx-shock{animation:fx-shock .4s}
 @keyframes fx-shake{10%,90%{translate:-2px 0}30%,70%{translate:4px 0}50%{translate:-6px 0}}
 main.fx-shake{animation:fx-shake .5s}
+/* Being frightened is not being hit: a fine tremble that goes on a little, not
+   one hard knock.  Small on purpose - at shake's amplitude it reads as another
+   blow rather than as somebody shaking. */
+@keyframes fx-scared{0%,100%{translate:0 0}
+  12%{translate:-1px 1px}25%{translate:1px -1px}37%{translate:-1px -1px}
+  50%{translate:1px 1px}62%{translate:-1px 0}75%{translate:1px 1px}87%{translate:-1px 1px}}
+main.fx-scared{animation:fx-scared .7s}
 @keyframes fx-dark{0%,100%{opacity:0}40%,60%{opacity:.85}}
 /* Over the whole window, the bar and the header included - it is the world
    going dark, not one panel of it - and never in the way of a tap. */

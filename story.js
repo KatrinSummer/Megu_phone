@@ -24,7 +24,7 @@ export function parseScene(text) {
 // How long each effect runs, and the only names there are.  A closed list on
 // purpose: a scene that asks for an effect nobody wrote says so in the console
 // instead of doing nothing and leaving her wondering.
-const EFFECTS = { shock: 400, shake: 500, dark: 900 };
+const EFFECTS = { shock: 400, scared: 700, shake: 500, dark: 900 };
 
 function runEffect(name) {
   const ms = EFFECTS[name];

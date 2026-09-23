@@ -1,7 +1,8 @@
 # 01-beach
-# Megu wakes on the shore, on her own.  Nobody speaks to her yet, so there is no
-# Japanese in this scene at all - Taro arrives in 02, and his lines are written
-# by ChatGPT out of words already in the deck.
+# Megu wakes on the shore.  She is on her own until the last line, when somebody
+# behind her clears his throat - that is Taro, and he is not seen yet.  Clearing
+# your throat is not language, so this scene still needs no Japanese; his words
+# are scene 02, written by ChatGPT out of words already in the deck.
 #
 # A line is "NAME: text", or "NAME -word-: text" to make the screen do
 # something as the line lands.  A "-word-" on a line of its own does it between
@@ -9,6 +10,5 @@
 
 MEGU -shock-: Haaaaah!!! WHERE AM I!!??? Oh no!! Ghhhhhhhyyyyyyyy
 MEGU: It wasn't a dream! I really did fall off that liner yesterday!
-MEGU: So I went over the side of a cruise liner and… woke up in Higashi village!
--dark-
-MEGU: What am I supposed to do now… T_T This is a nightmare!
+TARO: *ahem… ahem…*
+-scared-
