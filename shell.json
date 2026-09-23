@@ -10,4 +10,5 @@
  "icons.js", "ring.js", "nav.js", "dash.js", "decks.js", "screens.js", "page.js",
  "statsview.js", "calendar.js", "settings.js", "jungle.js", "pick.js", "perday.js",
  "boardart.js",
- "word.js", "priority.js", "swipe.js", "backup.js", "talk.js"]
+ "word.js", "priority.js", "swipe.js", "backup.js", "talk.js", "story.js",
+ "story/01-beach.txt"]

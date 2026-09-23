@@ -1,0 +1,14 @@
+# 01-beach
+# Megu wakes on the shore, on her own.  Nobody speaks to her yet, so there is no
+# Japanese in this scene at all - Taro arrives in 02, and his lines are written
+# by ChatGPT out of words already in the deck.
+#
+# A line is "NAME: text", or "NAME -word-: text" to make the screen do
+# something as the line lands.  A "-word-" on a line of its own does it between
+# two lines.  A "#" line is a note and is never shown.
+
+MEGU -shock-: Haaaaah!!! WHERE AM I!!??? Oh no!! Ghhhhhhhyyyyyyyy
+MEGU: It wasn't a dream! I really did fall off that liner yesterday!
+MEGU: So I went over the side of a cruise liner and… woke up in Higashi village!
+-dark-
+MEGU: What am I supposed to do now… T_T This is a nightmare!

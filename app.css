@@ -327,6 +327,23 @@ main.dash.talking>.talk{display:flex}
   padding:12px 14px;box-shadow:var(--shade)}
 .speech p{margin:0 0 8px}
 .speech p:last-child{margin:0}
+/* The quiet line under what is said, and the one that ends the scene. */
+.speech .on{font-size:12px;color:var(--dim)}
+.speech .end{color:var(--dim);text-align:center}
+
+/* What a -word- on its own does.  Two of them so far, and both are over in
+   under a second: a screen that shakes for longer reads as a fault. */
+/* Shock is the camera flinching once, hard and short - what a person does when
+   the ground goes out from under them.  Shake is the longer rattle. */
+@keyframes fx-shock{0%{translate:0 0}25%{translate:0 -7px}55%{translate:3px 4px}100%{translate:0 0}}
+main.fx-shock{animation:fx-shock .4s}
+@keyframes fx-shake{10%,90%{translate:-2px 0}30%,70%{translate:4px 0}50%{translate:-6px 0}}
+main.fx-shake{animation:fx-shake .5s}
+@keyframes fx-dark{0%,100%{opacity:0}40%,60%{opacity:.85}}
+/* Over the whole window, the bar and the header included - it is the world
+   going dark, not one panel of it - and never in the way of a tap. */
+main.fx-dark::after{content:"";position:fixed;inset:0;z-index:5;pointer-events:none;
+  background:#06101f;animation:fx-dark .9s}
 /* On a screen taller than her rows need, the spare room is nobody's: it lies at
    the end of them, under the last board.  It used to be held open between two
    rows - over the pair of tiles, and then under the sign - and either way it was

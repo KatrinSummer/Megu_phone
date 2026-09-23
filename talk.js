@@ -3,17 +3,12 @@
 // Home is a list of boards until she is pressed; then the rows fold away and the
 // screen is hers.  Kept apart from dash.js: that file is about how today stands,
 // this one about the story, and they will not grow into each other.
-import { $, esc } from './dom.js';
+import { $ } from './dom.js';
+import { startScene } from './story.js';
 
-// The opening she wrote, in Megu's own English: Megu is American and thinks in
-// it, so her lines are English however the scene was drafted.  What anybody says
-// in Japanese is written by ChatGPT out of words already in the deck - a line
-// invented here would be one she cannot read and never agreed to learn.
-const INTRO = [
-  'Haaaaah!!! WHERE AM I!!??? Oh no!! Ghhhhhhhyyyyyyyy',
-  "It wasn't a dream! I really did fall off that liner yesterday!",
-  'So I went over the side of a cruise liner and… woke up in Higashi village!',
-];
+// The scene she opens on.  Its text lives in story/01-beach.txt, not here: she
+// writes the story, and a line of it should never mean editing code.
+const FIRST = '01-beach';
 
 /** The way in, laid over her once she is pressed.  Megu is American and the app
  *  speaks English, so the button does too; the story she tells is in Russian. */
@@ -34,8 +29,6 @@ export function bindTalk() {
     // arrow, so it is only ever here while the story is on, and dash() hides it
     // again on the way back.
     $('back').hidden = false;
-    const box = $('d-say');
-    box.hidden = false;
-    box.innerHTML = INTRO.map((l) => `<p>${esc(l)}</p>`).join('');
+    startScene(FIRST);
   });
 }
