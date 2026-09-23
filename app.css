@@ -279,7 +279,7 @@ main.study ~ #tabs{display:none}
    down instead of being cropped by it. */
 .top{display:flex;align-items:flex-start;height:calc(39vh - 70px);overflow:hidden;
   position:relative}
-.char{flex:none;width:82%;max-width:330px;padding:0;border:0;background:none;line-height:0}
+.char{flex:none;width:72%;max-width:290px;padding:0;border:0;background:none;line-height:0}
 /* On Home she is grey: the colour belongs to the story, and she takes it back
    when the story starts. */
 .char img{width:100%;height:auto;display:block;
@@ -301,20 +301,29 @@ main.study ~ #tabs{display:none}
    this reaches for the children of the screen and not for the classes. */
 main.dash.talking>.duo,main.dash.talking>.big,
 main.dash.talking>.drop,main.dash.talking>.tile{display:none}
-/* Once the story starts she takes her colour back and walks to the middle of
-   the screen.  She is 40% of the row and stands at its left edge, so moving her
-   by 75% of her own width lands her dead centre - true while the app is the
-   phone-width column it is drawn for. */
-main.dash.talking .char{translate:11% 0}
+/* Once the story starts she takes her colour back, stands in the middle, and is
+   no longer cut off: the row stops holding a height and she is sized by hers.
+   Sized by height rather than width on purpose - the drawing is 600 tall, so
+   asking for 56vh keeps her under her own resolution on a phone and on a desktop
+   window alike, and she never has to be blown up to fill the screen. */
+main.dash.talking .top{height:auto;justify-content:center;overflow:visible}
+main.dash.talking .char{width:auto;max-width:100%;translate:0}
+main.dash.talking .char img{height:56vh;width:auto;max-width:100%}
 main.dash.talking .char img{filter:drop-shadow(0 5px 9px rgba(6,12,28,.3))}
 :root[data-theme="dark"] main.dash.talking .char img{filter:var(--dim-art)
   drop-shadow(0 5px 9px rgba(6,12,28,.55))}
 /* The way in is on Home from the start, laid over her, not waiting behind a tap
    on her.  It sits at the foot of the row, under the ring that moved up. */
-.top .story{position:absolute;left:50%;translate:-50% 0;bottom:0;width:min(62%,230px)}
+/* Laid over her, this one is small.  The play mark is painted into the button's
+   own picture and the left padding is the room kept for it, so the whole thing
+   shrinks together - slices, padding and height - or the label walks onto the
+   triangle. */
+.top .story{position:absolute;left:50%;translate:-50% 0;bottom:0;width:min(52%,190px);
+  height:52px;padding:0 12px 0 64px;
+  border-image-width:18px 24px 18px 62px}
 /* Her painted button is built round a 20px label; narrowed to sit on top of her
    it needs a smaller one, or "Start story" runs into the play mark. */
-.story .t{font-size:17px}
+.story .t{font-size:14px}
 /* The number steps out of the story altogether.  The row keeps its height from
    her picture, so taking the ring out of it drops nothing. */
 main.dash.talking .ring{display:none}

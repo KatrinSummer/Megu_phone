@@ -94,13 +94,18 @@ export function dash() {
     $('d-count').classList.toggle('on');           // slides out right under the button, where she drew it
   });
   bindCount();
-  // She is a way in, and once she is in the story she is a way on: a tap on her
-  // is the next line, the same as a tap on what she is saying.  The way back is
-  // the arrow in the header, never her - pressing the person you are listening
-  // to should not close the conversation.
+  // She is the way in.  Once the story is on she is a way on like everything
+  // else on the screen, and that is caught below, on the screen itself.
   $('d-char').addEventListener('click', () => {
-    if ($('main').classList.contains('talking')) advance();
-    else $('d-talk').click();
+    if (!$('main').classList.contains('talking')) $('d-talk').click();
+  });
+  // In the story a tap anywhere is the next line - her, the sand, the plate:
+  // a game is read by tapping the screen, not by finding the box.  The tap that
+  // opens the story is not also its first tap on; it arrives here the moment the
+  // class is set.  The way back stays the arrow in the header, never a tap -
+  // pressing the person you are listening to should not close the conversation.
+  $('main').addEventListener('click', (e) => {
+    if ($('main').classList.contains('talking') && !e.target.closest('#d-talk')) advance();
   });
   bindTalk();
   // A run through the jungle: words from every board, mostly ones she is meeting

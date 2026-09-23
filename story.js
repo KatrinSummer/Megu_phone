@@ -39,8 +39,8 @@ function runEffect(name) {
 
 let beats = [], at = 0, running = false;
 
-/** The next line, for anything outside this file that is also a way on - she
- *  herself is one: a tap on her carries the story, it does not leave it. */
+/** The next line.  Nothing in here listens for a tap: the screen does, and the
+ *  screen calls this - so the story runs the same whatever she pressed. */
 export const advance = () => { if (running) step(); };
 
 /** Effects run on the way past; the next line she reads stops the walk. */
@@ -49,8 +49,7 @@ function step() {
   while (at < beats.length && beats[at].effect) runEffect(beats[at++].effect);
   if (at >= beats.length) {
     box.innerHTML = '<p class="end">— to be continued —</p>';
-    box.onclick = null;
-    running = false;                    // and she stops being a way on as well
+    running = false;                    // and the screen stops being a way on
     return;
   }
   const b = beats[at++];
@@ -70,7 +69,6 @@ export async function startScene(name) {
     return;
   }
   at = 0;
-  running = true;
-  box.onclick = step;
+  running = true;                       // the screen carries the taps from here
   step();
 }
