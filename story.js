@@ -37,6 +37,10 @@ function runEffect(name) {
   setTimeout(() => main.classList.remove(`fx-${name}`), ms);
 }
 
+/** A scene is written with the speaker in capitals - MEGU, TARO - because that
+ *  is how a script reads on the page.  On screen it is a name, not shouting. */
+const named = (who) => who[0] + who.slice(1).toLowerCase();
+
 let beats = [], at = 0, running = false;
 
 /** The next line.  Nothing in here listens for a tap: the screen does, and the
@@ -54,7 +58,8 @@ function step() {
   }
   const b = beats[at++];
   if (b.fx) runEffect(b.fx);            // the screen flinches as the line lands
-  box.innerHTML = `<p>${esc(b.text)}</p><p class="on">tap to go on</p>`;
+  box.innerHTML = `${b.who ? `<p class="who">${esc(named(b.who))}</p>` : ''}
+    <p class="line">${esc(b.text)}</p><p class="on">tap to go on</p>`;
 }
 
 export async function startScene(name) {

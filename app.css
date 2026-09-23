@@ -361,6 +361,11 @@ main.dash.talking>.talk{display:flex;margin-top:auto}
 .speech p{margin:0 0 8px}
 .speech p:last-child{margin:0}
 /* The quiet line under what is said, and the one that ends the scene. */
+/* Who is speaking, over what they say.  Four voices meet in this story and one
+   of them she cannot understand a word of, so which mouth a line came out of is
+   the one thing she must never have to guess. */
+.speech .who{font-size:13px;font-weight:700;color:var(--pink);
+  letter-spacing:.02em;margin:0 0 3px}
 .speech .on{font-size:12px;color:var(--dim)}
 .speech .end{color:var(--dim);text-align:center}
 
