@@ -279,7 +279,12 @@ main.study ~ #tabs{display:none}
    down instead of being cropped by it. */
 .top{display:flex;align-items:flex-start;height:calc(39vh - 70px);overflow:hidden;
   position:relative}
-.char{flex:none;width:72%;max-width:290px;padding:0;border:0;background:none;line-height:0}
+/* Her box stops where the number begins, at every width: the ring is drawn
+   158px across and carries 4px either side, so what is left of the row after
+   175px is hers and the two can never reach each other.  A percentage alone
+   cannot promise that - it holds at one window width and breaks at the next. */
+.char{flex:none;width:min(72%,calc(100% - 175px));max-width:290px;
+  padding:0;border:0;background:none;line-height:0}
 /* On Home she is grey: the colour belongs to the story, and she takes it back
    when the story starts. */
 .char img{width:100%;height:auto;display:block;
@@ -295,20 +300,24 @@ main.study ~ #tabs{display:none}
    altogether.  It used to share the row with her, and once she grew to most of
    its width there was nothing left for it: "843" was pushed off the screen with
    only the 8 showing. */
-.top .ring{position:absolute;right:0;top:0;z-index:2;width:auto;padding:12px 4px 10px}
+.top .ring{position:absolute;right:0;top:26px;z-index:2;width:auto;padding:12px 4px 10px}
 /* While she has the screen the island's rows are folded away.  Only the rows
    themselves go: what is inside her own panel is not one of them, which is why
    this reaches for the children of the screen and not for the classes. */
 main.dash.talking>.duo,main.dash.talking>.big,
 main.dash.talking>.drop,main.dash.talking>.tile{display:none}
-/* Once the story starts she takes her colour back, stands in the middle, and is
-   no longer cut off: the row stops holding a height and she is sized by hers.
-   Sized by height rather than width on purpose - the drawing is 600 tall, so
-   asking for 56vh keeps her under her own resolution on a phone and on a desktop
-   window alike, and she never has to be blown up to fill the screen. */
-main.dash.talking .top{height:auto;justify-content:center;overflow:visible}
+/* The whole screen is tapped over and over to read the story, and taps that land
+   close together are a double-click: the browser answers one by selecting what
+   was under it, and drew a box round her.  Nothing here is text to copy. */
+main.dash.talking{user-select:none;-webkit-user-select:none}
+/* Once the story starts she takes her colour back and comes close: a head-and-
+   shoulders-to-hips shot, not the whole figure standing in the distance.  The
+   drawing is taller than the room it is shown in on purpose - it is asked for at
+   74vh and given 46vh of window, so what is left on screen is her down to about
+   the hips, and the rest runs off the bottom behind what is said. */
+main.dash.talking .top{height:52vh;justify-content:center;overflow:hidden}
 main.dash.talking .char{width:auto;max-width:100%;translate:0}
-main.dash.talking .char img{height:56vh;width:auto;max-width:100%}
+main.dash.talking .char img{height:88vh;width:auto;max-width:96vw}
 main.dash.talking .char img{filter:drop-shadow(0 5px 9px rgba(6,12,28,.3))}
 :root[data-theme="dark"] main.dash.talking .char img{filter:var(--dim-art)
   drop-shadow(0 5px 9px rgba(6,12,28,.55))}
