@@ -37,7 +37,11 @@ function runEffect(name) {
   setTimeout(() => main.classList.remove(`fx-${name}`), ms);
 }
 
-let beats = [], at = 0;
+let beats = [], at = 0, running = false;
+
+/** The next line, for anything outside this file that is also a way on - she
+ *  herself is one: a tap on her carries the story, it does not leave it. */
+export const advance = () => { if (running) step(); };
 
 /** Effects run on the way past; the next line she reads stops the walk. */
 function step() {
@@ -46,6 +50,7 @@ function step() {
   if (at >= beats.length) {
     box.innerHTML = '<p class="end">— to be continued —</p>';
     box.onclick = null;
+    running = false;                    // and she stops being a way on as well
     return;
   }
   const b = beats[at++];
@@ -65,6 +70,7 @@ export async function startScene(name) {
     return;
   }
   at = 0;
+  running = true;
   box.onclick = step;
   step();
 }

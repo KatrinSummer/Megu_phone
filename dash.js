@@ -16,6 +16,7 @@ import { pickBoard } from './pick.js';
 import { countRow, bindCount } from './perday.js';
 import { markTab } from './nav.js';
 import { storyButton, talkPanel, bindTalk } from './talk.js';
+import { advance } from './story.js';
 
 /** The board the big button starts.  Her last one while it still has new words
  *  in it, otherwise the newest lesson, which is the one she is usually after. */
@@ -93,10 +94,13 @@ export function dash() {
     $('d-count').classList.toggle('on');           // slides out right under the button, where she drew it
   });
   bindCount();
-  // She is a way in as well as the button on her, and the way back out: the rows
-  // are only hidden, never thrown out, so the tally behind them stays as it was.
+  // She is a way in, and once she is in the story she is a way on: a tap on her
+  // is the next line, the same as a tap on what she is saying.  The way back is
+  // the arrow in the header, never her - pressing the person you are listening
+  // to should not close the conversation.
   $('d-char').addEventListener('click', () => {
-    if (!$('main').classList.toggle('talking')) $('d-say').hidden = true;
+    if ($('main').classList.contains('talking')) advance();
+    else $('d-talk').click();
   });
   bindTalk();
   // A run through the jungle: words from every board, mostly ones she is meeting

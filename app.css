@@ -273,8 +273,13 @@ main.study ~ #tabs{display:none}
    39%.  The row is held to that share, so she stands on the sand and not in the
    sea when the window is tall.  (In a window wider than the art is - a desktop -
    the drawing is scaled by width instead and this no longer tracks it.) */
-.top{display:flex;align-items:flex-end;min-height:calc(39vh - 70px);position:relative}
-.char{flex:none;width:40%;max-width:170px;padding:0;border:0;background:none;line-height:0}
+/* She is drawn far taller than the row, and the row cuts her off: what shows is
+   her down to about the waist, and the rows of Home begin where she stops.  The
+   height is held rather than grown into, or she would push the whole screen
+   down instead of being cropped by it. */
+.top{display:flex;align-items:flex-start;height:calc(39vh - 70px);overflow:hidden;
+  position:relative}
+.char{flex:none;width:82%;max-width:330px;padding:0;border:0;background:none;line-height:0}
 /* On Home she is grey: the colour belongs to the story, and she takes it back
    when the story starts. */
 .char img{width:100%;height:auto;display:block;
@@ -286,7 +291,11 @@ main.study ~ #tabs{display:none}
 /* The ring rides at the top of the row, up in the sky.  It used to sit at the
    bottom beside her, and the way-in button - which is on Home from the start -
    was drawn straight through the number. */
-.top .ring{flex:1;width:auto;align-self:flex-start;padding:14px 4px 10px}
+/* The number hangs in the top right corner of the drawing, out of the row
+   altogether.  It used to share the row with her, and once she grew to most of
+   its width there was nothing left for it: "843" was pushed off the screen with
+   only the 8 showing. */
+.top .ring{position:absolute;right:0;top:0;z-index:2;width:auto;padding:12px 4px 10px}
 /* While she has the screen the island's rows are folded away.  Only the rows
    themselves go: what is inside her own panel is not one of them, which is why
    this reaches for the children of the screen and not for the classes. */
@@ -296,13 +305,16 @@ main.dash.talking>.drop,main.dash.talking>.tile{display:none}
    the screen.  She is 40% of the row and stands at its left edge, so moving her
    by 75% of her own width lands her dead centre - true while the app is the
    phone-width column it is drawn for. */
-main.dash.talking .char{translate:75% 0}
+main.dash.talking .char{translate:11% 0}
 main.dash.talking .char img{filter:drop-shadow(0 5px 9px rgba(6,12,28,.3))}
 :root[data-theme="dark"] main.dash.talking .char img{filter:var(--dim-art)
   drop-shadow(0 5px 9px rgba(6,12,28,.55))}
 /* The way in is on Home from the start, laid over her, not waiting behind a tap
    on her.  It sits at the foot of the row, under the ring that moved up. */
-.top .story{position:absolute;left:0;bottom:0;width:min(92%,330px)}
+.top .story{position:absolute;left:50%;translate:-50% 0;bottom:0;width:min(62%,230px)}
+/* Her painted button is built round a 20px label; narrowed to sit on top of her
+   it needs a smaller one, or "Start story" runs into the play mark. */
+.story .t{font-size:17px}
 /* The number steps out of the story altogether.  The row keeps its height from
    her picture, so taking the ring out of it drops nothing. */
 main.dash.talking .ring{display:none}
@@ -318,7 +330,10 @@ main.dash.talking .story{display:none}
    letter, so both alphabets come out right. */
 .talk{display:none;flex-direction:column;gap:10px;
   font-family:system-ui,-apple-system,"Hiragino Sans","Yu Gothic",sans-serif}
-main.dash.talking>.talk{display:flex}
+/* What is said sits at the foot of the screen, where a game puts it: with the
+   rows folded away the room below her is empty, and the plate tucked under her
+   left it stranded in the middle of the sand. */
+main.dash.talking>.talk{display:flex;margin-top:auto}
 /* What is said, on a plate of its own: the words stand on the beach otherwise
    and the sand reads straight through them.  Not .say - that is the speaker
    button inside a word's box, and two things under one name is how one of them
