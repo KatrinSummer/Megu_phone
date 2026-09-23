@@ -263,6 +263,70 @@ main.study ~ #tabs{display:none}
 /* Not .done: that is the card at the end of a lesson, and the checks find the
    end of a lesson by looking for it. */
 .ring .l.today{text-transform:none;letter-spacing:0;color:var(--good);font-weight:700;margin-top:3px}
+
+/* Her character, standing on the bare left of the island - the side she kept
+   clear of plates and rows when she drew the concept, which is where she asked
+   for her.  The ring shares the row instead of holding 60% of the screen on its
+   own, so the two stand side by side however tall the window is. */
+/* The island is taller than any phone, so it is always scaled to the height of
+   the window and the sand starts at the same share of it whatever the window is:
+   39%.  The row is held to that share, so she stands on the sand and not in the
+   sea when the window is tall.  (In a window wider than the art is - a desktop -
+   the drawing is scaled by width instead and this no longer tracks it.) */
+.top{display:flex;align-items:flex-end;min-height:calc(39vh - 70px);position:relative}
+.char{flex:none;width:40%;max-width:170px;padding:0;border:0;background:none;line-height:0}
+/* On Home she is grey: the colour belongs to the story, and she takes it back
+   when the story starts. */
+.char img{width:100%;height:auto;display:block;
+  filter:grayscale(1) drop-shadow(0 5px 9px rgba(6,12,28,.28))}
+:root[data-theme="dark"] .char img{filter:grayscale(1) var(--dim-art)
+  drop-shadow(0 5px 9px rgba(6,12,28,.55))}
+.char:active img{transform:translateY(1px)}
+.char{transition:translate .35s ease}
+/* The ring rides at the top of the row, up in the sky.  It used to sit at the
+   bottom beside her, and the way-in button - which is on Home from the start -
+   was drawn straight through the number. */
+.top .ring{flex:1;width:auto;align-self:flex-start;padding:14px 4px 10px}
+/* While she has the screen the island's rows are folded away.  Only the rows
+   themselves go: what is inside her own panel is not one of them, which is why
+   this reaches for the children of the screen and not for the classes. */
+main.dash.talking>.duo,main.dash.talking>.big,
+main.dash.talking>.drop,main.dash.talking>.tile{display:none}
+/* Once the story starts she takes her colour back and walks to the middle of
+   the screen.  She is 40% of the row and stands at its left edge, so moving her
+   by 75% of her own width lands her dead centre - true while the app is the
+   phone-width column it is drawn for. */
+main.dash.talking .char{translate:75% 0}
+main.dash.talking .char img{filter:drop-shadow(0 5px 9px rgba(6,12,28,.3))}
+:root[data-theme="dark"] main.dash.talking .char img{filter:var(--dim-art)
+  drop-shadow(0 5px 9px rgba(6,12,28,.55))}
+/* The way in is on Home from the start, laid over her, not waiting behind a tap
+   on her.  It sits at the foot of the row, under the ring that moved up. */
+.top .story{position:absolute;left:0;bottom:0;width:min(92%,330px)}
+/* The number steps out of the story altogether.  The row keeps its height from
+   her picture, so taking the ring out of it drops nothing. */
+main.dash.talking .ring{display:none}
+/* And the way in goes with it once it has been taken: it is the door, not part
+   of the room.  Two classes deep on purpose - .big paints it further down this
+   file and would win at equal weight. */
+main.dash.talking .story{display:none}
+/* The story is the one part of the app written in Russian, and the app's font
+   stack reaches a Japanese face first on Windows - where Cyrillic is drawn
+   full-width, one letter to a square, which is not writing she can read.  The
+   window's own interface font goes first here, and the Japanese faces stay
+   behind it for the kana in the same line: a browser picks a face letter by
+   letter, so both alphabets come out right. */
+.talk{display:none;flex-direction:column;gap:10px;
+  font-family:system-ui,-apple-system,"Hiragino Sans","Yu Gothic",sans-serif}
+main.dash.talking>.talk{display:flex}
+/* What is said, on a plate of its own: the words stand on the beach otherwise
+   and the sand reads straight through them.  Not .say - that is the speaker
+   button inside a word's box, and two things under one name is how one of them
+   quietly gets the other's padding. */
+.speech{background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:12px 14px;box-shadow:var(--shade)}
+.speech p{margin:0 0 8px}
+.speech p:last-child{margin:0}
 /* On a screen taller than her rows need, the spare room is nobody's: it lies at
    the end of them, under the last board.  It used to be held open between two
    rows - over the pair of tiles, and then under the sign - and either way it was

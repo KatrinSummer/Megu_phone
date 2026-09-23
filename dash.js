@@ -15,6 +15,7 @@ import { openBoard, cameIn } from './page.js';
 import { pickBoard } from './pick.js';
 import { countRow, bindCount } from './perday.js';
 import { markTab } from './nav.js';
+import { storyButton, talkPanel, bindTalk } from './talk.js';
 
 /** The board the big button starts.  Her last one while it still has new words
  *  in it, otherwise the newest lesson, which is the one she is usually after. */
@@ -47,10 +48,15 @@ export function dash() {
 
   $('main').className = 'dash';
   $('main').innerHTML = `
-    <div class="ring">
-      ${ring(deck.cards, '158px', `<div class="mid"><span class="n">${deck.cards.length}</span>
-        <span class="l">words</span>${done ? `<span class="l today">${done} today</span>` : ''}</div>`)}
+    <div class="top">
+      <button class="char" id="d-char" aria-label="Start story"><img src="img/char.webp" alt=""></button>
+      <div class="ring">
+        ${ring(deck.cards, '158px', `<div class="mid"><span class="n">${deck.cards.length}</span>
+          <span class="l">words</span>${done ? `<span class="l today">${done} today</span>` : ''}</div>`)}
+      </div>
+      ${storyButton()}
     </div>
+    ${talkPanel()}
     <div class="duo">
       <button id="d-known">${ic('archive')}<span><b>${learned}</b><span>learned</span></span></button>
       <button id="d-hidden">${ic('hidden')}<span><b>${hid}</b><span>hidden</span></span></button>
@@ -87,6 +93,12 @@ export function dash() {
     $('d-count').classList.toggle('on');           // slides out right under the button, where she drew it
   });
   bindCount();
+  // She is a way in as well as the button on her, and the way back out: the rows
+  // are only hidden, never thrown out, so the tally behind them stays as it was.
+  $('d-char').addEventListener('click', () => {
+    if (!$('main').classList.toggle('talking')) $('d-say').hidden = true;
+  });
+  bindTalk();
   // A run through the jungle: words from every board, mostly ones she is meeting
   // for the first time.  It belongs to no board, so it leaves her last one alone.
   $('d-jungle').addEventListener('click', () => {
