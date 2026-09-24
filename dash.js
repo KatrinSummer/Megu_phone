@@ -55,16 +55,16 @@ export function dash() {
         ${ring(deck.cards, '158px', `<div class="mid"><span class="n">${deck.cards.length}</span>
           <span class="l">words</span>${done ? `<span class="l today">${done} today</span>` : ''}</div>`)}
       </div>
-      <button class="big story" id="d-start">${due
-        ? `<span class="t">Repeat</span><span class="r">${ic('learning')}<span class="v">${due}</span>${COUNT}</span>`
-        : `<span class="t">Start Adventure</span><span class="r"><span class="v" id="d-v">${settings.rand ? '?' : settings.perDay}</span>${ic('jungle')}${COUNT}</span>`}</button>
-      ${countRow()}
     </div>
     ${talkPanel()}
     <div class="duo">
       <button id="d-known">${ic('archive')}<span><b>${learned}</b><span>learned</span></span></button>
       <button id="d-hidden">${ic('hidden')}<span><b>${hid}</b><span>hidden</span></span></button>
     </div>
+    <button class="big" id="d-start">${due
+      ? `<span class="t">Repeat</span><span class="r">${ic('learning')}<span class="v">${due}</span>${COUNT}</span>`
+      : `<span class="t">Start Adventure</span><span class="r"><span class="v" id="d-v">${settings.rand ? '?' : settings.perDay}</span>${ic('jungle')}${COUNT}</span>`}</button>
+    ${countRow()}
     <button class="tile" id="d-jungle">${ic('jungle')}
       <span class="n">Jungle<span class="s">15 to 30 words from every board</span></span>
       <span class="go">›</span></button>

@@ -335,22 +335,19 @@ main.dash.talking .char img{display:block;width:auto;height:auto;
    round it, which is the other half of "why do they stand out". */
 main.dash.talking .char img{filter:none}
 :root[data-theme="dark"] main.dash.talking .char img{filter:var(--dim-art)}
-/* The way in is on Home from the start, laid over her, not waiting behind a tap
-   on her.  It sits at the foot of the row, under the ring that moved up. */
-/* Her one pink button rides on her, at the foot of the drawing: she asked for
-   one button, not two, so the way into the story is Megu herself and this is
-   the lesson's.  Full size - it is the same button the rest of the app knows. */
-.top .story{position:absolute;left:0;right:0;bottom:0;width:auto}
-/* Her painted button is built round a 20px label; narrowed to sit on top of her
-   it needs a smaller one, or "Start story" runs into the play mark. */
-.story .t{font-size:14px}
+/* Her one pink button stands in the flow of the screen, under the first row of
+   tiles, where it has always stood.  It was lifted into the drawing's row and
+   pinned to the foot of it with an absolute - and on a real phone that row is
+   short, so the ring came down onto the button and the wooden sign it opens
+   slid out at the top of the screen.  A button that belongs to a list belongs
+   IN the list; only the drawing and the number live in that row.
+   The way into the story is still Megu herself, so there is still one button. */
 /* The number steps out of the story altogether.  The row keeps its height from
    her picture, so taking the ring out of it drops nothing. */
 main.dash.talking .ring{display:none}
-/* And the way in goes with it once it has been taken: it is the door, not part
-   of the room.  Two classes deep on purpose - .big paints it further down this
-   file and would win at equal weight. */
-main.dash.talking .story{display:none}
+/* The button itself is folded away with the other rows by the rule above, which
+   reaches every .big child of the screen - it no longer needs a class of its
+   own down here. */
 /* The story is the one part of the app written in Russian, and the app's font
    stack reaches a Japanese face first on Windows - where Cyrillic is drawn
    full-width, one letter to a square, which is not writing she can read.  The
