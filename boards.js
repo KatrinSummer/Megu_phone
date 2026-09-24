@@ -53,11 +53,14 @@ const byTurn = (a, b) => pri(b) - pri(a) || (b.when || '').localeCompare(a.when 
 const shuffle = (list) => list.sort(() => Math.random() - 0.5);
 
 /** The words she wants more often turn up in every review, at random, due or
- *  not and whether or not they belong to it - about one card in five. */
+ *  not and whether or not they belong to it - about one card in five, and never
+ *  more than five of them in one lesson.  Five is her ceiling, not her quota:
+ *  with two such words in the whole deck, two is what a lesson gets. */
+const MOST = 5;
 function withFavourites(list) {
   const here = new Set(list.map((c) => c.f));
   const extra = shuffle(deck.cards.filter((c) => pri(c) === 1 && !progress[c.f].known && !here.has(c.f)))
-    .slice(0, Math.ceil(list.length / 5));
+    .slice(0, Math.min(MOST, Math.ceil(list.length / 5)));
   for (const c of extra) list.splice(Math.floor(Math.random() * (list.length + 1)), 0, c);
   return list;
 }
