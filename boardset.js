@@ -19,8 +19,20 @@ export const boardBack = (id) => !!of(id).back;
  *  is also where Random lives - a board that has never been set follows it. */
 export const boardWords = (id) => of(id).per ?? lessonSize();
 
+/** What kind of lesson this board deals.  'mix' is the one lesson - the words
+ *  whose day has come first, new ones filling what is left.  The other two are
+ *  the piles the app used to keep apart, for a day when she wants only one of
+ *  them: nothing new at all, or nothing but new. */
+const KINDS = [['mix', 'Mixed'], ['review', 'Repeats'], ['new', 'New words']];
+export const boardMode = (id) => of(id).kind ?? 'mix';
+/** What the board's one button should call itself. */
+export const boardModeName = (id) => KINDS.find(([k]) => k === boardMode(id))[1];
+
 /** The panel, on the same sliding shelf as the board's pictures. */
 export const boardSetRow = (id) => `<div class="drop" id="b-set"><div><div class="pane">
+  <div class="set"><span class="n">Lesson</span>
+    <div class="chips kinds">${KINDS.map(([k, name]) => `<button data-k="${k}"${
+      boardMode(id) === k ? ' class="on"' : ''}>${name}</button>`).join('')}</div></div>
   <div class="set"><span class="n">English first</span>
     <button class="sw${boardBack(id) ? ' on' : ''}" id="s-back" role="switch"
       aria-checked="${boardBack(id)}" aria-label="English first"></button></div>
@@ -32,7 +44,15 @@ export const boardSetRow = (id) => `<div class="drop" id="b-set"><div><div class
 /** Changing one saves it at once - there is no Done button on a shelf.
  *  An empty count is not zero: it is "follow the app", so it is stored as
  *  nothing at all rather than as a number she never chose. */
-export function bindBoardSet(id) {
+export function bindBoardSet(id, onKind) {
+  for (const b of document.querySelectorAll('#b-set .kinds button')) {
+    b.addEventListener('click', () => {
+      of(id).kind = b.dataset.k;
+      saveSettings();
+      for (const o of document.querySelectorAll('#b-set .kinds button')) o.classList.toggle('on', o === b);
+      onKind?.(b.dataset.k);          // the button on the page says what it starts
+    });
+  }
   const sw = document.getElementById('s-back');
   sw?.addEventListener('click', () => {
     const on = !boardBack(id);

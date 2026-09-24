@@ -55,6 +55,7 @@ export function dash() {
         ${ring(deck.cards, '158px', `<div class="mid"><span class="n">${deck.cards.length}</span>
           <span class="l">words</span>${done ? `<span class="l today">${done} today</span>` : ''}</div>`)}
       </div>
+      <button class="story" id="d-story">${ic('start')}Start Adventure</button>
     </div>
     ${talkPanel()}
     <div class="duo">
@@ -100,6 +101,12 @@ export function dash() {
   // first tap on and eat the opening line.
   $('d-char').addEventListener('click', (e) => {
     if ($('main').classList.contains('talking')) return;
+    e.stopPropagation();
+    startStory();
+  });
+  // The same door with a handle on it: she wanted the way in written down, not
+  // only guessable from the drawing.
+  $('d-story').addEventListener('click', (e) => {
     e.stopPropagation();
     startStory();
   });

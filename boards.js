@@ -2,7 +2,7 @@
 import { progress, settings, today, fresh, saveProgress, started } from './store.js';
 import { startLesson, drop } from './lesson.js';
 import { jungleRun } from './jungle.js';
-import { boardWords } from './boardset.js';
+import { boardWords, boardMode } from './boardset.js';
 
 export const deck = { cards: [], decks: [] };
 export const setDeck = (d) => Object.assign(deck, d);
@@ -87,12 +87,34 @@ export function buildQueue() {
   const id = settings.deck, n = boardWords(id);
   // The jungle belongs to no board: a run out of every word still in the round.
   if (settings.mode === 'jungle') return refill(jungleRun(deck.cards.filter((c) => !isOut(c))));
+  // Which of the three this board deals.  The Review board's own button asks for
+  // repeats outright and is not a board of hers to set, so it still wins.
+  const kind = settings.mode === 'review' ? 'review' : boardMode(id);
   // A review: n of her started words, whether their day has come or not.
-  if (settings.mode === 'review') {
+  if (kind === 'review') {
     return refill(withFavourites(reviewable(id).sort(byDue).slice(0, n)).slice(0, n));
   }
-  // A lesson is for learning: new words only. What she has started comes back in a review.
-  refill(learnable(id).sort(byTurn).slice(0, n));
+  // New words only - the lesson the app used to deal, kept for a day she wants
+  // nothing but new ones.
+  if (kind === 'new') return refill(learnable(id).sort(byTurn).slice(0, n));
+  // One lesson, not two piles.  The words whose day has come go in first and new
+  // ones take the room that is left: a heavy day is nearly all repeats, a clear
+  // day is nearly all new words, and there is no threshold to set - the size of
+  // the lesson balances it by itself.
+  //
+  // Always some new words, though: a tenth of the lesson, so she never opens it
+  // to a wall of repeats.  A tenth is what it can afford.  Measured over half a
+  // year on her deck, two new in twenty costs nothing anyone could see, three
+  // leaves 190 words waiting instead of 11, and five leaves 586 - because every
+  // new word is a repeat tomorrow, and a forgotten one comes back the same day.
+  const some = Math.ceil(n / 10);
+  const brandNew = learnable(id).sort(byTurn);
+  const waiting = reviewable(id).sort(byDue);
+  const take = brandNew.slice(0, Math.max(some, n - waiting.length));
+  const back = waiting.slice(0, n - take.length);
+  // Shuffled together: eighteen repeats and then two new words at the end is
+  // two lessons in a row, not one lesson.
+  refill(shuffle(withFavourites([...back, ...take])).slice(0, n));
 }
 
 /** `key` is 'known' (the tick, "I know it") or 'hide' (the eye, "not

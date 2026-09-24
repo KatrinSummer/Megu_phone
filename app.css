@@ -326,15 +326,32 @@ main.dash.talking{user-select:none;-webkit-user-select:none}
    difference - which is where the frame she kept seeing came from: a hard edge
    down both sides of the drawing at the exact width of the box. */
 main.dash.talking .top{flex:1;min-height:0;height:auto;overflow:hidden;
-  align-items:flex-end;justify-content:center}
+  align-items:flex-start;justify-content:center}
 main.dash.talking .char{width:100%;max-width:none;height:100%;overflow:visible;
-  translate:0;display:flex;align-items:flex-end;justify-content:center}
-main.dash.talking .char img{display:block;width:auto;height:auto;
-  max-width:100%;max-height:100%;margin-left:0}
+  translate:0;display:flex;align-items:flex-start;justify-content:center}
+/* Close up, the way a novel stands somebody on screen: as tall as the window,
+   head at the top, and whatever is below the hips runs off the bottom behind
+   what is being said.  That is the screen's edge doing the cutting, not a box
+   inside it - the row is the full width now, so nothing draws a line down her
+   sides the way the old 52vh box did. */
+main.dash.talking .char img{display:block;width:auto;height:88vh;
+  max-width:none;max-height:none;margin-left:0}
 /* And no shadow on the stage.  A hard shadow behind a big figure draws a line
    round it, which is the other half of "why do they stand out". */
 main.dash.talking .char img{filter:none}
 :root[data-theme="dark"] main.dash.talking .char img{filter:var(--dim-art)}
+/* The way into her story, written on her: a small pill at the foot of the
+   drawing.  It carries nothing that drops out from under it, which is what made
+   the LESSON button unsafe in this row - there is nothing here to push the ring
+   onto, and nothing to slide out at the top of the screen. */
+.top .story{position:absolute;left:8px;bottom:6px;z-index:3;width:auto;
+  display:flex;align-items:center;gap:6px;padding:7px 14px 7px 10px;
+  border:0;border-radius:999px;font-size:13px;font-weight:700;color:#fff;
+  background:var(--pink);box-shadow:0 3px 10px rgba(6,12,28,.28)}
+.top .story .ic{--s:18px}
+.top .story:active{transform:translateY(1px)}
+main.dash.talking .top .story{display:none}
+
 /* Her one pink button stands in the flow of the screen, under the first row of
    tiles, where it has always stood.  It was lifted into the drawing's row and
    pinned to the foot of it with an absolute - and on a real phone that row is
@@ -469,7 +486,11 @@ main.fx-dark::after{content:"";position:fixed;inset:0;z-index:5;pointer-events:n
 .drop#b-art.on>div{max-height:480px}
 /* Two rows of switches, and they are taller than the wooden sign the count
    rides on: a shelf cut to the sign's height would show one and a half. */
-.drop#b-set.on>div{max-height:200px}
+.drop#b-set.on>div{max-height:280px}
+/* The three kinds of lesson ride on the right of their row, and wrap onto a
+   line of their own on a narrow phone rather than squeezing the label out. */
+.set .chips{flex:none;justify-content:flex-end;flex-wrap:wrap;gap:6px;padding:0}
+.set .chips button{font-size:12px;padding:5px 9px}
 /* The meaning as the question, on a board she has turned round.  It stands
    where her word stands on an ordinary card, so it is sized like a question and
    not like the small line of English under one. */

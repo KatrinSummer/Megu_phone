@@ -11,11 +11,18 @@ import { stateOf } from './word.js';
 // reaches her as noise.  The noise is kana rather than invented symbols: she is
 // hearing Japanese, she simply cannot understand it - and kana is certain to
 // draw on her phone, which a rare glyph is not.
-const KANA = 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわん';
+// Blocked out, not spelled out.  It was kana at first - real letters in a random
+// order - and it read as Japanese she simply had not learned, which is not what
+// being unable to understand someone feels like.  She asked for something that
+// LOOKS unreadable, blacked out like a censored line, and she is right.
+// Blocks rather than odd symbols on purpose: these four are in every font there
+// is, and a rare glyph would come out as an empty box on her phone - which is
+// unreadable for the wrong reason.
+const BLOCKS = '█▓▒░';
 /** Same word in, same noise out - so an unheard word is recognisably the same
  *  one each time it comes round, and the day she learns it, it resolves. */
 const deafen = (t) => [...t].map((ch, i) => (/[぀-ヿ]/.test(ch)
-  ? KANA[(ch.codePointAt(0) * 7 + i * 13) % KANA.length] : ch)).join('');
+  ? BLOCKS[(ch.codePointAt(0) * 7 + i * 13) % BLOCKS.length] : ch)).join('');
 
 // A line is Japanese if there is kana in it; Megu's own English never is.
 const JAPANESE = /[぀-ヿ]/;

@@ -8,7 +8,7 @@ import { stats, leave, begin } from './screens.js';
 import { openWord, stateOf } from './word.js';
 import { ic, COG } from './icons.js';
 import { boardIcon, canPick, artRow, bindArt } from './boardart.js';
-import { boardSetRow, bindBoardSet } from './boardset.js';
+import { boardSetRow, bindBoardSet, boardModeName } from './boardset.js';
 import { markTab } from './nav.js';
 
 const NAMES = { learning: 'Review', star: 'Bookmarks', pri: 'Priorities',
@@ -57,13 +57,13 @@ export function openBoard(id, where = from) {
   const cards = boardCards(id), kinds = cards.map(kindOf), n = settings.perDay;
   const learn = learnable(id).length, rev = reviewable(id), due = rev.filter(isDue).length;
   const count = (k) => (k === 'all' ? cards.length : kinds.filter((x) => x === k).length);
-  const go = isOutBoard(id) ? '<div class="note">Tap a word to put it back into the round.</div>' : `
-    ${rev.length ? `<button class="wide" id="review">${ic('learning')} ${
-      settings.rand ? 'Review' : `Review ${Math.min(n, rev.length)}`}
-      <span class="s">${due ? `${due} due` : 'nothing due'} · ${rev.length} started</span></button>` : ''}
-    ${learn ? `<button class="wide" id="learn">${
-      settings.rand ? 'Learn new words' : `Learn ${Math.min(n, learn)} new`}
-      <span class="s">${learn} new on this board</span></button>` : ''}`;
+  // One button, and it says which of the three lessons it starts - the choice
+  // lives on the shelf under the board's name, not in a second button here.
+  const go = isOutBoard(id) ? '<div class="note">Tap a word to put it back into the round.</div>'
+    : (rev.length || learn) ? `
+    <button class="wide" id="go-lesson">${ic('learning')} <span id="go-what">${boardModeName(id)}</span>${
+      settings.rand ? '' : ` ${n}`}
+      <span class="s">${due ? `${due} due` : 'nothing due'} · ${learn} new on this board</span></button>` : '';
   $('main').className = 'board';
   // The board says its own name on the screen, the way every other screen does
   // and the way she drew it - not only in small letters up in the header.
@@ -76,7 +76,7 @@ export function openBoard(id, where = from) {
     ${canPick(id) ? artRow(id) : ''}
     ${boardSetRow(id)}
     <div class="go">${go}</div>
-    <div class="chips">${KINDS.filter(([k]) => k === 'all' || count(k)).map(([k, name]) =>
+    <div class="chips filters">${KINDS.filter(([k]) => k === 'all' || count(k)).map(([k, name]) =>
       `<button data-k="${k}"${k === filter ? ' class="on"' : ''}>${name} ${count(k)}</button>`).join('')}</div>
     <div class="words">${cards.map((c, i) => filter !== 'all' && kinds[i] !== filter ? '' :
       `<button class="wd ${kinds[i]}" data-f="${esc(c.f)}">
@@ -87,9 +87,13 @@ export function openBoard(id, where = from) {
         // that would be the board's name printed against every word on it.
         isOutBoard(id) ? `<span class="from">${esc(boardName(c.d))}</span>` : ''}</button>`).join('')}</div>`;
 
-  for (const m of ['learn', 'review']) {
-    $(m)?.addEventListener('click', () => { settings.mode = m; saveSettings(); begin(); });
-  }
+  // The board's own kind decides what the lesson holds, so the button only has
+  // to say "a lesson on this board" - buildQueue reads the rest.
+  $('go-lesson')?.addEventListener('click', () => {
+    settings.mode = 'learn';
+    saveSettings();
+    begin();
+  });
   // The gear beside the board's name: her drawings slide out under it, and the
   // one she taps is this board's from then on - here, in the list, everywhere.
   if (canPick(id)) {
@@ -102,8 +106,14 @@ export function openBoard(id, where = from) {
     $('b-art')?.classList.remove('on');
     $('b-set').classList.toggle('on');
   });
-  bindBoardSet(id);
-  for (const b of document.querySelectorAll('.chips button')) {
+  // Picking a kind renames the button under her finger, without drawing the
+  // whole page again while the shelf is open.
+  bindBoardSet(id, () => { const w = $('go-what'); if (w) w.textContent = boardModeName(id); });
+  // Only the filter row, by name.  The lesson kinds on the shelf are chips too,
+  // and an unscoped "every chip on the page" caught them as well: picking
+  // "Mixed" set the word filter to "mix", which nothing matches, and the board
+  // drew itself with no words on it at all.
+  for (const b of document.querySelectorAll('.chips.filters button')) {
     b.addEventListener('click', () => { filter = b.dataset.k; openBoard(id); });
   }
   // The same box as a word tapped in a sentence; once it closes, the page shows
