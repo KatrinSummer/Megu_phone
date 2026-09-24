@@ -5,7 +5,7 @@
 #
 # Taro's Japanese was written by ChatGPT out of words already in the deck, and
 # every one of them was checked against deck.json before it was put here:
-# どうしたの, いたい, きぶんがわるい, しかたない - all four are cards she has.
+# どうしたの, いたい, きぶんがわるい - all three are cards she has.
 #
 # His third line is hers, not ChatGPT's.  She wrote a soft old-man laugh; he
 # could find no laugh in the deck and offered "it can't be helped" instead.  But
