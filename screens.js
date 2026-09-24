@@ -7,6 +7,7 @@ import { deck, boardCards, pool, buildQueue, flipMark, learnable, reviewable, is
 import { queue, again, first, lesson, nextCard, keep, forget } from './lesson.js';
 import { play, SPEAKER } from './sound.js';
 import { yomi, glosses, openWord } from './word.js';
+import { boardBack } from './boardset.js';
 import { priButtons, bindPri } from './priority.js';
 import { openBoard, cameFromHome } from './page.js';
 // Home, for the end of a jungle run.  Home leads here and this leads back; both
@@ -143,6 +144,14 @@ function draw() {
   const p = progress[c.f];
   const seen = p && (lifetime(p) || p.lapses)
     ? `${lifetime(p)} reviews${p.lapses ? ` · ${p.lapses} slips` : ''}` : 'new word';
+  // Which way round this board stands its cards: her word as the question, or
+  // its meaning as the question and the Japanese as what she has to recall.
+  const other = boardBack(settings.deck);
+  const jp = `${c.k ? `<div class="kanji">${esc(c.k)}</div>` : ''}
+      <div class="kana${[...c.f].length > 7 ? ' long' : ''}">${esc(c.f)}</div>`;
+  // The sound goes wherever the Japanese goes.  On the face of an English-first
+  // card it would be the answer said out loud before she has guessed.
+  const say = `<button id="say" aria-label="Say it" title="Say it">${SPEAKER}</button>`;
   // The word itself is the question, in the kana she reads it in, with the
   // kanji sitting small above it.  The answer is the sound and the meaning.
   // The card scrolls by itself when the back does not fit, above buttons that
@@ -154,12 +163,11 @@ function draw() {
         <svg viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.7 5.3A9.4 9.4 0 0112 5.2c5 0 9 4.3 9 6.8 0 .9-.5 2-1.4 3.1M6.6 7.4C4.1 8.9 3 10.9 3 12c0 2.5 4 6.8 9 6.8 1.5 0 2.9-.4 4.1-1"/><path d="M9.9 10.1a3 3 0 004.2 4.2"/></svg></button>
       <button id="know" class="${p?.known ? 'on' : ''}" aria-label="I know this one" title="I know this one">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.3 12.3l2.5 2.5 5-5.2"/></svg></button>
-      ${c.k ? `<div class="kanji">${esc(c.k)}</div>` : ''}
-      <div class="kana${[...c.f].length > 7 ? ' long' : ''}">${esc(c.f)}</div>
-      <button id="say" aria-label="Say it" title="Say it">${SPEAKER}</button>
+      ${other ? `<div class="english ask">${esc(c.e)}</div>` : `${jp}${say}`}
       ${shown ? `<div class="back">
-          <div class="reading">${esc(c.r)}</div>
-          <div class="english">${esc(c.e)}</div>
+          ${other ? `${jp}${say}<div class="reading">${esc(c.r)}</div>`
+                  : `<div class="reading">${esc(c.r)}</div>
+          <div class="english">${esc(c.e)}</div>`}
           ${c.x?.length ? `<div class="ex">${c.x.map((x, i) => `<button data-i="${i}" ${x.a ? '' : 'disabled'}
             aria-label="Say this sentence">${x.a ? SPEAKER : ''}<span class="lines"><span class="jp">${esc(x.t)}</span>${
               // The same sentence in kana, word by word, and her words in it in English.
@@ -189,7 +197,8 @@ function draw() {
   const flip = () => { shown = !shown; revealed = true; draw(); };
   $('face').addEventListener('click', flip);
   // It sits on the card, so its tap must not also turn the card over.
-  $('say').addEventListener('click', (e) => { e.stopPropagation(); play(c); });
+  // Not always there: on an English-first card the sound waits on the back.
+  $('say')?.addEventListener('click', (e) => { e.stopPropagation(); play(c); });
   // A sentence says itself when tapped - she reads kana, not kanji. One of her
   // own words in its kana opens that word instead.
   for (const b of document.querySelectorAll('.ex button')) {

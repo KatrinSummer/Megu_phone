@@ -8,6 +8,7 @@ import { stats, leave, begin } from './screens.js';
 import { openWord, stateOf } from './word.js';
 import { ic, COG } from './icons.js';
 import { boardIcon, canPick, artRow, bindArt } from './boardart.js';
+import { boardSetRow, bindBoardSet } from './boardset.js';
 import { markTab } from './nav.js';
 
 const NAMES = { learning: 'Review', star: 'Bookmarks', pri: 'Priorities',
@@ -69,8 +70,11 @@ export function openBoard(id, where = from) {
   $('main').innerHTML = `
     <div class="head"><span id="b-icon">${ic(boardIcon(id))}</span><h1>${esc(boardName(id))}</h1>
       <span class="s">${cards.length} words</span>
-      ${canPick(id) ? COG('b-cog', 'Board icon') : ''}</div>
+      ${canPick(id) ? COG('b-cog', 'Board icon') : ''}
+      <span class="cog" id="b-set-cog" role="button" tabindex="0" aria-label="Board settings">
+        <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span></div>
     ${canPick(id) ? artRow(id) : ''}
+    ${boardSetRow(id)}
     <div class="go">${go}</div>
     <div class="chips">${KINDS.filter(([k]) => k === 'all' || count(k)).map(([k, name]) =>
       `<button data-k="${k}"${k === filter ? ' class="on"' : ''}>${name} ${count(k)}</button>`).join('')}</div>
@@ -92,6 +96,13 @@ export function openBoard(id, where = from) {
     $('b-cog').addEventListener('click', () => $('b-art').classList.toggle('on'));
     bindArt(id, (name) => { $('b-icon').innerHTML = ic(name); });
   }
+  // The board's own settings, on the same shelf as its pictures - and only one
+  // shelf is ever out, or the second would push the first off the screen.
+  $('b-set-cog').addEventListener('click', () => {
+    $('b-art')?.classList.remove('on');
+    $('b-set').classList.toggle('on');
+  });
+  bindBoardSet(id);
   for (const b of document.querySelectorAll('.chips button')) {
     b.addEventListener('click', () => { filter = b.dataset.k; openBoard(id); });
   }
