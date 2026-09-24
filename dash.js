@@ -108,8 +108,8 @@ export function dash() {
   // opens the story is not also its first tap on; it arrives here the moment the
   // class is set.  The way back stays the arrow in the header, never a tap -
   // pressing the person you are listening to should not close the conversation.
-  $('main').addEventListener('click', () => {
-    if ($('main').classList.contains('talking')) advance();
+  $('main').addEventListener('click', (e) => {
+    if ($('main').classList.contains('talking')) advance(e);
   });
   // A run through the jungle: words from every board, mostly ones she is meeting
   // for the first time.  It belongs to no board, so it leaves her last one alone.

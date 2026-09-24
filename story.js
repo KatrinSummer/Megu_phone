@@ -24,14 +24,11 @@ const JAPANESE = /[぀-ヿ]/;
  *  her example sentences do, so each piece is one word to look up.  Learned
  *  words stand as themselves and wear their colour; the rest is noise. */
 const known = (t) => { const c = cardOf(t); return !!c && isMemorized(c); };
+/** A word she has not learned carries both of its faces: the noise she hears,
+ *  and what was really said underneath.  A tap turns the line over. */
 const heard = (text) => text.split(' ').map((t) => (known(t)
   ? `<span class="w ${stateOf(cardOf(t))}">${esc(t)}</span>`
-  : esc(deafen(t)))).join(' ');
-
-/** Is there anything in this line she cannot hear yet?  The day she knows every
- *  word of it there is no noise left, and the line below would be the same
- *  sentence a second time. */
-const noisy = (text) => !text.split(' ').every(known);
+  : `<span class="noise" data-said="${esc(t)}" data-noise="${esc(deafen(t))}">${esc(deafen(t))}</span>`)).join(' ');
 
 /** One line of the file -> one beat.
  *  "NAME: text" is somebody speaking, "NAME -word-: text" is speaking while the
@@ -83,13 +80,36 @@ function show(who) {
 
 let beats = [], at = 0, running = false;
 
+let back;                               // the timer that puts the noise back
+
+/** Turn the line over: the noise becomes what was really said, and a second tap
+ *  - or five seconds - turns it back.  It is not a translation she keeps, it is
+ *  a glance at the writing on the sign.  Whole line at once, because one word
+ *  out of a sentence she cannot read is not worth the tap. */
+function flip(line) {
+  clearTimeout(back);
+  const open = line.classList.toggle('open');
+  for (const s of line.querySelectorAll('.noise')) {
+    s.textContent = open ? s.dataset.said : s.dataset.noise;
+  }
+  if (open) back = setTimeout(() => flip(line), 5000);
+}
+
 /** The next line.  Nothing in here listens for a tap: the screen does, and the
- *  screen calls this - so the story runs the same whatever she pressed. */
-export const advance = () => { if (running) step(); };
+ *  screen calls this - so the story runs the same whatever she pressed.
+ *  A tap that landed on the noise is the exception: it turns that line over and
+ *  goes no further, or the same tap would show her the words and take them away
+ *  in the same instant. */
+export const advance = (e) => {
+  const noise = e?.target?.closest?.('.noise');
+  if (noise) return flip(noise.closest('.line'));
+  if (running) step();
+};
 
 /** Effects run on the way past; the next line she reads stops the walk. */
 function step() {
   const box = $('d-say');
+  clearTimeout(back);                   // the line it would turn back is gone
   while (at < beats.length && beats[at].effect) runEffect(beats[at++].effect);
   if (at >= beats.length) {
     box.innerHTML = '<p class="end">— to be continued —</p>';
@@ -100,14 +120,8 @@ function step() {
   show(b.who);                          // the screen belongs to whoever is talking
   if (b.fx) runEffect(b.fx);            // the screen flinches as the line lands
   const jp = JAPANESE.test(b.text);
-  // What she HEARS is the line; what was SAID is written under it, quietly and
-  // as plain text.  Not a hint she taps for - the words are simply there to look
-  // at, the way the writing on a foreign sign is there whether or not it means
-  // anything to you.  Nothing in it is a word to press: pressing a word is how
-  // she learns one, and she has not learned these.
   box.innerHTML = `${b.who ? `<p class="who">${esc(named(b.who))}</p>` : ''}
-    <p class="line">${jp ? heard(b.text) : esc(b.text)}</p>
-    ${jp && noisy(b.text) ? `<p class="jp">${esc(b.text)}</p>` : ''}<p class="on">tap to go on</p>`;
+    <p class="line">${jp ? heard(b.text) : esc(b.text)}</p><p class="on">tap to go on</p>`;
 }
 
 export async function startScene(name) {

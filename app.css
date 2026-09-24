@@ -295,7 +295,7 @@ main.study ~ #tabs{display:none}
    would have been the obvious way to enlarge her and is the one thing that
    cannot be done here, because the box is what keeps her off the number.
    What the overhang costs is the outermost tips of her hair, left and right. */
-.char img{width:124%;margin-left:-12%;height:auto;display:block;
+.char img{width:112%;margin-left:-12%;height:auto;display:block;
   filter:grayscale(1) drop-shadow(0 5px 9px rgba(6,12,28,.28))}
 :root[data-theme="dark"] .char img{filter:grayscale(1) var(--dim-art)
   drop-shadow(0 5px 9px rgba(6,12,28,.55))}
@@ -318,17 +318,23 @@ main.dash.talking>.tile,main.dash.talking .drop{display:none}
    close together are a double-click: the browser answers one by selecting what
    was under it, and drew a box round her.  Nothing here is text to copy. */
 main.dash.talking{user-select:none;-webkit-user-select:none}
-/* Once the story starts she takes her colour back and comes close: a head-and-
-   shoulders-to-hips shot, not the whole figure standing in the distance.  The
-   drawing is taller than the room it is shown in on purpose - it is asked for at
-   74vh and given 46vh of window, so what is left on screen is her down to about
-   the hips, and the rest runs off the bottom behind what is said. */
-main.dash.talking .top{height:52vh;justify-content:center;overflow:hidden}
-main.dash.talking .char{width:auto;max-width:100%;translate:0}
-main.dash.talking .char img{height:88vh;width:auto;max-width:96vw}
-main.dash.talking .char img{filter:drop-shadow(0 5px 9px rgba(6,12,28,.3))}
-:root[data-theme="dark"] main.dash.talking .char img{filter:var(--dim-art)
-  drop-shadow(0 5px 9px rgba(6,12,28,.55))}
+/* A stage, the way a visual novel builds one - not a box with somebody inside
+   it.  The row takes whatever height is left over (flex:1) and the person is
+   fitted INTO it whole: max-width and max-height both 100%, so the picture is
+   made smaller when it must be and is never cut to fit.
+   It used to be asked for at 88vh inside a 52vh box, and the box cropped the
+   difference - which is where the frame she kept seeing came from: a hard edge
+   down both sides of the drawing at the exact width of the box. */
+main.dash.talking .top{flex:1;min-height:0;height:auto;overflow:hidden;
+  align-items:flex-end;justify-content:center}
+main.dash.talking .char{width:100%;max-width:none;height:100%;overflow:visible;
+  translate:0;display:flex;align-items:flex-end;justify-content:center}
+main.dash.talking .char img{display:block;width:auto;height:auto;
+  max-width:100%;max-height:100%;margin-left:0}
+/* And no shadow on the stage.  A hard shadow behind a big figure draws a line
+   round it, which is the other half of "why do they stand out". */
+main.dash.talking .char img{filter:none}
+:root[data-theme="dark"] main.dash.talking .char img{filter:var(--dim-art)}
 /* The way in is on Home from the start, laid over her, not waiting behind a tap
    on her.  It sits at the foot of the row, under the ring that moved up. */
 /* Her one pink button rides on her, at the foot of the drawing: she asked for
@@ -371,10 +377,13 @@ main.dash.talking>.talk{display:flex;margin-top:auto}
    the one thing she must never have to guess. */
 .speech .who{font-size:13px;font-weight:700;color:var(--pink);
   letter-spacing:.02em;margin:0 0 3px}
-/* What he actually said, under what she heard.  Quiet and small, because it is
-   not hers yet: no colour, no underline, nothing to press.  It is writing on a
-   sign in a country whose language you do not have. */
-.speech .jp{font-size:13px;color:var(--dim);letter-spacing:.04em}
+/* The noise she can turn over.  It looks exactly like the rest of the line: a
+   word that advertises itself is a hint, and hints are the thing she ruled out.
+   She knows which words she cannot read - they are the ones she cannot read. */
+.line .noise{cursor:pointer}
+/* Turned over, the real words stand in the pink of somebody speaking, so a
+   glance tells her which face the line is wearing right now. */
+.line.open .noise{color:var(--pink)}
 .speech .on{font-size:12px;color:var(--dim)}
 .speech .end{color:var(--dim);text-align:center}
 
