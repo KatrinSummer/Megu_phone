@@ -53,14 +53,20 @@ const byTurn = (a, b) => pri(b) - pri(a) || (b.when || '').localeCompare(a.when 
 const shuffle = (list) => list.sort(() => Math.random() - 0.5);
 
 /** The words she wants more often turn up in every review, at random, due or
- *  not and whether or not they belong to it - about one card in five, and never
- *  more than five of them in one lesson.  Five is her ceiling, not her quota:
- *  with two such words in the whole deck, two is what a lesson gets. */
-const MOST = 5;
+ *  not and whether or not they belong to it: her share is five of twenty, seven
+ *  of thirty - one card in four, rounded down, which is exactly those numbers.
+ *  They are mixed INTO the lesson, not added on top: the list is cut back to the
+ *  lesson's size afterwards, so twenty stays twenty.
+ *  A share, not a quota: with two such words in the whole deck, a lesson gets
+ *  two. */
+const SHARE = 4;
 function withFavourites(list) {
   const here = new Set(list.map((c) => c.f));
   const extra = shuffle(deck.cards.filter((c) => pri(c) === 1 && !progress[c.f].known && !here.has(c.f)))
-    .slice(0, Math.min(MOST, Math.ceil(list.length / 5)));
+    // Never none: rounding down alone gives zero for any lesson under four, and
+    // a word she asked to see more often would be shut out of a short review
+    // altogether - which is the one thing "more often" must never mean.
+    .slice(0, Math.max(1, Math.floor(list.length / SHARE)));
   for (const c of extra) list.splice(Math.floor(Math.random() * (list.length + 1)), 0, c);
   return list;
 }
