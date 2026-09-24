@@ -6,7 +6,7 @@ import { answer, nextIn, isMemorized } from './schedule.js';
 import { deck, boardCards, pool, buildQueue, flipMark, learnable, reviewable, isOut } from './boards.js';
 import { queue, again, first, lesson, nextCard, keep, forget } from './lesson.js';
 import { play, SPEAKER } from './sound.js';
-import { yomi, openWord } from './word.js';
+import { yomi, glosses, openWord } from './word.js';
 import { priButtons, bindPri } from './priority.js';
 import { openBoard, cameFromHome } from './page.js';
 // Home, for the end of a jungle run.  Home leads here and this leads back; both
@@ -164,8 +164,9 @@ function draw() {
             aria-label="Say this sentence">${x.a ? SPEAKER : ''}<span class="lines"><span class="jp">${esc(x.t)}</span>${
               // The same sentence in kana, word by word, and her words in it in English.
               x.k ? `<span class="yomi">${yomi(x, c.f)}</span>` : ''}${
-              // The word itself is left out: its meaning is right above.
-              x.w?.some(([k]) => k !== c.f) ? `<span class="gloss">${x.w.filter(([k]) => k !== c.f)
+              // The word itself is left out - its meaning is right above - and so
+              // is any particle wearing a homograph's meaning.
+              glosses(x, c.f).length ? `<span class="gloss">${glosses(x, c.f)
                 .map(([k, e]) => `<span>${esc(k)} <i>${esc(e)}</i></span>`).join('')}</span>` : ''
             }</span></button>`).join('')}</div>` : ''}
         </div>

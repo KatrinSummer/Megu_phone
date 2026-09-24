@@ -77,7 +77,11 @@ export function openBoard(id, where = from) {
     <div class="words">${cards.map((c, i) => filter !== 'all' && kinds[i] !== filter ? '' :
       `<button class="wd ${kinds[i]}" data-f="${esc(c.f)}">
         <span class="jp"><b>${esc(c.f)}</b>${c.k ? ` <span class="k">${esc(c.k)}</span>` : ''}</span>
-        <span class="st">${when(c, kinds[i])}</span><span class="e">${esc(c.e)}</span></button>`).join('')}</div>`;
+        <span class="st">${when(c, kinds[i])}</span><span class="e">${esc(c.e)}</span>${
+        // On Known and Hidden the words come from every board at once, so the
+        // row has to say which one it will go back to.  On a board's own page
+        // that would be the board's name printed against every word on it.
+        isOutBoard(id) ? `<span class="from">${esc(boardName(c.d))}</span>` : ''}</button>`).join('')}</div>`;
 
   for (const m of ['learn', 'review']) {
     $(m)?.addEventListener('click', () => { settings.mode = m; saveSettings(); begin(); });

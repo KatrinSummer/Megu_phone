@@ -19,6 +19,22 @@ const inSentence = (c, x) => (!!c.k && x.t.includes(c.k))
   || (x.w ?? []).some(([k]) => k === c.f)
   || ([...c.f].length > 1 && x.t.includes(c.f));
 
+/** A gloss hung on a one-letter particle, carrying the meaning of a card spelled
+ *  the same way: は the particle wearing 歯 "tooth", か wearing 蚊 "mosquito".
+ *  The card is real - it simply is not the word standing here, and its kanji is
+ *  how that shows: 歯 is nowhere in "夏、友達は熱中症です", but は is.
+ *  と keeps its gloss: her card for it carries no kanji, because it IS the
+ *  particle, and "and" is what it means. */
+const homograph = (k, x) => {
+  const c = [...k].length === 1 && cardOf(k);
+  return !!c && !!c.k && !x.t.includes(c.k);
+};
+
+/** ChatGPT's list of words under a sentence, minus the one being shown - its
+ *  meaning is right above - and minus the particles wearing someone else's. */
+export const glosses = (x, self) =>
+  (x.w ?? []).filter(([k]) => k !== self && !homograph(k, x));
+
 /** The kana line of a sentence, with every other word of hers in it tappable.
  *  ChatGPT spaces the kana word by word, so her word is one piece of it; a verb
  *  he wrote bent (およいだ) is not one of her cards and stays plain. */
