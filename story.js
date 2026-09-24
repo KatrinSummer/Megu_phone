@@ -41,6 +41,17 @@ function runEffect(name) {
  *  is how a script reads on the page.  On screen it is a name, not shouting. */
 const named = (who) => who[0] + who.slice(1).toLowerCase();
 
+// Who the screen shows.  There is one place to stand, so it belongs to whoever
+// is talking - a story that keeps showing her while somebody else speaks is
+// telling the wrong thing.  A name with no picture leaves whoever is there.
+const FACES = { MEGU: 'img/char.webp', TARO: 'img/taro.webp' };
+
+function show(who) {
+  const face = FACES[who?.toUpperCase()];
+  const img = $('d-char')?.querySelector('img');
+  if (face && img && !img.src.endsWith(face)) img.src = face;
+}
+
 let beats = [], at = 0, running = false;
 
 /** The next line.  Nothing in here listens for a tap: the screen does, and the
@@ -57,6 +68,7 @@ function step() {
     return;
   }
   const b = beats[at++];
+  show(b.who);                          // the screen belongs to whoever is talking
   if (b.fx) runEffect(b.fx);            // the screen flinches as the line lands
   box.innerHTML = `${b.who ? `<p class="who">${esc(named(b.who))}</p>` : ''}
     <p class="line">${esc(b.text)}</p><p class="on">tap to go on</p>`;
