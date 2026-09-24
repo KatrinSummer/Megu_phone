@@ -3,6 +3,32 @@
 // The scene lives in a text file she writes herself - names, lines, and
 // -effects- between dashes - so the story can grow without this file changing.
 import { $, esc } from './dom.js';
+import { cardOf } from './boards.js';
+import { isMemorized } from './schedule.js';
+import { stateOf } from './word.js';
+
+// The village speaks Japanese and she does not, so a word she has not learned
+// reaches her as noise.  The noise is kana rather than invented symbols: she is
+// hearing Japanese, she simply cannot understand it - and kana is certain to
+// draw on her phone, which a rare glyph is not.
+const KANA = 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわん';
+/** Same word in, same noise out - so an unheard word is recognisably the same
+ *  one each time it comes round, and the day she learns it, it resolves. */
+const deafen = (t) => [...t].map((ch, i) => (/[぀-ヿ]/.test(ch)
+  ? KANA[(ch.codePointAt(0) * 7 + i * 13) % KANA.length] : ch)).join('');
+
+// A line is Japanese if there is kana in it; Megu's own English never is.
+const JAPANESE = /[぀-ヿ]/;
+
+/** A line as she hears it.  Scenes space their kana word by word, the same way
+ *  her example sentences do, so each piece is one word to look up.  Learned
+ *  words stand as themselves and wear their colour; the rest is noise. */
+const heard = (text) => text.split(' ').map((t) => {
+  const c = cardOf(t);
+  return c && isMemorized(c)
+    ? `<span class="w ${stateOf(c)}">${esc(t)}</span>`
+    : esc(deafen(t));
+}).join(' ');
 
 /** One line of the file -> one beat.
  *  "NAME: text" is somebody speaking, "NAME -word-: text" is speaking while the
@@ -70,8 +96,9 @@ function step() {
   const b = beats[at++];
   show(b.who);                          // the screen belongs to whoever is talking
   if (b.fx) runEffect(b.fx);            // the screen flinches as the line lands
+  const said = JAPANESE.test(b.text) ? heard(b.text) : esc(b.text);
   box.innerHTML = `${b.who ? `<p class="who">${esc(named(b.who))}</p>` : ''}
-    <p class="line">${esc(b.text)}</p><p class="on">tap to go on</p>`;
+    <p class="line">${said}</p><p class="on">tap to go on</p>`;
 }
 
 export async function startScene(name) {
