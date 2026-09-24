@@ -325,8 +325,16 @@ main.dash.talking{user-select:none;-webkit-user-select:none}
    It used to be asked for at 88vh inside a 52vh box, and the box cropped the
    difference - which is where the frame she kept seeing came from: a hard edge
    down both sides of the drawing at the exact width of the box. */
+/* The stage runs to the edges of the SCREEN, not to the edges of the page.
+   Measured: the window is 390 wide and this row was 362 - the 14px of padding
+   main carries on each side.  The drawing overflowed correctly, and then the row
+   clipped it 14 points early, drawing exactly the straight line down her side
+   that kept coming back.  Three times I looked for it in the picture.
+   The negative margin is cancelled by hiding overflow across the screen, or the
+   row would push a horizontal scrollbar out instead. */
+main.dash.talking{overflow-x:hidden}
 main.dash.talking .top{flex:1;min-height:0;height:auto;overflow:hidden;
-  align-items:flex-start;justify-content:center}
+  margin:0 -14px;align-items:flex-start;justify-content:center}
 main.dash.talking .char{width:100%;max-width:none;height:100%;overflow:visible;
   translate:0;display:flex;align-items:flex-start;justify-content:center}
 /* Close up, the way a novel stands somebody on screen: as tall as the window,
@@ -334,22 +342,37 @@ main.dash.talking .char{width:100%;max-width:none;height:100%;overflow:visible;
    what is being said.  That is the screen's edge doing the cutting, not a box
    inside it - the row is the full width now, so nothing draws a line down her
    sides the way the old 52vh box did. */
-main.dash.talking .char img{display:block;width:auto;height:88vh;
+/* Closer still.  The drawings are narrow and tall - 695x1400 - so asking for a
+   height that fits the window shows the whole person and a lot of beach.  At
+   120vh she is taller than the screen: the head stays at the top, the legs run
+   off the bottom behind what is said, and the sides lose only the outermost
+   curls of hair.  The row is the full width, so that trimming happens at the
+   edge of the screen and draws no line down her. */
+main.dash.talking .char img{display:block;flex:none;width:auto;height:120vh;
   max-width:none;max-height:none;margin-left:0}
 /* And no shadow on the stage.  A hard shadow behind a big figure draws a line
    round it, which is the other half of "why do they stand out". */
 main.dash.talking .char img{filter:none}
 :root[data-theme="dark"] main.dash.talking .char img{filter:var(--dim-art)}
-/* The way into her story, written on her: a small pill at the foot of the
-   drawing.  It carries nothing that drops out from under it, which is what made
-   the LESSON button unsafe in this row - there is nothing here to push the ring
-   onto, and nothing to slide out at the top of the screen. */
-.top .story{position:absolute;left:8px;bottom:6px;z-index:3;width:auto;
-  display:flex;align-items:center;gap:6px;padding:7px 14px 7px 10px;
-  border:0;border-radius:999px;font-size:13px;font-weight:700;color:#fff;
-  background:var(--pink);box-shadow:0 3px 10px rgba(6,12,28,.28)}
-.top .story .ic{--s:18px}
-.top .story:active{transform:translateY(1px)}
+/* The way into her story, on her: the painted button she drew, narrowed and
+   standing at her waist rather than at her feet.
+   Her button carries its play triangle INSIDE the picture it is painted with,
+   so a narrower button has to shrink its border slices by the same hand -
+   otherwise the label walks straight onto the triangle.  These numbers come
+   from the version she approved, not from me; the only one changed is the
+   width, because "Start Adventure" does not fit the room "Start story" needed.
+   It carries nothing that drops out from under it, which is what made the
+   LESSON button unsafe in this row: nothing here can push the ring down or
+   slide a sign out at the top of the screen. */
+/* Centred on HER, not on the row.  The row runs the full width of the screen
+   while she only occupies what is left of it after the ring's 175px, so
+   left:50% put the button out over the sea with its edge on the number.  The
+   same expression as her box above, halved. */
+.top .story{position:absolute;left:calc(min(72%, 100% - 175px) / 2);
+  translate:-50% 0;bottom:26%;z-index:3;
+  width:min(58%,206px);height:52px;padding:0 12px 0 64px;
+  border-image-width:18px 24px 18px 62px}
+.story .t{font-size:14px}
 main.dash.talking .top .story{display:none}
 
 /* Her one pink button stands in the flow of the screen, under the first row of
