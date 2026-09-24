@@ -15,7 +15,7 @@ import { openBoard, cameIn } from './page.js';
 import { pickBoard } from './pick.js';
 import { countRow, bindCount } from './perday.js';
 import { markTab } from './nav.js';
-import { storyButton, talkPanel, bindTalk } from './talk.js';
+import { talkPanel, startStory } from './talk.js';
 import { advance } from './story.js';
 
 /** The board the big button starts.  Her last one while it still has new words
@@ -55,17 +55,16 @@ export function dash() {
         ${ring(deck.cards, '158px', `<div class="mid"><span class="n">${deck.cards.length}</span>
           <span class="l">words</span>${done ? `<span class="l today">${done} today</span>` : ''}</div>`)}
       </div>
-      ${storyButton()}
+      <button class="big story" id="d-start">${due
+        ? `<span class="t">Repeat</span><span class="r">${ic('learning')}<span class="v">${due}</span>${COUNT}</span>`
+        : `<span class="t">Start Adventure</span><span class="r"><span class="v" id="d-v">${settings.rand ? '?' : settings.perDay}</span>${ic('jungle')}${COUNT}</span>`}</button>
+      ${countRow()}
     </div>
     ${talkPanel()}
     <div class="duo">
       <button id="d-known">${ic('archive')}<span><b>${learned}</b><span>learned</span></span></button>
       <button id="d-hidden">${ic('hidden')}<span><b>${hid}</b><span>hidden</span></span></button>
     </div>
-    <button class="big" id="d-start">${due
-      ? `<span class="t">Repeat</span><span class="r">${ic('learning')}<span class="v">${due}</span>${COUNT}</span>`
-      : `<span class="t">Start Adventure</span><span class="r"><span class="v" id="d-v">${settings.rand ? '?' : settings.perDay}</span>${ic('jungle')}${COUNT}</span>`}</button>
-    ${countRow()}
     <button class="tile" id="d-jungle">${ic('jungle')}
       <span class="n">Jungle<span class="s">15 to 30 words from every board</span></span>
       <span class="go">›</span></button>
@@ -94,20 +93,24 @@ export function dash() {
     $('d-count').classList.toggle('on');           // slides out right under the button, where she drew it
   });
   bindCount();
-  // She is the way in.  Once the story is on she is a way on like everything
-  // else on the screen, and that is caught below, on the screen itself.
-  $('d-char').addEventListener('click', () => {
-    if (!$('main').classList.contains('talking')) $('d-talk').click();
+  // Pressing HER is the way into the story - the button laid over her belongs to
+  // the lesson.  Inside the story she is a way on like the rest of the screen,
+  // so the tap is left to bubble to the listener below; the tap that OPENS the
+  // story is stopped here, or that same tap would arrive down there as the
+  // first tap on and eat the opening line.
+  $('d-char').addEventListener('click', (e) => {
+    if ($('main').classList.contains('talking')) return;
+    e.stopPropagation();
+    startStory();
   });
   // In the story a tap anywhere is the next line - her, the sand, the plate:
   // a game is read by tapping the screen, not by finding the box.  The tap that
   // opens the story is not also its first tap on; it arrives here the moment the
   // class is set.  The way back stays the arrow in the header, never a tap -
   // pressing the person you are listening to should not close the conversation.
-  $('main').addEventListener('click', (e) => {
-    if ($('main').classList.contains('talking') && !e.target.closest('#d-talk')) advance();
+  $('main').addEventListener('click', () => {
+    if ($('main').classList.contains('talking')) advance();
   });
-  bindTalk();
   // A run through the jungle: words from every board, mostly ones she is meeting
   // for the first time.  It belongs to no board, so it leaves her last one alone.
   $('d-jungle').addEventListener('click', () => {
