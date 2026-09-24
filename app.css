@@ -289,7 +289,13 @@ main.study ~ #tabs{display:none}
   height:100%;overflow:hidden;padding:0;border:0;background:none;line-height:0}
 /* On Home she is grey: the colour belongs to the story, and she takes it back
    when the story starts. */
-.char img{width:100%;height:auto;display:block;
+/* Bigger than the box she stands in, and the box clips what hangs over - so she
+   grows without her box growing, and the promise above holds unchanged: the box
+   stops 175px short of the ring, therefore so does she.  Making the BOX wider
+   would have been the obvious way to enlarge her and is the one thing that
+   cannot be done here, because the box is what keeps her off the number.
+   What the overhang costs is the outermost tips of her hair, left and right. */
+.char img{width:124%;margin-left:-12%;height:auto;display:block;
   filter:grayscale(1) drop-shadow(0 5px 9px rgba(6,12,28,.28))}
 :root[data-theme="dark"] .char img{filter:grayscale(1) var(--dim-art)
   drop-shadow(0 5px 9px rgba(6,12,28,.55))}
@@ -365,6 +371,10 @@ main.dash.talking>.talk{display:flex;margin-top:auto}
    the one thing she must never have to guess. */
 .speech .who{font-size:13px;font-weight:700;color:var(--pink);
   letter-spacing:.02em;margin:0 0 3px}
+/* What he actually said, under what she heard.  Quiet and small, because it is
+   not hers yet: no colour, no underline, nothing to press.  It is writing on a
+   sign in a country whose language you do not have. */
+.speech .jp{font-size:13px;color:var(--dim);letter-spacing:.04em}
 .speech .on{font-size:12px;color:var(--dim)}
 .speech .end{color:var(--dim);text-align:center}
 
