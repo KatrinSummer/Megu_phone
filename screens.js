@@ -194,7 +194,13 @@ function draw() {
 
   // Both ways: once she has seen the back, the card turns over on every tap and
   // the three buttons stay put, so flipping back never costs her the answer.
-  const flip = () => { shown = !shown; revealed = true; draw(); };
+  // On an English-first card the Japanese is the answer, so the flip is what
+  // says it: the face has none to say, and saying it there would be the answer
+  // read out before she has guessed.
+  const flip = () => {
+    shown = !shown; revealed = true; draw();
+    if (other && shown && settings.autoPlay) play(c);
+  };
   $('face').addEventListener('click', flip);
   // It sits on the card, so its tap must not also turn the card over.
   // Not always there: on an English-first card the sound waits on the back.

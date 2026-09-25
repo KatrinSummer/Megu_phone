@@ -115,9 +115,14 @@ export function dash() {
   // opens the story is not also its first tap on; it arrives here the moment the
   // class is set.  The way back stays the arrow in the header, never a tap -
   // pressing the person you are listening to should not close the conversation.
-  $('main').addEventListener('click', (e) => {
+  // Assigned, not added: dash() runs again every time she comes back to Home,
+  // and addEventListener stacked a new copy each time onto the one #main that
+  // never goes away.  Two visits meant two listeners, so one tap advanced two
+  // lines - the story ran out of order and the second time through it was
+  // missing half its lines.
+  $('main').onclick = (e) => {
     if ($('main').classList.contains('talking')) advance(e);
-  });
+  };
   // A run through the jungle: words from every board, mostly ones she is meeting
   // for the first time.  It belongs to no board, so it leaves her last one alone.
   $('d-jungle').addEventListener('click', () => {

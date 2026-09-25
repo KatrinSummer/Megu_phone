@@ -3,6 +3,7 @@ import { progress, settings, today, fresh, saveProgress, started } from './store
 import { startLesson, drop } from './lesson.js';
 import { jungleRun } from './jungle.js';
 import { boardWords, boardMode } from './boardset.js';
+import { isMemorized } from './schedule.js';
 
 export const deck = { cards: [], decks: [] };
 export const setDeck = (d) => Object.assign(deck, d);
@@ -17,7 +18,12 @@ export const boardCards = (id) => id === 'star' ? deck.cards.filter((c) => progr
   // The words she asked to see more often, gathered in one place - her concept
   // calls them Priorities.
   : id === 'pri' ? deck.cards.filter((c) => progress[c.f]?.pri === 1)
-  : id === 'known' ? deck.cards.filter((c) => progress[c.f]?.known)
+  // Everything she has learned, however she learned it: the ones she ticked off
+  // herself AND the ones the schedule parked as memorized.  Home counts both
+  // under "learned", so a board that held only the ticked ones said 0 words
+  // while the tile beside it said 2 - the same two words, in two places, with
+  // two different answers.
+  : id === 'known' ? deck.cards.filter((c) => progress[c.f]?.known || isMemorized(c))
   : id === 'hidden' ? deck.cards.filter((c) => progress[c.f]?.hide)
   // Review: every word she has started, from every deck.
   : id === 'learning' ? deck.cards.filter((c) => started(progress[c.f]))

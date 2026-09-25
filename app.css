@@ -107,6 +107,18 @@ header .grow{flex:1;min-width:0}
   text-shadow:0 1px 3px rgba(255,255,255,.85)}
 .counts b{color:var(--ink);font-weight:700}
 :root[data-theme="dark"] .counts{text-shadow:0 1px 3px rgba(6,12,28,.8)}
+/* A board's own row, up in the header above the two bars.  .counts is one short
+   grey line of text by default, so this takes back the size, the colour and the
+   wrapping for the one case that is a row rather than a count. */
+.bh{display:flex;align-items:center;gap:8px;white-space:normal}
+.bh .ic{--s:34px;flex:none}
+.bh b{font-size:19px;font-weight:700;color:var(--ink);min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bh .s{margin-left:auto;font-size:12px;font-weight:600;flex:none}
+.bh .cog{display:grid;place-items:center;width:30px;height:30px;flex:none;opacity:.75}
+.bh .cog svg{width:20px;height:20px;display:block;fill:none;stroke:currentColor;
+  stroke-width:2;stroke-linecap:round}
+.bh .cog:active{opacity:1}
 /* padding:0 - the iPhone gives every button a padding of its own, which pushed
    the icon in a small round button off its centre. */
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
@@ -332,8 +344,15 @@ main.dash.talking{user-select:none;-webkit-user-select:none}
    that kept coming back.  Three times I looked for it in the picture.
    The negative margin is cancelled by hiding overflow across the screen, or the
    row would push a horizontal scrollbar out instead. */
-main.dash.talking{overflow-x:hidden}
-main.dash.talking .top{flex:1;min-height:0;height:auto;overflow:hidden;
+/* Both axes now.  The figure is let out of its row on purpose (below), so the
+   screen itself has to be what stops it - otherwise the overflow hands main a
+   scrollbar and she can scroll the story sideways and down. */
+main.dash.talking{overflow:hidden}
+/* overflow:visible, which is the whole point: the row ends where the plate
+   begins, and a row that clipped its own contents cut the person off along that
+   line with the sand still showing underneath.  A novel does not end the person
+   above the text box - it runs them behind it. */
+main.dash.talking .top{flex:1;min-height:0;height:auto;overflow:visible;
   margin:0 -14px;align-items:flex-start;justify-content:center}
 main.dash.talking .char{width:100%;max-width:none;height:100%;overflow:visible;
   translate:0;display:flex;align-items:flex-start;justify-content:center}
@@ -399,7 +418,10 @@ main.dash.talking .ring{display:none}
 /* What is said sits at the foot of the screen, where a game puts it: with the
    rows folded away the room below her is empty, and the plate tucked under her
    left it stranded in the middle of the sand. */
-main.dash.talking>.talk{display:flex;margin-top:auto}
+/* Over the figure, not under it.  The person now runs off the bottom of the
+   screen behind this plate, so the plate has to be the thing in front - and it
+   has a solid background, which is what hides the cut. */
+main.dash.talking>.talk{display:flex;margin-top:auto;position:relative;z-index:2}
 /* What is said, on a plate of its own: the words stand on the beach otherwise
    and the sand reads straight through them.  Not .say - that is the speaker
    button inside a word's box, and two things under one name is how one of them
@@ -687,6 +709,14 @@ main.fx-dark::after{content:"";position:fixed;inset:0;z-index:5;pointer-events:n
    the two pages whose words come from everywhere, and on a board's own page it
    would be that board's name printed against every single row. */
 .wd .from{grid-column:1/-1;font-size:11px;color:var(--dim);opacity:.8}
+/* The way back into the round, in the word's own row where the state label used
+   to sit.  Round and outlined so it reads as something to press: what stood
+   here before was the word "hidden", which only told her what she already did. */
+.wd .un{align-self:center;display:grid;place-items:center;width:34px;height:34px;
+  border-radius:50%;border:1px solid var(--line);background:var(--card)}
+.wd .un svg{width:19px;height:19px;display:block;fill:none;stroke:currentColor;
+  stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.wd .un:active{background:var(--warm)}
 
 /* The two bars and the round number, over the top of whatever screen she is on. */
 .stats{display:flex;align-items:center;gap:10px;padding:9px 14px;
@@ -800,7 +830,10 @@ main.fx-dark::after{content:"";position:fixed;inset:0;z-index:5;pointer-events:n
   background:#fdecec;color:#8a1c1c;border-bottom:1px solid #f0bcbc}
 :root[data-theme="dark"] #warn{background:#3a2222;color:#f0b8b8;border-bottom-color:#5c3333}
 #warn[hidden]{display:none}
-.hidden{display:none}
+/* There was a .hidden{display:none} here, used by nothing and reached by
+   everything: a word row is given its state as a class, so every hidden word on
+   the Hidden board was a row with display:none on it.  The board counted five
+   words and drew five rows, and not one of them could be seen. */
 .tap{font-size:13px;color:var(--dim)}
 .meta{font-size:12px;color:var(--dim)}
 

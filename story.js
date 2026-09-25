@@ -11,18 +11,19 @@ import { stateOf } from './word.js';
 // reaches her as noise.  The noise is kana rather than invented symbols: she is
 // hearing Japanese, she simply cannot understand it - and kana is certain to
 // draw on her phone, which a rare glyph is not.
-// Blocked out, not spelled out.  It was kana at first - real letters in a random
-// order - and it read as Japanese she simply had not learned, which is not what
-// being unable to understand someone feels like.  She asked for something that
-// LOOKS unreadable, blacked out like a censored line, and she is right.
-// Blocks rather than odd symbols on purpose: these four are in every font there
-// is, and a rare glyph would come out as an empty box on her phone - which is
-// unreadable for the wrong reason.
-const BLOCKS = '█▓▒░';
+// Writing she cannot read, not a line struck out.  It was kana first, which read
+// as Japanese she simply had not learned; then blocks, which read as a censored
+// document rather than as a village speaking.  What she asked for is a script of
+// their own - so this is one: letters, clearly letters, and not one of them hers.
+// These are real Unicode syllabics rather than invented pictures because a made-
+// up glyph has no font behind it and arrives on her phone as an empty box, which
+// is unreadable for the wrong reason.  This block ships with iOS, Android and
+// Windows alike.
+const SCRIPT = 'ᐊᐃᐅᑎᑭᒥᓇᔭᕐᖏᐸᒐᓗᑦᔅ';
 /** Same word in, same noise out - so an unheard word is recognisably the same
  *  one each time it comes round, and the day she learns it, it resolves. */
 const deafen = (t) => [...t].map((ch, i) => (/[぀-ヿ]/.test(ch)
-  ? BLOCKS[(ch.codePointAt(0) * 7 + i * 13) % BLOCKS.length] : ch)).join('');
+  ? SCRIPT[(ch.codePointAt(0) * 7 + i * 13) % SCRIPT.length] : ch)).join('');
 
 // A line is Japanese if there is kana in it; Megu's own English never is.
 const JAPANESE = /[぀-ヿ]/;
@@ -72,7 +73,13 @@ function runEffect(name) {
 
 /** A scene is written with the speaker in capitals - MEGU, TARO - because that
  *  is how a script reads on the page.  On screen it is a name, not shouting. */
-const named = (who) => who[0] + who.slice(1).toLowerCase();
+// Nobody has introduced him.  She washes up on a beach and a stranger speaks to
+// her in a language she does not have a word of - she cannot know his name, and
+// a plate that prints it is the story telling her something she was never told.
+// He leaves this set on the day the story says who he is.
+const UNMET = new Set(['TARO']);
+const named = (who) => (UNMET.has(who.toUpperCase()) ? '???'
+  : who[0] + who.slice(1).toLowerCase());
 
 // Who the screen shows.  There is one place to stand, so it belongs to whoever
 // is talking - a story that keeps showing her while somebody else speaks is
