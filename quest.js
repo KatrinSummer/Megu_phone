@@ -61,9 +61,10 @@ function over(html) {
  *  and that tap is also the way out, back to the island. */
 export function noteAfterStory() {
   const r = settings.scenes?.[FIRST];
-  const score = !r ? ''
-    : r.skipped ? '<p>You skipped the test.</p>'
-    : `<p><b>${r.right} of ${r.of}</b></p>`;
+  // A test she skipped has already said so, on its own last plate.  This one
+  // carries only a score she actually sat for; the question under it is still
+  // asked either way, because that is how she overrules what the test decided.
+  const score = !r || r.skipped ? '' : `<p><b>${r.right} of ${r.of}</b></p>`;
   const ask = !r ? '' : `<p>How much of their language do you have?</p>
     <div class="chips lv">${LEVELS.map(([id, title]) =>
       `<button class="${id === level() ? 'on' : ''}" data-lv="${esc(id)}">${esc(title)}</button>`)

@@ -202,7 +202,19 @@ export function startQuiz(box, name, words, done) {
   /** Pressed past it.  A test she did not sit cannot say a thing about her, so
    *  it scores nothing and leaves her at the bottom of the ladder - and the
    *  island asks her straight away what she would rather it said. */
-  const skipped = () => { land('none', 0, qs.length, true); done(); };
+  const skipped = () => {
+    land('none', 0, qs.length, true);
+    // Said at the end of the TEST, where she pressed past it - not on the plate
+    // that meets her at home.  By the time she is back on the island the test
+    // is two screens behind her, and being told there what she did to it reads
+    // as the island telling her off for something she has already moved on from.
+    box.innerHTML = `<p class="who">A test</p>
+      <p>You skipped the test.</p>
+      <p class="on">tap to go on</p>`;
+    // The press that skipped it stops at the button, so this plate is not
+    // tapped away by the same tap that put it up.
+    box.addEventListener('click', done, { once: true });
+  };
 
   const next = () => {
     at++;
