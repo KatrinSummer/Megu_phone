@@ -292,7 +292,25 @@ main.study ~ #tabs{display:none}
 /* The crop belongs to HER, not to the row: the row also carries her button and
    the word count that swings out under it, and a row that clips would cut those
    off as well. */
-.top{display:flex;align-items:flex-start;height:calc(39vh - 70px);position:relative}
+/* Home's row only.  ".top" was a name two screens had taken: the row her
+   drawing stands in, and the first line of the little box a tapped word opens.
+   The height here is Home's, and the word box was quietly given it as well -
+   259px of empty white above the word on a phone, which is the box she saw
+   stretched and sliding about under her finger. */
+main.dash .top{display:flex;align-items:flex-start;height:calc(39vh - 70px);position:relative}
+/* The edge she drew across the bottom of the drawing.  The row ends at her
+   knees, and a person who simply stops in mid-air reads as a mistake; a bar
+   across the foot of the row makes the same cut read as standing behind
+   something.  It runs to the edges of the screen, past main's padding, so it is
+   an edge of the world and not a line drawn under her. */
+main.dash:not(.talking) .top::after{content:"";position:absolute;z-index:1;
+  pointer-events:none;                 /* she is underneath it, and she is a button */
+  left:-14px;right:-14px;bottom:0;height:11px;border-radius:7px;
+  background:linear-gradient(180deg,#f6e3c2,#e3c79b);
+  box-shadow:0 -7px 12px -6px rgba(90,58,28,.45)}
+:root[data-theme="dark"] main.dash:not(.talking) .top::after{
+  background:linear-gradient(180deg,#3b4a74,#26314f);
+  box-shadow:0 -7px 12px -6px rgba(0,0,0,.55)}
 /* Her box stops where the number begins, at every width: the ring is drawn
    158px across and carries 4px either side, so what is left of the row after
    175px is hers and the two can never reach each other.  A percentage alone
@@ -301,13 +319,12 @@ main.study ~ #tabs{display:none}
   height:100%;overflow:hidden;padding:0;border:0;background:none;line-height:0}
 /* On Home she is grey: the colour belongs to the story, and she takes it back
    when the story starts. */
-/* Bigger than the box she stands in, and the box clips what hangs over - so she
-   grows without her box growing, and the promise above holds unchanged: the box
-   stops 175px short of the ring, therefore so does she.  Making the BOX wider
-   would have been the obvious way to enlarge her and is the one thing that
-   cannot be done here, because the box is what keeps her off the number.
-   What the overhang costs is the outermost tips of her hair, left and right. */
-.char img{width:112%;margin-left:-12%;height:auto;display:block;
+/* The whole width of her box and no more.  She was drawn at 112% of it and the
+   box clipped the overhang, which made her bigger at the price of the outermost
+   curls of her hair on both sides - and her hair is not mine to trim.  She is
+   smaller by that much; the box is what keeps her clear of the number, so it
+   cannot be widened to give the size back. */
+.char img{width:100%;height:auto;display:block;
   filter:grayscale(1) drop-shadow(0 5px 9px rgba(6,12,28,.28))}
 :root[data-theme="dark"] .char img{filter:grayscale(1) var(--dim-art)
   drop-shadow(0 5px 9px rgba(6,12,28,.55))}
@@ -320,7 +337,7 @@ main.study ~ #tabs{display:none}
    altogether.  It used to share the row with her, and once she grew to most of
    its width there was nothing left for it: "843" was pushed off the screen with
    only the 8 showing. */
-.top .ring{position:absolute;right:0;top:26px;z-index:2;width:auto;padding:12px 4px 10px}
+main.dash .top .ring{position:absolute;right:0;top:26px;z-index:2;width:auto;padding:12px 4px 10px}
 /* While she has the screen the island's rows are folded away.  Only the rows
    themselves go: what is inside her own panel is not one of them, which is why
    this reaches for the children of the screen and not for the classes. */
@@ -387,11 +404,17 @@ main.dash.talking .char img{filter:none}
    while she only occupies what is left of it after the ring's 175px, so
    left:50% put the button out over the sea with its edge on the number.  The
    same expression as her box above, halved. */
-.top .story{position:absolute;left:calc(min(72%, 100% - 175px) / 2);
+/* Smaller than it was, and orange rather than pink: she asked for both.  The
+   picture it is painted with is her pink one, so the colour is turned rather
+   than repainted - the white of the label has no hue to turn and stays white.
+   Its border slices shrink with it, or the label walks onto the play mark that
+   is painted inside the left end. */
+main.dash .top .story{position:absolute;left:calc(min(72%, 100% - 175px) / 2);
   translate:-50% 0;bottom:26%;z-index:3;
-  width:min(58%,206px);height:52px;padding:0 12px 0 64px;
-  border-image-width:18px 24px 18px 62px}
-.story .t{font-size:14px}
+  width:min(48%,170px);height:42px;padding:0 10px 0 50px;
+  border-image-width:14px 19px 14px 50px;
+  filter:hue-rotate(55deg) saturate(1.2) brightness(1.06)}
+.story .t{font-size:12px}
 main.dash.talking .top .story{display:none}
 
 /* Her one pink button stands in the flow of the screen, under the first row of
@@ -436,13 +459,27 @@ main.dash.talking>.talk{display:flex;margin-top:auto;position:relative;z-index:2
    the one thing she must never have to guess. */
 .speech .who{font-size:13px;font-weight:700;color:var(--pink);
   letter-spacing:.02em;margin:0 0 3px}
-/* The noise she can turn over.  It looks exactly like the rest of the line: a
-   word that advertises itself is a hint, and hints are the thing she ruled out.
-   She knows which words she cannot read - they are the ones she cannot read. */
-.line .noise{cursor:pointer}
-/* Turned over, the real words stand in the pink of somebody speaking, so a
-   glance tells her which face the line is wearing right now. */
-.line.open .noise{color:var(--pink)}
+/* The noise she can turn over, and it says so: pink, with a dotted line under
+   it, the same way one of her own words is marked inside an example sentence.
+   It used to look exactly like the rest of the line, on the grounds that a word
+   which advertises itself is a hint - but there is nothing to give away here,
+   she cannot read any of it, and a line that can be turned over and never says
+   so is a button nobody presses. */
+.line .noise{cursor:pointer;color:var(--pink);border-bottom:1.5px dotted currentColor;
+  padding-bottom:1px}
+/* Turned over, the real words stand in the same pink with the dots gone: the
+   line has been answered, so there is nothing left to press. */
+.line.open .noise{color:var(--pink);border-bottom:0}
+/* The test at the end of a scene, on the same plate the talking happened on:
+   it is the last beat of the conversation, not a screen of its own. */
+.quiz-q{margin:0 0 9px}
+.quiz{display:flex;flex-direction:column;gap:7px;margin:0 0 8px}
+.quiz-a{padding:10px 12px;border-radius:14px;border:1px solid var(--line);
+  background:var(--card);font-size:17px;font-weight:600;text-align:center}
+.quiz-a:active{background:var(--warm)}
+.quiz-a.right{border-color:var(--good);color:var(--good);font-weight:700}
+.quiz-a.wrong{border-color:var(--again);color:var(--again)}
+.quiz-a.dim{opacity:.45}
 .speech .on{font-size:12px;color:var(--dim)}
 .speech .end{color:var(--dim);text-align:center}
 
@@ -712,6 +749,10 @@ main.fx-dark::after{content:"";position:fixed;inset:0;z-index:5;pointer-events:n
 /* The way back into the round, in the word's own row where the state label used
    to sit.  Round and outlined so it reads as something to press: what stood
    here before was the word "hidden", which only told her what she already did. */
+/* The cell that holds it is the same cell that holds her little labels, and it
+   paints a plate of its own: a round button inside a green plate is two marks
+   on one word, which is why the two rows of Known never looked alike. */
+.wd .st:has(.un){padding:0;background:none;border:0}
 .wd .un{align-self:center;display:grid;place-items:center;width:34px;height:34px;
   border-radius:50%;border:1px solid var(--line);background:var(--card)}
 .wd .un svg{width:19px;height:19px;display:block;fill:none;stroke:currentColor;

@@ -97,8 +97,8 @@ export function render() {
 function summary() {
   const how = [...first.values()];
   const n = (k) => how.filter((v) => v === k).length;
-  const rows = [['Words', how.length], ['Knew it', n('good')], ['Easy', n('easy')],
-    ['Forgot', n('again')], ['Skipped', n('skip')]].filter(([, v], i) => !i || v);
+  const rows = [['Words', how.length], ['Normal', n('good')], ['Easy', n('easy')],
+    ['Hard', n('again')], ['Skipped', n('skip')]].filter(([, v], i) => !i || v);
   const missed = [...first].filter(([, v]) => v === 'again').map(([f]) => f);
   // What is left: a review has the words not seen today, a lesson its new words.
   const rev = settings.mode === 'review', wild = settings.mode === 'jungle', id = settings.deck;
@@ -115,7 +115,7 @@ function summary() {
   $('main').className = 'page';
   $('main').innerHTML = `<div class="done"><h2>${how.length ? 'Lesson done' : 'Done for today'}</h2>
     ${how.length ? `<table>${rows.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('')}</table>` : ''}
-    ${missed.length ? `<div class="note">Forgot: ${missed.map(esc).join(' · ')}</div>` : ''}
+    ${missed.length ? `<div class="note">Hard: ${missed.map(esc).join(' · ')}</div>` : ''}
     <div>${wild ? `${left} words are out there in the jungle.`
       : rev ? `${left} more to review today.` : left ? `${left} new words left on this board.`
       : 'Every word of this board has been started: review them from its page.'}</div>
@@ -184,8 +184,8 @@ function draw() {
     </div>
     <div class="row">
       ${revealed ? `
-        <button id="again">${ic('again')}Forgot<span class="s">again</span></button>
-        <button id="good">${ic('gotit')}Knew it<span class="s">${nextIn(c, 'good')}</span></button>
+        <button id="again">${ic('again')}Hard<span class="s">again</span></button>
+        <button id="good">${ic('gotit')}Normal<span class="s">${nextIn(c, 'good')}</span></button>
         <button id="easy">${ic('hint')}Easy<span class="s">${nextIn(c, 'easy')}</span></button>`
       : `<button id="reveal">${ic('start')}Show</button>`}
       <button id="skip" aria-label="Skip this word" title="Skip: it does not come back in this lesson">

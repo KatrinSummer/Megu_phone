@@ -6,6 +6,7 @@ import { $, esc } from './dom.js';
 import { cardOf } from './boards.js';
 import { isMemorized } from './schedule.js';
 import { stateOf } from './word.js';
+import { startQuiz } from './quiz.js';
 
 // The village speaks Japanese and she does not, so a word she has not learned
 // reaches her as noise.  The noise is kana rather than invented symbols: she is
@@ -34,9 +35,16 @@ const JAPANESE = /[぀-ヿ]/;
 const known = (t) => { const c = cardOf(t); return !!c && isMemorized(c); };
 /** A word she has not learned carries both of its faces: the noise she hears,
  *  and what was really said underneath.  A tap turns the line over. */
-const heard = (text) => text.split(' ').map((t) => (known(t)
-  ? `<span class="w ${stateOf(cardOf(t))}">${esc(t)}</span>`
-  : `<span class="noise" data-said="${esc(t)}" data-noise="${esc(deafen(t))}">${esc(deafen(t))}</span>`)).join(' ');
+/** Every word of theirs the scene put in front of her, in the order it came.
+ *  The test at the end asks about these and nothing else: it is a test on the
+ *  conversation she just had, not on the deck. */
+const said = new Set();
+const heard = (text) => text.split(' ').map((t) => {
+  if (cardOf(t)) said.add(t);
+  return known(t)
+    ? `<span class="w ${stateOf(cardOf(t))}">${esc(t)}</span>`
+    : `<span class="noise" data-said="${esc(t)}" data-noise="${esc(deafen(t))}">${esc(deafen(t))}</span>`;
+}).join(' ');
 
 /** One line of the file -> one beat.
  *  "NAME: text" is somebody speaking, "NAME -word-: text" is speaking while the
@@ -85,14 +93,25 @@ const named = (who) => (UNMET.has(who.toUpperCase()) ? '???'
 // is talking - a story that keeps showing her while somebody else speaks is
 // telling the wrong thing.  A name with no picture leaves whoever is there.
 const FACES = { MEGU: 'img/char.webp', TARO: 'img/taro.webp' };
+// Centred on the PERSON, which is not the middle of the picture.  His staff is
+// held out to his left and her hair sweeps to her right, so the drawing's own
+// centre sits away from the body and a picture centred on screen stands the
+// person off to one side of it.  Measured on the files themselves: the middle
+// of the torso, row by row over the middle of the figure, is 2.6% right of
+// centre in his and 4.3% right of centre in hers - so each is moved back by
+// that much.  Re-measure if a drawing is ever recut.
+const OFFSET = { MEGU: '-4.3%', TARO: '-2.6%' };
 
 function show(who) {
-  const face = FACES[who?.toUpperCase()];
+  const name = who?.toUpperCase();
+  const face = FACES[name];
   const img = $('d-char')?.querySelector('img');
-  if (face && img && !img.src.endsWith(face)) img.src = face;
+  if (!face || !img) return;
+  if (!img.src.endsWith(face)) img.src = face;
+  img.style.translate = `${OFFSET[name] ?? '0'} 0`;
 }
 
-let beats = [], at = 0, running = false;
+let beats = [], at = 0, running = false, scene = '';
 
 let back;                               // the timer that puts the noise back
 
@@ -126,9 +145,13 @@ function step() {
   clearTimeout(back);                   // the line it would turn back is gone
   while (at < beats.length && beats[at].effect) runEffect(beats[at++].effect);
   if (at >= beats.length) {
-    box.innerHTML = '<p class="end">— to be continued —</p>';
     running = false;                    // and the screen stops being a way on
-    return;
+    // The test comes before the curtain, where she put it: she has just been
+    // spoken to in a language she is learning, and this asks what she caught of
+    // it.  It runs the plate itself until it is done, then hands it back.
+    return startQuiz(box, scene, [...said], () => {
+      box.innerHTML = '<p class="end">— to be continued —</p>';
+    });
   }
   const b = beats[at++];
   show(b.who);                          // the screen belongs to whoever is talking
@@ -150,6 +173,8 @@ export async function startScene(name) {
     return;
   }
   at = 0;
+  scene = name;
+  said.clear();                         // the test asks about THIS run of it
   running = true;                       // the screen carries the taps from here
   step();
 }

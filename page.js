@@ -3,7 +3,7 @@
 // ones - and every word on it.
 import { $, esc } from './dom.js';
 import { progress, settings, saveSettings, today } from './store.js';
-import { deck, boardCards, learnable, reviewable, isDue, isOutBoard, flipMark } from './boards.js';
+import { deck, boardCards, learnable, reviewable, isDue, isOutBoard, flipMark, putBack } from './boards.js';
 import { stats, leave, begin } from './screens.js';
 import { openWord, stateOf } from './word.js';
 import { ic, COG } from './icons.js';
@@ -31,8 +31,11 @@ const undo = (k, svg) => `<span class="un" data-k="${k}" role="button" tabindex=
 function when(c, kind) {
   const p = progress[c.f] ?? {};
   if (p.hide) return undo('hide', EYE);
-  if (p.known) return undo('known', TICK);
-  if (kind !== 'learn') return { new: 'new', know: '✓' }[kind];
+  // Every word she has learned wears the same tick, whether she ticked it off
+  // herself or the schedule parked it: two rows of one board carrying two
+  // different marks for the same thing is the board contradicting itself.
+  if (kind === 'know') return undo('known', TICK);
+  if (kind !== 'learn') return { new: 'new' }[kind];
   const d = p.due - today();
   return d <= 0 ? 'due' : d === 1 ? 'tomorrow' : `in ${d} d`;
 }
@@ -140,7 +143,13 @@ export function openBoard(id, where = from) {
       // The eye and the tick put the word straight back, without making her open
       // it first: on these two boards that is the only thing she came to do.
       const un = e.target.closest('.un');
-      if (un) { flipMark(b.dataset.f, un.dataset.k); again(); return; }
+      if (un) {
+        // The eye simply comes off; the tick has two kinds of word under it, so
+        // it goes through the one place that knows the difference.
+        if (un.dataset.k === 'hide') flipMark(b.dataset.f, 'hide'); else putBack(b.dataset.f);
+        again();
+        return;
+      }
       openWord(b, again);
     });
   }

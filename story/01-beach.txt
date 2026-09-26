@@ -16,7 +16,7 @@
 # something as the line lands.  A "-word-" on a line of its own does it between
 # two lines.  A "#" line is a note and is never shown.
 
-MEGU -shock-: Haaaaah!!! WHERE AM I!!??? Oh no!! Ghhhhhhhyyyyyyyy
+MEGU -shock-: Haaaaah!!! WHERE AM I!!??? Oh no!!
 MEGU: It wasn't a dream! I really did fall off that liner yesterday!
 TARO: Ahem… ahem…
 -scared-
@@ -27,4 +27,4 @@ TARO: きぶんがわるい ？
 MEGU: …
 MEGU: ???
 MEGU -shock-: !!! I DON'T UNDERSTAND A WORD HE SAYS!!! AAAAAAH
-TARO: Ho ho ho…
+TARO: …Oh ho ho…

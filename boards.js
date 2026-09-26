@@ -126,6 +126,22 @@ export function buildQueue() {
 /** `key` is 'known' (the tick, "I know it") or 'hide' (the eye, "not
  *  important"). The one clears the other; either way the word no longer
  *  belongs in what she is going through right now. */
+/** The tick on a word's own row, on the Known board: put it back into the round.
+ *  Two different words wear that tick - one she ticked off herself, and one the
+ *  schedule parked as memorized - and the same press has to mean the same thing
+ *  on both, or the mark is a lie on one of the two rows. */
+export function putBack(front) {
+  const p = progress[front] ??= fresh();
+  if (p.known) return flipMark(front, 'known');
+  // Nothing to un-tick: what is holding this one out of the round is the month
+  // the schedule gave it, so the wait is what goes.  Everything it earned - how
+  // many times she has recalled it, how easy it is - is left alone.
+  p.iv = 0;
+  p.due = today();
+  saveProgress();
+  drop(front);
+}
+
 export function flipMark(front, key) {
   const p = progress[front] ??= fresh();
   p[key] = p[key] ? 0 : 1;
