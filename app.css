@@ -390,18 +390,25 @@ main.dash.talking .char{width:100%;max-width:none;height:100%;overflow:visible;
    off the bottom behind what is said, and the sides lose only the outermost
    curls of hair.  The row is the full width, so that trimming happens at the
    edge of the screen and draws no line down her. */
-main.dash.talking .char img{display:block;flex:none;width:auto;height:120vh;
-  max-width:none;max-height:none;margin-left:0}
+/* Sized to COVER the stage, not merely to be tall.  Height alone was enough on
+   a phone - 120vh of a 390-wide screen overflows it and there is no bare beach
+   to see - but she looks at this in a window twice that wide, where the same
+   drawing is narrower than the stage and the island shows down one side.  That
+   is what "I can still see the background" was: not a bad cut, a short picture.
+   object-fit keeps her proportions while the box takes the whole stage. */
+main.dash.talking .char img{display:block;flex:none;width:100%;height:120vh;
+  object-fit:cover;object-position:50% 0;max-width:none;max-height:none;margin-left:0}
 /* Taro alone, and by eye rather than by arithmetic.  He is not framed in his own
    file the way she is in hers: he is drawn holding a staff out to his left, so
    centring the PICTURE puts the man right of centre and runs the staff off the
-   edge of the screen, with the sea left empty on his other side.  Rendered at 0,
-   4, 8 and 12 percent against a red line down the middle of the screen, 8 is the
-   one where the whole staff is on screen, his beard stands on the line and the
-   hut in the background stops sitting inside the curl of the staff.
+   edge of the screen, with the sea left empty on his other side.
    Five attempts to find this number by measuring the drawing gave five different
-   answers and each made it worse; this one was looked at. */
-main.dash.talking .char img[data-who="TARO"]{translate:8% 0}
+   answers and each made it worse; this one was looked at, against a red line
+   down the middle of the screen, at both widths.
+   It moves the PICTURE inside the stage, not the stage: sliding the whole box
+   sideways - which is what translate did - is what left bare island down the
+   left edge in a wide window, because the box is now exactly the stage. */
+main.dash.talking .char img[data-who="TARO"]{object-position:36% 0}
 /* And no shadow on the stage.  A hard shadow behind a big figure draws a line
    round it, which is the other half of "why do they stand out". */
 main.dash.talking .char img{filter:none}
@@ -433,8 +440,12 @@ main.dash .top .story{position:absolute;left:calc(min(72%, 100% - 175px) / 2);
    dark saturated pink, and turning that hue alone lands in olive - it has to be
    lightened by the same hand.  Six candidates rendered and looked at: the two
    that forced a single hue (sepia) turned the white label and the white play
-   triangle yellow as well, which is the readable part of the button gone. */
-  filter:hue-rotate(72deg) saturate(1.25) brightness(1.55)}
+   triangle yellow as well, which is the readable part of the button gone.
+   Round two, because the first yellow was nuclear: the hue was right and the
+   volume was not.  Saturation is what makes it shout and brightness is what
+   bleaches it, so both came down and the hue stayed - six more rendered, and
+   this is the one that is yellow without being a warning sign. */
+  filter:hue-rotate(74deg) saturate(.6) brightness(1.34)}
 .story .t{font-size:12px}
 main.dash.talking .top .story{display:none}
 
@@ -734,7 +745,11 @@ main.fx-dark::after{content:"";position:fixed;inset:0;z-index:5;pointer-events:n
 .chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
 .chips::-webkit-scrollbar{display:none}
 .chips button{flex:none}
-.chips button{padding:7px 12px;font-size:12px;font-weight:600;color:#4d7fa6;
+/* Every pill in the app is one of her two pictures, so a pill drawn any other
+   way reads as somebody else's app: the switch on a word's row and the levels
+   on the back of a card were plain CSS capsules, a grey outline and a flat
+   pink, and both of them stuck out.  One paint, listed once, three places. */
+.chips button,.wd .rowset .p,.pri button{padding:7px 12px;font-size:12px;font-weight:600;color:#4d7fa6;
   border:0 solid transparent;background:none;
 /* The end of a pill is a half-circle, so the slice that keeps its shape is half
    the picture's height: chip-off is 92x72 and chip-on 122x73.  Cutting less
@@ -743,7 +758,7 @@ main.fx-dark::after{content:"";position:fixed;inset:0;z-index:5;pointer-events:n
    chopped off.  The pictures themselves were chopped too, until the cut learned
    to follow her paint outwards instead of trusting a box measured by eye. */
   border-image:url(img/chip-off.webp) 0 36 fill / 0 17px / 0 stretch}
-.chips .on{color:#fff;font-weight:700;
+.chips .on,.wd .rowset .p.on,.pri .on{color:#fff;font-weight:700;
   border-image-source:url(img/chip-on.webp);border-image-slice:0 36 fill}
 .words{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:0 12px;
   box-shadow:var(--shade)}
@@ -788,11 +803,12 @@ main.fx-dark::after{content:"";position:fixed;inset:0;z-index:5;pointer-events:n
    English in the right-hand cell squeeze the Japanese into an ellipsis, and the
    Japanese is the word. */
 .wd .rowset{grid-column:1/-1;display:flex;gap:5px;margin-top:6px}
-.wd .rowset .p{padding:4px 10px;border-radius:999px;border:1px solid var(--line);
-  font-size:11px;font-weight:600;color:var(--dim);background:var(--card)}
-.wd .rowset .p.on{color:#fff;background:var(--pink);border-color:transparent;font-weight:700}
-.wd .rowset .p:active{background:var(--warm)}
-.wd .rowset .p.on:active{background:var(--pink)}
+/* Painted by the shared pill rule above; all that is left here is its size.
+   The cap of her picture is half the pill's height, so a shorter pill needs a
+   narrower slice - 17px on a chip this tall leaves the two ends meeting in the
+   middle with no straight run between them. */
+.wd .rowset .p{padding:5px 11px;font-size:11px;border-image-width:0 13px}
+.wd .rowset .p:active{filter:brightness(.93)}
 /* On Learned the switch underneath says everything the tick above used to, so
    the tick is gone there - and the cell it stood in paints a plate of its own,
    which would otherwise be left standing empty beside every learned word. */
@@ -868,8 +884,8 @@ main.fx-dark::after{content:"";position:fixed;inset:0;z-index:5;pointer-events:n
 .ex .w.new{color:var(--w-new)}
 /* How often she wants the word: small, under everything else on the back. */
 .pri{display:flex;justify-content:center;gap:6px}
-.pri button{padding:6px 11px;border-radius:999px;border:1px solid var(--line);font-size:12px;color:var(--dim)}
-.pri .on{color:#fff;background:var(--pink);border-color:transparent;font-weight:700}
+.pri button{border-image-width:0 15px}
+.pri button:active{filter:brightness(.93)}
 #pop .pri{margin-top:8px}
 #pop .pri button{flex:1;padding:7px 4px}
 /* Her thumb is on the word, not up in the header, so the sound is there too. */
