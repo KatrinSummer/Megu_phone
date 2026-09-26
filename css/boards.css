@@ -1,0 +1,128 @@
+/* The board list and a board's own page: the rows, the two ways in, her
+   painted pills, every word with its little label and the switch under it -
+   and Settings, which is the same row with something to change on the end. */
+/* Settings: the same rows, with something to change on the right.  Like every
+   screen but Home and the card, it stands on plain blue - see body.island. */
+.set{display:flex;align-items:center;gap:11px;padding:11px 14px;border-bottom:1px solid var(--line)}
+.set:last-child{border-bottom:0}
+.set .n{flex:1;min-width:0}
+/* The phone's own little up/down arrows sat inside the box and looked like a
+   fault in the drawing; the number is typed, not clicked. */
+.set input[type=number]{width:74px;text-align:right;-moz-appearance:textfield}
+.set input[type=number]::-webkit-outer-spin-button,
+.set input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+/* Her switch, both halves of it painted - the knob is part of the picture. */
+.set .sw{width:54px;height:30px;flex:none;
+  background:url(../img/sw-off.webp) center/100% 100% no-repeat}
+.set .sw.on{background-image:url(../img/sw-on.webp)}
+#note{font-size:12px;color:var(--dim);padding:0 14px 10px}
+#note:empty{display:none}
+
+/* The board list, as she drew it: her icon for the board, its name, and what is
+   on it underneath, with an arrow at the end. */
+.deck{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border-radius:18px;
+  text-align:left;border:1px solid var(--line);background:var(--card);box-shadow:var(--shade)}
+.deck .ic{--s:54px}
+.deck .n{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;
+  font-size:17px;font-weight:700;overflow:hidden;text-overflow:ellipsis}
+.deck .s{font-size:13px;font-weight:400;color:var(--dim);white-space:nowrap}
+.deck .go{color:var(--dim);font-size:22px;line-height:1}
+/* An empty board keeps its card - faded out, it washed away over the island.
+   It is the drawing and the words that go quiet instead. */
+.deck:disabled{opacity:1;color:var(--dim)}
+.deck:disabled .ic{opacity:.4;filter:saturate(.35)}
+.deck:active{background:var(--warm)}
+
+/* A board's page: the two ways in, the filter, then every word on it. */
+.go .wide{margin-top:0}
+.go .wide+.wide{margin-top:10px}
+/* Starting a lesson is the pink one, with her play mark painted on it.  It
+   carries a second line, so it is taller than the plain one and its ends are
+   drawn bigger to match - in the same proportion as the picture. */
+#learn{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:88px;padding:0 26px 0 118px;color:#fff;
+  border-image:url(../img/btn-go.webp) 40 60 40 150 fill / 33px 49px 33px 122px / 0 stretch}
+#learn .s{color:rgba(255,255,255,.9)}
+/* The two ways into a board are big painted buttons, and 12px under them read
+   as a footnote: both lines are given the size of something to press. */
+.go .wide{font-size:18px}
+.go .s{display:block;font-size:14px;font-weight:400;color:var(--dim)}
+.go .note{margin:0;text-align:center}
+/* Her Tabs / Filters, painted: the chosen one her pink pill, the rest her pale
+   blue ones. */
+/* Her Tabs / Filters, painted.  Only the two ends are cut out of the picture:
+   slicing the top and the bottom as well chopped the pill flat, because her
+   rounded edge lives in the very rows that were being cut away. */
+/* One row, always: five filters wrapped onto a second line looked like a
+   mistake.  Past the edge of the screen they slide sideways instead. */
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.chips::-webkit-scrollbar{display:none}
+.chips button{flex:none}
+/* Every pill in the app is one of her two pictures, so a pill drawn any other
+   way reads as somebody else's app: the switch on a word's row and the levels
+   on the back of a card were plain CSS capsules, a grey outline and a flat
+   pink, and both of them stuck out.  One paint, listed once, three places. */
+.chips button,.wd .rowset .p,.pri button{padding:7px 12px;font-size:12px;font-weight:600;color:#4d7fa6;
+  border:0 solid transparent;background:none;
+/* The end of a pill is a half-circle, so the slice that keeps its shape is half
+   the picture's height: chip-off is 92x72 and chip-on 122x73.  Cutting less
+   than that leaves a piece of the curve in the middle band, and the middle band
+   is stretched - which flattened the pill and read as a button with its ends
+   chopped off.  The pictures themselves were chopped too, until the cut learned
+   to follow her paint outwards instead of trusting a box measured by eye. */
+  border-image:url(../img/chip-off.webp) 0 36 fill / 0 17px / 0 stretch}
+.chips .on,.wd .rowset .p.on,.pri .on{color:#fff;font-weight:700;
+  border-image-source:url(../img/chip-on.webp);border-image-slice:0 36 fill}
+.words{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:0 12px;
+  box-shadow:var(--shade)}
+.wd{display:grid;grid-template-columns:1fr auto;column-gap:10px;width:100%;text-align:left;
+  padding:10px 2px;border-bottom:1px solid var(--line)}
+.wd:last-child{border-bottom:0}
+.wd:active{background:var(--warm)}
+.wd .jp{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wd .jp b{font-size:18px;font-weight:600}
+.wd .k{font-size:13px;color:var(--dim)}
+/* Her little labels: "Due soon" on pink, "In 3 d" on cream. */
+.wd .st{align-self:center;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;
+  background:#eef4f8;color:var(--dim);white-space:nowrap}
+:root[data-theme="dark"] .wd .st{background:#22345f}
+/* Her own little label, the cream one, for a word with a day set on it.  It is
+   149x59 and the row gives it about 42x23: stretched whole, her rounded ends
+   were squashed to a third of the width she drew them at, so it is sliced. */
+.wd.learn .st{background:none;border:0 solid transparent;color:#a8690a;
+  border-image:url(../img/tag-cream.webp) 0 30 fill / 0 12px / 0 stretch}
+.wd.know .st{background:#dcf5ea;color:#0f8a63}
+:root[data-theme="dark"] .wd.know .st{background:#1e4a3c;color:#5fd6ae}
+.wd .e{grid-column:1/-1;font-size:13px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Which board the word goes back to.  Only Known and Hidden draw it: they are
+   the two pages whose words come from everywhere, and on a board's own page it
+   would be that board's name printed against every single row. */
+.wd .from{grid-column:1/-1;font-size:11px;color:var(--dim);opacity:.8}
+/* The way back into the round, in the word's own row where the state label used
+   to sit.  Round and outlined so it reads as something to press: what stood
+   here before was the word "hidden", which only told her what she already did. */
+/* The cell that holds it is the same cell that holds her little labels, and it
+   paints a plate of its own: a round button inside a green plate is two marks
+   on one word, which is why the two rows of Known never looked alike. */
+.wd .st:has(.un){padding:0;background:none;border:0}
+.wd .un{align-self:center;display:grid;place-items:center;width:34px;height:34px;
+  border-radius:50%;border:1px solid var(--line);background:var(--card)}
+.wd .un svg{width:19px;height:19px;display:block;fill:none;stroke:currentColor;
+  stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.wd .un:active{background:var(--warm)}
+/* The switch on the word's own row, on the two boards that exist to set one
+   thing each: the level on Priorities, learned-or-still-going on Learned.  It
+   runs the full width UNDER the word rather than beside it - three words of
+   English in the right-hand cell squeeze the Japanese into an ellipsis, and the
+   Japanese is the word. */
+.wd .rowset{grid-column:1/-1;display:flex;gap:5px;margin-top:6px}
+/* Painted by the shared pill rule above; all that is left here is its size.
+   The cap of her picture is half the pill's height, so a shorter pill needs a
+   narrower slice - 17px on a chip this tall leaves the two ends meeting in the
+   middle with no straight run between them. */
+.wd .rowset .p{padding:5px 11px;font-size:11px;border-image-width:0 13px}
+.wd .rowset .p:active{filter:brightness(.93)}
+/* On Learned the switch underneath says everything the tick above used to, so
+   the tick is gone there - and the cell it stood in paints a plate of its own,
+   which would otherwise be left standing empty beside every learned word. */
+.wd .st:empty{display:none}

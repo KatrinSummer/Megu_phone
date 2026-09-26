@@ -1,4 +1,5 @@
-[".", "index.html", "app.css", "manifest.webmanifest", "icon.png", "deck.json",
+[".", "index.html", "css/theme.css", "css/chrome.css", "css/stats.css", "css/home.css", "css/story.css", "css/buttons.css", "css/boards.css", "css/lesson.css",
+ "manifest.webmanifest", "icon.png", "deck.json",
  "img/sprite-day.webp", "img/sprite-night.webp", "img/bg-day.jpg", "img/bg-night.jpg",
  "img/bg-sky.jpg", "img/bg-sky-night.jpg",
  "img/gear.webp", "img/decks.webp", "img/jungle.webp",

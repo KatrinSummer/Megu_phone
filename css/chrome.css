@@ -1,0 +1,125 @@
+/* The frame every screen is drawn inside: the header and what stands in it,
+   the bar along the bottom, the scrolling area between them, the heading each
+   screen wears, and the two shapes the whole app is built out of - a white
+   card and a row that does something. */
+/* The header stands on the sky of her island, so it is only the buttons and the
+   name - no plate, no line under it. */
+header{display:flex;align-items:center;gap:9px;padding:14px 14px 10px;position:relative}
+header .grow{flex:1;min-width:0}
+.counts{font-size:14px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  text-shadow:0 1px 3px rgba(255,255,255,.85)}
+.counts b{color:var(--ink);font-weight:700}
+:root[data-theme="dark"] .counts{text-shadow:0 1px 3px rgba(6,12,28,.8)}
+/* A board's own row, up in the header above the two bars.  .counts is one short
+   grey line of text by default, so this takes back the size, the colour and the
+   wrapping for the one case that is a row rather than a count. */
+.bh{display:flex;align-items:center;gap:8px;white-space:normal}
+.bh .ic{--s:34px;flex:none}
+.bh b{font-size:19px;font-weight:700;color:var(--ink);min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bh .s{margin-left:auto;font-size:12px;font-weight:600;flex:none}
+.bh .cog{display:grid;place-items:center;width:30px;height:30px;flex:none;opacity:.75}
+.bh .cog svg{width:20px;height:20px;display:block;fill:none;stroke:currentColor;
+  stroke-width:2;stroke-linecap:round}
+.bh .cog:active{opacity:1}
+/* padding:0 - the iPhone gives every button a padding of its own, which pushed
+   the icon in a small round button off its centre. */
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+/* The header stands on her island now, and her Menu is three pale bars with no
+   outline: over the palms they stopped being a button at all.  So they get a
+   white plate - a bigger one than before, with the drawing well inside it
+   instead of pressed against the frame. */
+.icon{width:50px;height:50px;border-radius:16px;display:grid;place-items:center;flex:none;
+  border:1px solid var(--line);background:var(--card);box-shadow:var(--shade)}
+.icon:active{background:var(--warm)}
+.icon .ic{--s:34px}
+.icon svg{width:21px;height:21px;display:block;fill:none;stroke:currentColor;
+  stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.starred{color:var(--star);border-color:var(--star)}
+.starred svg{fill:currentColor}
+/* Her bookmark is a gold star with nothing to switch off, so an unset one is
+   simply faded: the same picture, plainly not chosen. */
+#star:not(.starred) .ic{opacity:.45;filter:saturate(.3)}
+/* .icon sets its own display, so the plain [hidden] rule would lose to it. */
+.icon[hidden]{display:none}
+/* Her Finish, standing in the middle of the header while a lesson is on - in
+   the middle of the header itself, not of what is left beside the counts.  It
+   is her painted button, the same one that starts a lesson, small enough for a
+   header.  The whole picture is drawn at its own proportion (429x108), not cut
+   into ends and a middle like the big one: at this size the middle would be
+   squeezed four times harder than the ends, and her gloss broke at both seams. */
+#finish{position:absolute;left:50%;transform:translateX(-50%);
+  height:38px;width:151px;padding:0 14px 0 52px;text-align:center;
+  font-size:15px;font-weight:700;color:#fff;
+  background:url(../img/btn-go.webp) 0 0/100% 100% no-repeat}
+#finish:active{transform:translateX(-50%) translateY(1px)}
+/* It stands over the header, so the count beside it is kept short enough not to
+   run under it - "12 once more · 10 ✓" is longer than "20 to go · 5 ✓". The
+   count then stops filling the header, so the star is held to its edge by hand. */
+header:has(#finish:not([hidden])) .grow{max-width:calc(50% - 90px)}
+#star{margin-left:auto}
+
+/* overflow-anchor: when something opens in the middle of the screen the phone
+   likes to keep what is *under* it where it was and scroll the rest away, so
+   the beach slid up off the top instead of the boards moving down.  Anchoring
+   off: what is above the sign stays put and what is below it is pushed. */
+main{flex:1;display:flex;flex-direction:column;justify-content:center;
+  padding:14px;gap:12px;overflow-y:auto;overflow-anchor:none;position:relative}
+/* A long list has to start at the top, not sit centred and clipped. */
+main.home,main.board,main.dash,main.page{justify-content:flex-start;gap:10px}
+main>*{flex-shrink:0}
+/* On a card only the card scrolls: the buttons under it never move.  A swipe
+   across it is hers (next / back), not the browser's history gesture. */
+main.study{overflow:hidden;touch-action:pan-y}
+
+/* The bar she drew along the bottom.  It is gone during a lesson: the answers
+   own that edge of the screen, and a tab under her thumb there is a mis-tap. */
+#tabs{display:flex;background:var(--bar);border-top:1px solid var(--line);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  padding-bottom:env(safe-area-inset-bottom)}
+main.study ~ #tabs{display:none}
+#tabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;
+  padding:7px 0 5px;font-size:13px;letter-spacing:.02em;color:var(--dim)}
+#tabs .ic{--s:46px}
+#tabs .on{color:var(--pink);font-weight:700}
+#tabs button:active{background:var(--warm)}
+
+/* The name of the screen, the way she drew it: her icon, the word in big
+   letters, and what it counts on the right. */
+.head{display:flex;align-items:center;gap:12px;padding:2px 4px 2px 2px}
+/* Every screen's heading wears the same size of icon, so the name of the screen
+   sits at the same height wherever she is - one of them a few pixels bigger and
+   the line jumped as she moved between them. */
+.head .ic{--s:48px}
+/* The handle on a board's picture, at the end of its name's line. */
+.head .cog{display:grid;place-items:center;width:34px;height:34px;flex:none;
+  color:var(--ink);opacity:.6}
+.head .cog svg{width:22px;height:22px;display:block;fill:none;stroke:currentColor;
+  stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.head .cog:active{opacity:1}
+.head h1{margin:0;font-size:27px;font-weight:700;letter-spacing:.01em;
+  text-shadow:0 1px 4px rgba(255,255,255,.9)}
+/* It stands on her sky, not on a card: grey on that blue all but disappeared. */
+.head .s{margin-left:auto;font-size:13px;font-weight:600;color:var(--ink);opacity:.72;
+  white-space:nowrap;text-shadow:0 1px 4px rgba(255,255,255,.9)}
+/* Home says its name over two lines, the way she drew the logo: the name, and
+   under it what the app is for. */
+.head .t{display:flex;flex-direction:column;min-width:0}
+.head .sub{font-size:12px;color:var(--dim);text-shadow:0 1px 4px rgba(255,255,255,.9)}
+:root[data-theme="dark"] .head h1,:root[data-theme="dark"] .head .s,
+:root[data-theme="dark"] .head .sub{text-shadow:0 1px 4px rgba(6,12,28,.85)}
+/* A white card: everything she reads sits on one. */
+.pane{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shade)}
+
+/* A row that does something: icon, name, what it is worth, and an arrow. */
+.tile{display:flex;align-items:center;gap:11px;width:100%;text-align:left;
+  padding:13px 14px;border-radius:16px;border:1px solid var(--line);background:var(--card);
+  box-shadow:var(--shade)}
+.tile:active{background:var(--warm)}
+.tile .ic{--s:54px}
+.tile .n{flex:1;min-width:0;font-size:17px;font-weight:600;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tile .v{color:var(--dim);font-size:14px;white-space:nowrap}
+.tile .go{color:var(--dim);font-size:19px;line-height:1}
+.tile:disabled{opacity:.5}
+.tile .s{display:block;font-size:12px;font-weight:400;color:var(--dim)}

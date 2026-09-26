@@ -1,0 +1,63 @@
+/* What she has done, drawn: the fortnight of bars, the month of days, the
+   ring of how much of the library she knows, and the plain rows of numbers
+   under it. */
+/* The days she has studied.  A day with nothing in it keeps its place in the
+   row, drawn as a grey stub, so the fortnight stays a fortnight. */
+.cap{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+  padding:12px 14px 2px;font-weight:700}
+.cap span{font-weight:400;font-size:12px;color:var(--dim)}
+/* Her picker over the chart - "last 14 days" - reads as part of the line, not
+   as a form on a card. */
+.cap select{font:inherit;font-size:12px;font-weight:400;color:var(--dim);
+  padding:2px 4px;border-radius:8px;border:1px solid var(--line);background:var(--solid)}
+.chart{display:flex;align-items:flex-end;gap:4px;height:110px;padding:8px 14px 24px}
+.chart i{flex:1;min-width:4px;height:var(--h);min-height:3px;border-radius:4px 4px 0 0;
+  background:var(--aqua);position:relative}
+.chart i.none{background:var(--line)}
+.chart i span{position:absolute;left:0;right:0;bottom:-14px;text-align:center;
+  font-size:9px;color:var(--dim)}
+/* How many words a bar is worth, up the side of it, the way she drew it. */
+.plot{display:flex;gap:8px;padding:2px 14px 0}
+.plot .chart{flex:1;min-width:0;padding:8px 0 24px}
+.axis{flex:none;width:22px;height:110px;padding-bottom:24px;font-size:10px;color:var(--dim);
+  display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end}
+
+/* The month.  A day she studied is green - the more she did, the stronger -
+   and a day she did not keeps its place, so the shape of the month shows. */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:8px 12px 14px}
+.cal b{text-align:center;font-size:10px;font-weight:700;color:var(--dim);padding-bottom:2px}
+.cal i{aspect-ratio:1;display:grid;place-items:center;border-radius:9px;font-style:normal;
+  font-size:12px;color:var(--dim);background:var(--line)}
+.cal i:empty{background:none}
+.cal i.l1{background:#bfe7d8;color:#0f6b50}
+.cal i.l2{background:#6fd0ae;color:#0b4a37}
+.cal i.l3{background:var(--good);color:#fff;font-weight:700}
+.cal i.now{outline:2px solid var(--pink);outline-offset:1px}
+:root[data-theme="dark"] .cal i.l1{background:#1f5145;color:#bfe7d8}
+:root[data-theme="dark"] .cal i.l2{background:#2f7a63;color:#eafff6}
+/* Stats: the ring, what it is made of, and the plain numbers under it. */
+.wheel{display:flex;align-items:center;gap:16px;padding:16px 14px}
+.wheel svg{flex:none;width:104px;height:104px;transform:rotate(-90deg)}
+.wheel .pct{font-size:22px;font-weight:700}
+.wheel .legend{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.wheel .legend div{display:flex;align-items:center;gap:8px}
+/* The dot for the words she has not started is white, and a white dot on a
+   white card is no dot at all: every one of them carries a faint edge. */
+.wheel .legend i.dot{width:10px;height:10px;border-radius:50%;flex:none;
+  box-shadow:0 0 0 1px rgba(22,70,110,.22)}
+.wheel .legend b{margin-left:auto;font-weight:700}
+/* The little pink plate she writes a section's name on - hers, painted, not one
+   drawn in CSS.  Sliced at half its height (58/2), the same rule as the pills. */
+.grp{align-self:flex-start;padding:6px 15px;font-size:11px;font-weight:700;
+  color:#b93a76;border:0 solid transparent;background:none;
+  border-image:url(../img/tag-pink.webp) 0 30 fill / 0 14px / 0 stretch;
+  text-transform:uppercase;letter-spacing:.08em}
+/* The plate stays the pink she painted after dark, so the writing on it has to
+   stay dark too. */
+:root[data-theme="dark"] .grp{color:#a32f68}
+.rows{padding:2px 14px}
+.rows div{display:flex;align-items:center;gap:10px;padding:9px 0;
+  border-bottom:1px solid var(--line);font-size:14px}
+.rows .ic{--s:24px}
+.rows div:last-child{border-bottom:0}
+.rows b{margin-left:auto;font-weight:700}

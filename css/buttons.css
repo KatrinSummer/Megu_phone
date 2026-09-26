@@ -1,0 +1,131 @@
+/* The things she presses that are her own paintings rather than shapes drawn
+   in CSS: the two board buttons, her big pink one, what a gear drops out from
+   under it, and the wooden sign that carries the count and her board
+   pictures. */
+/* On a screen taller than her rows need, the spare room is nobody's: it lies at
+   the end of them, under the last board.  It used to be held open between two
+   rows - over the pair of tiles, and then under the sign - and either way it was
+   room the sign could eat: the sign opened by shrinking the gap, so nothing
+   below it moved and everything above it climbed, and the gap it left behind was
+   a hole in the beach.  Whoever holds the spare room hands it to the sign, so
+   nobody holds it.  A phone has none of it to hand over either way. */
+.duo{display:flex;gap:10px}
+.duo button{flex:1;display:flex;align-items:center;gap:9px;padding:11px 12px;border-radius:16px;
+  border:1px solid var(--line);background:var(--card);text-align:left;box-shadow:var(--shade)}
+.duo .ic{--s:52px}
+.duo b{font-size:22px;font-weight:700;line-height:1.1;display:block}
+.duo span{font-size:12px;color:var(--dim)}
+.duo button:active{background:var(--warm)}
+/* Her Primary Button, painted.  It is stretched as a nine-slice: the two ends
+   keep their shape and only the middle grows.  The play mark is painted into
+   the left end, so that end is never stretched and nothing is drawn over it -
+   which is why this button is the one that starts something. */
+/* The ends are drawn at a fixed size, so the button is given a height to match
+   the picture: let it grow and the play mark is stretched out of shape. */
+.big{display:flex;align-items:center;gap:10px;width:100%;
+  height:68px;padding:0 16px 0 86px;font-size:20px;font-weight:700;color:#fff;
+  border:0 solid transparent;background:none;
+  border-image:url(../img/btn-go.webp) 40 60 40 150 fill / 24px 32px 24px 80px / 0 stretch}
+/* What it starts, on the right of it: the wave for a repeat, her jungle for an
+   adventure, and how many words - or a question mark, when that is the point. */
+/* What it starts and the gear travel together on the right of it, so the order
+   inside them is hers to choose without the spacing moving. */
+.big .r{margin-left:auto;display:flex;align-items:center;gap:7px}
+.big .ic{--s:54px}
+/* Her name for it stays on one line: with the gear there as well, "Start
+   Adventure" was breaking in two. */
+.big .t{white-space:nowrap}
+/* A plain gear, not one of her drawings: it is a small handle on a painted
+   button, and her own gear would read as a second picture beside the jungle. */
+.big .cog{display:grid;place-items:center;padding:4px;opacity:.9}
+.big .cog svg{width:21px;height:21px;display:block;fill:none;stroke:currentColor;
+  stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.big .cog:active{opacity:1}
+.big .v{min-width:14px;text-align:right;text-shadow:0 1px 2px rgba(180,20,90,.35)}
+.big:active{transform:translateY(1px)}
+/* The gear is inside the button, so a tap on it was pressing the button down
+   under her finger as well - the button jumped for something it never did. */
+.big:has(.cog:active){transform:none}
+
+/* What a gear drops out: the word count under the big button, her pictures
+   under a board's name.  It slides, because she asked for something that comes
+   out and goes back in. */
+.drop{opacity:0;transition:opacity .18s ease,margin-bottom .26s ease}
+/* The box that does the clipping carries nothing of its own - no padding, no
+   height: a padded box cannot shrink to nothing, and rolled up it left as much
+   empty beach behind it as the sign takes when it is out.
+   It grows by its own height and not by a grid row grown from nothing: the
+   second is the tidier trick and her phone does not always run it, and a sign
+   that appears instead of sliding is not what she asked for. The ceiling is
+   only a ceiling - taller than any sign here, so nothing is ever cut by it. */
+.drop>div{overflow:hidden;max-height:0;transition:max-height .26s ease}
+.drop.on{opacity:1}
+/* The ceiling is near the height the sign really is.  Far above it, the sign
+   was open long before the clock ran out and shut only in the last of it: it
+   hung there and then snapped, which is the jerk she saw. */
+.drop.on>div{max-height:120px}
+.drop#b-art.on>div{max-height:480px}
+/* Two rows of switches, and they are taller than the wooden sign the count
+   rides on: a shelf cut to the sign's height would show one and a half. */
+.drop#b-set.on>div{max-height:280px}
+/* The three kinds of lesson ride on the right of their row, and wrap onto a
+   line of their own on a narrow phone rather than squeezing the label out. */
+.set .chips{flex:none;justify-content:flex-end;flex-wrap:wrap;gap:6px;padding:0}
+/* Four levels do not fit on the same line as their own name on a phone - they
+   ran off the right edge of the screen.  They take a line of their own under
+   it and wrap onto a second if they must. */
+.set:has(.lv){flex-wrap:wrap}
+.set .chips.lv{flex:1 0 100%;justify-content:flex-start;margin-top:2px;overflow:visible}
+.set .chips button{font-size:12px;padding:5px 9px}
+/* The meaning as the question, on a board she has turned round.  It stands
+   where her word stands on an ordinary card, so it is sized like a question and
+   not like the small line of English under one. */
+.card .ask{font-size:clamp(22px,7vw,34px);font-weight:700;line-height:1.25;
+  text-align:center;padding:4px 8px}
+/* Rolled up it is still sitting between two of the screen's gaps: one of them goes. */
+.drop:not(.on){margin-bottom:-10px}
+
+/* The sign itself: her wooden board with the leaves, drawn once at this size so
+   nothing is stretched on the phone but the grain of the planks. */
+/* The line is centred on the planks, and the padding is the leafy ends of the
+   sign: her words start where the wood does and never climb onto a leaf. */
+/* Nothing on this line may be squeezed: the first thing flex chose to shrink was
+   the number, and its box came out narrower than the number in it. */
+.cnt{display:flex;align-items:center;justify-content:center;gap:4px;min-height:72px;
+  padding:10px 12px;color:#5a3a1c;
+  background:url(../img/plank.webp) 0 0/100% 100% no-repeat}
+:root[data-theme="dark"] .cnt{filter:var(--dim-art)}
+/* Her words on the sign: big enough to read at arm's length, and drawn round
+   with cream so the letters do not sink into the grain of the wood.  The size
+   follows the width of the phone - as big as the wood allows, and never so big
+   that the one line it makes stops fitting between the leaves. */
+.cnt .n{flex:none;min-width:0;font-size:clamp(16px,4.3vw,20px);font-weight:700;white-space:nowrap;
+  text-shadow:0 1px 0 rgba(255,248,232,.95),0 -1px 0 rgba(255,248,232,.7),
+    1px 0 0 rgba(255,248,232,.7),-1px 0 0 rgba(255,248,232,.7)}
+/* Random or a number of her own, on the chip she drew - the same picture the
+   filters along every screen wear, so it is a chip here too and not a box. */
+.cnt .pick{flex:none;width:auto;height:auto;padding:7px 8px;font-size:13px;font-weight:700;
+  color:#4d7fa6;border:0 solid transparent;border-radius:0;background:none;
+  border-image:url(../img/chip-off.webp) 0 36 fill / 0 17px / 0 stretch}
+.cnt .pick.on{color:#fff;border-image-source:url(../img/chip-on.webp);border-image-slice:0 36 fill}
+/* With Random on, the number is still there to read - it is simply not what
+   the lesson is counting by. */
+.drop.rand b,.drop.rand #c-less,.drop.rand #c-more{opacity:.45}
+.cnt button{width:28px;height:28px;flex:none;border-radius:50%;font-size:18px;font-weight:700;
+  color:#a8562a;background:rgba(255,252,244,.8);border:1px solid rgba(120,80,40,.3)}
+/* Not the chips: they are her drawing, and a white plate flashing behind one
+   for the length of a tap is a white square on the wood. */
+.cnt button:not(.pick):active{background:#fff}
+/* The number sits in a little box of its own, like everything else on the line
+   she can press - it is the thing the minus and the plus are moving. */
+.cnt b{flex:none;font-size:20px;font-weight:700;min-width:20px;text-align:center;
+  padding:3px 7px;border-radius:12px;
+  background:rgba(255,248,232,.8);border:1px solid rgba(120,80,40,.3)}
+/* The same sign, taller, holding every picture a board can wear.  Three rows of
+   them are on screen and the rest is a scroll - the page under it must not be
+   pushed off the phone by a list of drawings. */
+.cnt.art{flex-direction:column;align-items:stretch;gap:8px;padding:14px 16px;border-radius:18px;
+  background:url(../img/wood.webp) center/cover;box-shadow:0 2px 10px rgba(60,35,10,.22)}
+.cnt .pics{display:flex;flex-wrap:wrap;gap:6px;max-height:174px;overflow-y:auto}
+.cnt .pics button{width:54px;height:54px;border-radius:15px;background:rgba(255,252,244,.5)}
+.cnt .pics button.on{background:var(--pink);border-color:var(--pink)}

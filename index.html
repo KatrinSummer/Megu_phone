@@ -13,7 +13,16 @@
   document.querySelector('meta[name=theme-color]').content='#0d1733';}}catch{}</script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon.png">
-<link rel="stylesheet" href="app.css">
+<!-- One file per screen, and the order is the cascade: theme first,
+     the lesson last.  css/theme.css holds every colour. -->
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/chrome.css">
+<link rel="stylesheet" href="css/stats.css">
+<link rel="stylesheet" href="css/home.css">
+<link rel="stylesheet" href="css/story.css">
+<link rel="stylesheet" href="css/buttons.css">
+<link rel="stylesheet" href="css/boards.css">
+<link rel="stylesheet" href="css/lesson.css">
 <title>Megu</title>
 </head>
 <body>

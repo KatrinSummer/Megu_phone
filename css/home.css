@@ -1,0 +1,249 @@
+/* Home, which is her island: the ring and the number in the sky, Megu
+   standing on the sand, the way into her story, the quest mark at her feet -
+   and the stage the island turns into while the story runs, where she comes
+   close and everything else folds away.  The plate laid over the island is
+   here too: it belongs to Home, not to the story that put it there. */
+/* Home: how today stands.  No plate under it and nothing beside it - she asked
+   for the left of her island left bare, the hut and the sea showing, and only
+   the ring over on the right.  The writing in it stands on the drawing, so it
+   carries a glow instead of a card. */
+.ring{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  align-self:flex-end;width:60%;padding:34px 4px 10px}
+.ring .n,.ring .l{text-shadow:0 1px 5px rgba(255,255,255,.95)}
+:root[data-theme="dark"] .ring .n,:root[data-theme="dark"] .ring .l{
+  text-shadow:0 1px 5px rgba(6,12,28,.9)}
+/* The ring itself, with the number sitting in its hole. */
+.donut{position:relative;width:var(--d);height:var(--d);flex:none;display:grid;place-items:center}
+.donut svg{width:100%;height:100%;display:block}
+.donut .mid{position:absolute;display:flex;flex-direction:column;align-items:center;line-height:1.1}
+.ring .n{font-size:40px;font-weight:700;line-height:1.05}
+.ring .l{font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em}
+/* Not .done: that is the card at the end of a lesson, and the checks find the
+   end of a lesson by looking for it. */
+.ring .l.today{text-transform:none;letter-spacing:0;color:var(--good);font-weight:700;margin-top:3px}
+
+/* Her character, standing on the bare left of the island - the side she kept
+   clear of plates and rows when she drew the concept, which is where she asked
+   for her.  The ring shares the row instead of holding 60% of the screen on its
+   own, so the two stand side by side however tall the window is. */
+/* The island is taller than any phone, so it is always scaled to the height of
+   the window and the sand starts at the same share of it whatever the window is:
+   39%.  The row is held to that share, so she stands on the sand and not in the
+   sea when the window is tall.  (In a window wider than the art is - a desktop -
+   the drawing is scaled by width instead and this no longer tracks it.) */
+/* She is drawn far taller than the row, and the row cuts her off: what shows is
+   her down to about the waist, and the rows of Home begin where she stops.  The
+   height is held rather than grown into, or she would push the whole screen
+   down instead of being cropped by it. */
+/* The crop belongs to HER, not to the row: the row also carries her button and
+   the word count that swings out under it, and a row that clips would cut those
+   off as well. */
+/* Home's row only.  ".top" was a name two screens had taken: the row her
+   drawing stands in, and the first line of the little box a tapped word opens.
+   The height here is Home's, and the word box was quietly given it as well -
+   259px of empty white above the word on a phone, which is the box she saw
+   stretched and sliding about under her finger. */
+main.dash .top{display:flex;align-items:flex-start;height:calc(39vh - 70px);position:relative}
+/* The edge she drew across the bottom of the drawing.  The row ends at her
+   knees, and a person who simply stops in mid-air reads as a mistake; a bar
+   across the foot of the row makes the same cut read as standing behind
+   something.  It runs to the edges of the screen, past main's padding, so it is
+   an edge of the world and not a line drawn under her. */
+main.dash:not(.talking) .top::after{content:"";position:absolute;z-index:1;
+  pointer-events:none;                 /* she is underneath it, and she is a button */
+  left:-14px;right:-14px;bottom:0;height:11px;border-radius:7px;
+  background:linear-gradient(180deg,#f6e3c2,#e3c79b);
+  box-shadow:0 -7px 12px -6px rgba(90,58,28,.45)}
+:root[data-theme="dark"] main.dash:not(.talking) .top::after{
+  background:linear-gradient(180deg,#3b4a74,#26314f);
+  box-shadow:0 -7px 12px -6px rgba(0,0,0,.55)}
+/* Her box stops where the number begins, at every width: the ring is drawn
+   158px across and carries 4px either side, so what is left of the row after
+   175px is hers and the two can never reach each other.  A percentage alone
+   cannot promise that - it holds at one window width and breaks at the next. */
+/* Out to the edge of the screen, past the padding the page carries.  Her body
+   sits 4.3% right of the middle of her own drawing - her hair sweeps that way -
+   so in a box that starts at the padding she reads as standing off to the
+   right.  The box moves rather than the picture inside it: moving the picture
+   would push her hair out of a box that clips, and her hair is not mine to
+   trim. 14px is the padding, and on a phone it is very near that same 4.3%. */
+.char{flex:none;width:min(72%,calc(100% - 175px));max-width:290px;margin-left:-14px;
+  height:100%;overflow:hidden;padding:0;border:0;background:none;line-height:0}
+/* On Home she is grey: the colour belongs to the story, and she takes it back
+   when the story starts. */
+/* The whole width of her box and no more.  She was drawn at 112% of it and the
+   box clipped the overhang, which made her bigger at the price of the outermost
+   curls of her hair on both sides - and her hair is not mine to trim.  She is
+   smaller by that much; the box is what keeps her clear of the number, so it
+   cannot be widened to give the size back. */
+.char img{width:100%;height:auto;display:block;
+  filter:grayscale(1) drop-shadow(0 5px 9px rgba(6,12,28,.28))}
+:root[data-theme="dark"] .char img{filter:grayscale(1) var(--dim-art)
+  drop-shadow(0 5px 9px rgba(6,12,28,.55))}
+.char:active img{transform:translateY(1px)}
+.char{transition:translate .35s ease}
+/* The ring rides at the top of the row, up in the sky.  It used to sit at the
+   bottom beside her, and the way-in button - which is on Home from the start -
+   was drawn straight through the number. */
+/* The number hangs in the top right corner of the drawing, out of the row
+   altogether.  It used to share the row with her, and once she grew to most of
+   its width there was nothing left for it: "843" was pushed off the screen with
+   only the 8 showing. */
+main.dash .top .ring{position:absolute;right:0;top:26px;z-index:2;width:auto;padding:12px 4px 10px}
+/* While she has the screen the island's rows are folded away.  Only the rows
+   themselves go: what is inside her own panel is not one of them, which is why
+   this reaches for the children of the screen and not for the classes. */
+main.dash.talking>.duo,main.dash.talking>.big,
+main.dash.talking>.tile,main.dash.talking .drop{display:none}
+/* The whole screen is tapped over and over to read the story, and taps that land
+   close together are a double-click: the browser answers one by selecting what
+   was under it, and drew a box round her.  Nothing here is text to copy. */
+main.dash.talking{user-select:none;-webkit-user-select:none}
+/* A stage, the way a visual novel builds one - not a box with somebody inside
+   it.  The row takes whatever height is left over (flex:1) and the person is
+   fitted INTO it whole: max-width and max-height both 100%, so the picture is
+   made smaller when it must be and is never cut to fit.
+   It used to be asked for at 88vh inside a 52vh box, and the box cropped the
+   difference - which is where the frame she kept seeing came from: a hard edge
+   down both sides of the drawing at the exact width of the box. */
+/* The stage runs to the edges of the SCREEN, not to the edges of the page.
+   Measured: the window is 390 wide and this row was 362 - the 14px of padding
+   main carries on each side.  The drawing overflowed correctly, and then the row
+   clipped it 14 points early, drawing exactly the straight line down her side
+   that kept coming back.  Three times I looked for it in the picture.
+   The negative margin is cancelled by hiding overflow across the screen, or the
+   row would push a horizontal scrollbar out instead. */
+/* Both axes now.  The figure is let out of its row on purpose (below), so the
+   screen itself has to be what stops it - otherwise the overflow hands main a
+   scrollbar and she can scroll the story sideways and down. */
+main.dash.talking{overflow:hidden}
+/* overflow:visible, which is the whole point: the row ends where the plate
+   begins, and a row that clipped its own contents cut the person off along that
+   line with the sand still showing underneath.  A novel does not end the person
+   above the text box - it runs them behind it. */
+main.dash.talking .top{flex:1;min-height:0;height:auto;overflow:visible;
+  margin:0 -14px;align-items:flex-start;justify-content:center}
+main.dash.talking .char{width:100%;max-width:none;height:100%;overflow:visible;
+  translate:0;display:flex;align-items:flex-start;justify-content:center}
+/* Close up, the way a novel stands somebody on screen: as tall as the window,
+   head at the top, and whatever is below the hips runs off the bottom behind
+   what is being said.  That is the screen's edge doing the cutting, not a box
+   inside it - the row is the full width now, so nothing draws a line down her
+   sides the way the old 52vh box did. */
+/* Closer still.  The drawings are narrow and tall - 695x1400 - so asking for a
+   height that fits the window shows the whole person and a lot of beach.  At
+   120vh she is taller than the screen: the head stays at the top, the legs run
+   off the bottom behind what is said, and the sides lose only the outermost
+   curls of hair.  The row is the full width, so that trimming happens at the
+   edge of the screen and draws no line down her. */
+/* Sized to COVER the stage, not merely to be tall.  Height alone was enough on
+   a phone - 120vh of a 390-wide screen overflows it and there is no bare beach
+   to see - but she looks at this in a window twice that wide, where the same
+   drawing is narrower than the stage and the island shows down one side.  That
+   is what "I can still see the background" was: not a bad cut, a short picture.
+   object-fit keeps her proportions while the box takes the whole stage. */
+main.dash.talking .char img{display:block;flex:none;width:100%;height:120vh;
+  object-fit:cover;object-position:50% 0;max-width:none;max-height:none;margin-left:0}
+/* Taro alone, and by eye rather than by arithmetic.  He is not framed in his own
+   file the way she is in hers: he is drawn holding a staff out to his left, so
+   centring the PICTURE puts the man right of centre and runs the staff off the
+   edge of the screen, with the sea left empty on his other side.
+   Five attempts to find this number by measuring the drawing gave five different
+   answers and each made it worse; this one was looked at, against a red line
+   down the middle of the screen, at both widths.
+   It moves the PICTURE inside the stage, not the stage: sliding the whole box
+   sideways - which is what translate did - is what left bare island down the
+   left edge in a wide window, because the box is now exactly the stage. */
+main.dash.talking .char img[data-who="TARO"]{object-position:36% 0}
+/* And no shadow on the stage.  A hard shadow behind a big figure draws a line
+   round it, which is the other half of "why do they stand out". */
+main.dash.talking .char img{filter:none}
+:root[data-theme="dark"] main.dash.talking .char img{filter:var(--dim-art)}
+/* The way into her story, on her: the painted button she drew, narrowed and
+   standing at her waist rather than at her feet.
+   Her button carries its play triangle INSIDE the picture it is painted with,
+   so a narrower button has to shrink its border slices by the same hand -
+   otherwise the label walks straight onto the triangle.  These numbers come
+   from the version she approved, not from me; the only one changed is the
+   width, because "Start Adventure" does not fit the room "Start story" needed.
+   It carries nothing that drops out from under it, which is what made the
+   LESSON button unsafe in this row: nothing here can push the ring down or
+   slide a sign out at the top of the screen. */
+/* Centred on HER, not on the row.  The row runs the full width of the screen
+   while she only occupies what is left of it after the ring's 175px, so
+   left:50% put the button out over the sea with its edge on the number.  The
+   same expression as her box above, halved. */
+/* Smaller than it was, and yellow rather than pink: she asked for both.  The
+   picture it is painted with is her pink one, so the colour is turned rather
+   than repainted - the white of the label has no hue to turn and stays white.
+   Its border slices shrink with it, or the label walks onto the play mark that
+   is painted inside the left end. */
+main.dash .top .story{position:absolute;left:calc(min(72%, 100% - 175px) / 2);
+  translate:-50% 0;bottom:26%;z-index:3;
+  width:min(48%,170px);height:42px;padding:0 10px 0 50px;
+  border-image-width:14px 19px 14px 50px;
+/* Yellow is not the next number along from orange.  Her button is painted a
+   dark saturated pink, and turning that hue alone lands in olive - it has to be
+   lightened by the same hand.  Six candidates rendered and looked at: the two
+   that forced a single hue (sepia) turned the white label and the white play
+   triangle yellow as well, which is the readable part of the button gone.
+   Round two, because the first yellow was nuclear: the hue was right and the
+   volume was not.  Saturation is what makes it shout and brightness is what
+   bleaches it, so both came down and the hue stayed.
+   Round three, because that one came out washed out - brighter and lighter,
+   she said, and she is right: it had gone past quiet into weak.  Back up
+   between the two, and this time the candidates were rendered on the NIGHT
+   theme, which is the one she looks at: the island behind the button is darker
+   there, and half of how loud a colour reads is what it is standing on. */
+  filter:hue-rotate(74deg) saturate(.9) brightness(1.40)}
+.story .t{font-size:12px}
+main.dash.talking .top .story{display:none}
+/* The island has something for her: a "!" down at her feet, where she drew it.
+   It nods, because a mark that never moves is scenery - and it is gone while
+   the story is running, like everything else in this row. */
+/* The quest mark is a button, so it is painted with the picture every other
+   button in the app is painted with - her pink capsule - and not with a shape
+   CSS invented. Square with rounded corners, which takes a narrower slice than
+   a pill does: her cap is half a pill's height, and at that width on a square
+   box the two caps meet in the middle and it comes out a circle. */
+main.dash .top .quest{position:absolute;left:8px;bottom:9%;z-index:4;
+  width:38px;height:38px;padding:0;display:grid;place-items:center;
+  font-size:20px;font-weight:800;line-height:1;color:#fff;
+  border:0 solid transparent;background:none;
+  border-image:url(../img/chip-on.webp) 0 36 fill / 0 12px / 0 stretch;
+  filter:drop-shadow(0 4px 9px #0b142c77);animation:nod 1.7s ease-in-out infinite}
+@keyframes nod{0%,100%{translate:0 0}50%{translate:0 -3px}}
+main.dash.talking .top .quest{display:none}
+/* A note laid over the island rather than a screen of its own: she asked for
+   it over the screen, and it is tapped away anywhere. */
+.over{position:fixed;inset:0;z-index:6;display:grid;place-items:center;padding:18px;
+  background:#0b142c66}
+.over .card{max-width:330px;max-height:80vh;overflow:auto;background:var(--sheet);
+  border:1px solid var(--line);border-radius:20px;padding:15px 16px 11px;
+  box-shadow:0 12px 34px #0005;line-height:1.45}
+.over h2{margin:0 0 7px;font-size:14px;font-weight:700;color:var(--pink)}
+.over p{margin:0 0 10px}
+.over .q{border-top:1px solid var(--line);padding-top:9px;margin-bottom:9px}
+.over .q b{display:block;font-size:15px;margin-bottom:2px}
+.over .hint{font-size:13px;color:var(--dim)}
+.over .on{margin:0;font-size:12px;color:var(--dim);text-align:center}
+
+/* Her one pink button stands in the flow of the screen, under the first row of
+   tiles, where it has always stood.  It was lifted into the drawing's row and
+   pinned to the foot of it with an absolute - and on a real phone that row is
+   short, so the ring came down onto the button and the wooden sign it opens
+   slid out at the top of the screen.  A button that belongs to a list belongs
+   IN the list; only the drawing and the number live in that row.
+   The way into the story is still Megu herself, so there is still one button. */
+/* The number steps out of the story altogether.  The row keeps its height from
+   her picture, so taking the ring out of it drops nothing. */
+main.dash.talking .ring{display:none}
+/* The button itself is folded away with the other rows by the rule above, which
+   reaches every .big child of the screen - it no longer needs a class of its
+   own down here. */
+/* The story is the one part of the app written in Russian, and the app's font
+   stack reaches a Japanese face first on Windows - where Cyrillic is drawn
+   full-width, one letter to a square, which is not writing she can read.  The
+   window's own interface font goes first here, and the Japanese faces stay
+   behind it for the kana in the same line: a browser picks a face letter by
+   letter, so both alphabets come out right. */

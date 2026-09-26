@@ -1,0 +1,93 @@
+/* What is said, and the test at the end of it: the plate at the foot of the
+   screen, who is speaking, the noise she cannot read yet and the pink it turns
+   when she taps it, the answers, and the four effects a scene may ask for. */
+.talk{display:none;flex-direction:column;gap:10px;
+  font-family:system-ui,-apple-system,"Hiragino Sans","Yu Gothic",sans-serif}
+/* What is said sits at the foot of the screen, where a game puts it: with the
+   rows folded away the room below her is empty, and the plate tucked under her
+   left it stranded in the middle of the sand. */
+/* Over the figure, not under it.  The person now runs off the bottom of the
+   screen behind this plate, so the plate has to be the thing in front - and it
+   has a solid background, which is what hides the cut. */
+main.dash.talking>.talk{display:flex;margin-top:auto;position:relative;z-index:2}
+/* What is said, on a plate of its own: the words stand on the beach otherwise
+   and the sand reads straight through them.  Not .say - that is the speaker
+   button inside a word's box, and two things under one name is how one of them
+   quietly gets the other's padding. */
+.speech{background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:12px 14px;box-shadow:var(--shade)}
+.speech p{margin:0 0 8px}
+.speech p:last-child{margin:0}
+/* The quiet line under what is said, and the one that ends the scene. */
+/* Who is speaking, over what they say.  Four voices meet in this story and one
+   of them she cannot understand a word of, so which mouth a line came out of is
+   the one thing she must never have to guess. */
+.speech .who{font-size:13px;font-weight:700;color:var(--pink);
+  letter-spacing:.02em;margin:0 0 3px}
+/* The noise she can turn over, and it says so: pink.  It used to look exactly
+   like the rest of the line, on the grounds that a word which advertises itself
+   is a hint - but there is nothing to give away here, she cannot read any of it,
+   and a line that can be turned over and never says so is a button nobody
+   presses.  The pink is the whole mark: a dotted line under it as well was too
+   much, and it is her line to draw.
+   This comment was closed twice, and the stray half-sentence left standing
+   between the two ends read to the parser as a broken selector - which swallows
+   the rule underneath it as part of the wreckage.  That is why the noise turned
+   pink only once she had tapped it: the rule that paints it BEFORE the tap is
+   this one, and it never survived parsing. */
+.line .noise{cursor:pointer;color:var(--pink)}
+/* Turned over, the real words stand in the same pink. */
+.line.open .noise{color:var(--pink)}
+/* The test at the end of a scene, on the same plate the talking happened on:
+   it is the last beat of the conversation, not a screen of its own. */
+.quiz-q{margin:0 0 9px}
+.quiz{display:flex;flex-direction:column;gap:7px;margin:0 0 8px}
+.quiz-a{padding:10px 12px;border-radius:14px;border:1px solid var(--line);
+  background:var(--card);font-size:17px;font-weight:600;text-align:center}
+.quiz-a:active{background:var(--warm)}
+.quiz-a.right{border-color:var(--good);color:var(--good);font-weight:700}
+.quiz-a.wrong{border-color:var(--again);color:var(--again)}
+.quiz-a.dim{opacity:.45}
+/* "I don't know" is on every question and is never the answer, so it is drawn
+   as the way out rather than as a fourth guess: no card behind it, quieter
+   type.  A test with three guesses and no way to say "no idea" cannot tell
+   knowing from luck, which is the one thing it is for. */
+.quiz-a.idk{background:none;border-style:dashed;color:var(--dim);font-weight:600;font-size:15px}
+/* The hard end of the test: a whole sentence with one word taken out of it.
+   It is the thing being read, so it is given the size of a thing being read
+   rather than the size of a label. */
+.cloze{display:block;margin-top:7px;font-size:17px;line-height:1.55}
+.speech .on{font-size:12px;color:var(--dim)}
+/* The four levels on the plate over the island, once the test is behind her.
+   Her painted pills, the same ones Settings holds. Two by two rather than a
+   wrapping row: four of them are wider than the card, and a row that wraps
+   leaves "Most of it" standing alone on the last line, which reads as
+   something gone wrong rather than as the fourth of four. */
+.over .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0 9px;overflow:visible}
+/* Out of the test altogether, next to the counter that says how far in she is.
+   Small and dashed on purpose: it is a way past the test, not a fifth answer. */
+.speech .skip{margin-left:9px;padding:2px 8px;border:1px dashed var(--line);border-radius:9px;
+  background:none;color:var(--dim);font-size:11px;font-weight:600}
+.speech .skip:active{background:var(--warm)}
+.speech .end{color:var(--dim);text-align:center}
+
+/* What a -word- on its own does.  Two of them so far, and both are over in
+   under a second: a screen that shakes for longer reads as a fault. */
+/* Shock is the camera flinching once, hard and short - what a person does when
+   the ground goes out from under them.  Shake is the longer rattle. */
+@keyframes fx-shock{0%{translate:0 0}25%{translate:0 -7px}55%{translate:3px 4px}100%{translate:0 0}}
+main.fx-shock{animation:fx-shock .4s}
+@keyframes fx-shake{10%,90%{translate:-2px 0}30%,70%{translate:4px 0}50%{translate:-6px 0}}
+main.fx-shake{animation:fx-shake .5s}
+/* Being frightened is not being hit: a fine tremble that goes on a little, not
+   one hard knock.  Small on purpose - at shake's amplitude it reads as another
+   blow rather than as somebody shaking. */
+@keyframes fx-scared{0%,100%{translate:0 0}
+  12%{translate:-1px 1px}25%{translate:1px -1px}37%{translate:-1px -1px}
+  50%{translate:1px 1px}62%{translate:-1px 0}75%{translate:1px 1px}87%{translate:-1px 1px}}
+main.fx-scared{animation:fx-scared .7s}
+@keyframes fx-dark{0%,100%{opacity:0}40%,60%{opacity:.85}}
+/* Over the whole window, the bar and the header included - it is the world
+   going dark, not one panel of it - and never in the way of a tap. */
+main.fx-dark::after{content:"";position:fixed;inset:0;z-index:5;pointer-events:none;
+  background:#06101f;animation:fx-dark .9s}

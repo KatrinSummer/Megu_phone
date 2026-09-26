@@ -57,8 +57,16 @@ export function ic(name, size = '') {
   const night = document.documentElement.dataset.theme === 'dark';
   const own = OWN[name];
   if (own) {
+    // The path is written as a real property rather than handed to the
+    // stylesheet through a custom property.  A url() that reaches a rule
+    // through var() is resolved against the STYLESHEET that uses it, not
+    // against the page: once the styles moved into css/, every one of these
+    // became css/img/... and her gear, her books and her jungle stopped being
+    // drawn, while the files themselves were served perfectly well.  An inline
+    // declaration is resolved against the page, which is what this path is
+    // written relative to.
     return `<i class="ic own" aria-hidden="true"
-      style="--own:url(${own})${size ? `;--s:${size}` : ''}"></i>`;
+      style="background-image:url(${own})${size ? `;--s:${size}` : ''}"></i>`;
   }
   const board = bat.get(name);
   if (board) {
