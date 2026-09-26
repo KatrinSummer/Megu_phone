@@ -1,10 +1,15 @@
 // The test at the end of a scene: how much of their language does she have?
 //
-// Ten questions, and they get harder as they go - three she should manage, three
-// that ask the same thing backwards, three where she has to hold a whole
-// sentence, and a last one that is meant to be beyond her.  Every question is
-// Megu trying to speak or trying to follow, because that is what is happening
-// to her; none of it is a vocabulary drill with a costume on.
+// Ten questions in the order the conversation went.  He has just been talking
+// at her, so the first three only ask what he said; then she tries to say
+// something back; then a whole sentence has to hold together; and the last one
+// is meant to be beyond her.  Every question is Megu trying to speak or trying
+// to follow, because that is what is happening to her; none of it is a
+// vocabulary drill with a costume on.
+//
+// Every question ends with "I don't know", and it counts as wrong.  Three
+// guesses and no way to say "no idea" cannot tell knowing from luck, and saying
+// how much she actually has is this test's whole job.
 //
 // It asks about the words that were actually spoken in the scene first, then
 // fills up from the deck - a scene says three words and the test is ten long.
@@ -27,20 +32,24 @@ function decoys(card, n, key) {
   return shuffle([...(near.length >= n ? near : others)]).slice(0, n);
 }
 
-const answers = (card, n, key) =>
-  shuffle([card, ...decoys(card, n, key)]).map((c) => c[key]);
+/** Three to choose from and a fourth that is not a choice at all. */
+const REAL = 2;                           // decoys; with the right answer, three
+const IDK = "I don't know";
 
-/** She has something to say and has to find it. */
-const toSay = (c) => ({
-  q: `You want to say <b>${esc(c.e)}</b>. How does it go?`,
-  opts: answers(c, 2, 'f'), right: c.f,
-});
+const answers = (card, key) =>
+  shuffle([card, ...decoys(card, REAL, key)]).map((c) => c[key]);
 
-/** The other way round, which is the harder one: she is not choosing what to
- *  say, she is catching what was said to her. */
+/** The easy end: he is the one talking, and all she has to do is catch it. */
 const toHear = (c) => ({
   q: `He said <b>${esc(c.f)}</b>. What was that?`,
-  opts: answers(c, 3, 'e'), right: c.e,
+  opts: answers(c, 'e'), right: c.e,
+});
+
+/** Harder, because now it is her turn: she has something to say and has to
+ *  find it, with nobody having said it first. */
+const toSay = (c) => ({
+  q: `You want to say <b>${esc(c.e)}</b>. How does it go?`,
+  opts: answers(c, 'f'), right: c.f,
 });
 
 /** A whole sentence with the word taken out of it.  Her own example sentences,
@@ -50,7 +59,7 @@ const toHear = (c) => ({
 const WORD = 8;                           // kana; past this it is a phrase, not a word
 const isWord = (c) => [...c.f].length <= WORD;
 
-function toSpeak(c, n) {
+function toSpeak(c) {
   // A word missing out of a sentence, not a sentence missing out of a sentence.
   // A fair share of the deck is whole phrases, and one of those in the hole
   // turns the question into five unrelated sentences to choose between - which
@@ -61,7 +70,7 @@ function toSpeak(c, n) {
   const hole = ex.k.split(' ').map((w) => (w === c.f ? '＿＿＿' : w)).join(' ');
   return {
     q: `You are trying to say this. One word is missing:<br><span class="cloze">${esc(hole)}</span>`,
-    opts: answers(c, n, 'f'), right: c.f,
+    opts: answers(c, 'f'), right: c.f,
   };
 }
 
@@ -77,13 +86,13 @@ function build(words) {
   const next = () => pool[at++];
   const add = (make) => { const c = next(); if (c) { const q = make(c); if (q) qs.push(q); } };
 
-  for (let i = 0; i < 3; i++) add(toSay);
   for (let i = 0; i < 3; i++) add(toHear);
+  for (let i = 0; i < 3; i++) add(toSay);
   // Three with a sentence in them, and one last one that is meant to be beyond
-  // her: five answers instead of four, and the longest sentence the pool has.
+  // her: the longest sentence the pool has.
   for (let i = 0; i < 3 && at < pool.length; i++) {
     const before = qs.length;
-    while (qs.length === before && at < pool.length) add((c) => toSpeak(c, 3));
+    while (qs.length === before && at < pool.length) add(toSpeak);
   }
   // The longest sentence left - but only among cards a hole can be cut in, and
   // walking down the list rather than betting the last question on the very
@@ -94,7 +103,7 @@ function build(words) {
     .map((c) => [c, (c.x ?? []).reduce((n, x) =>
       Math.max(n, x.k?.split(' ').includes(c.f) ? x.k.length : 0), 0)])
     .filter(([, n]) => n).sort((a, b) => b[1] - a[1]);
-  for (const [c] of longest) { const q = toSpeak(c, 4); if (q) { qs.push(q); break; } }
+  for (const [c] of longest) { const q = toSpeak(c); if (q) { qs.push(q); break; } }
   return qs;
 }
 
@@ -115,11 +124,20 @@ export function startQuiz(box, name, words, done) {
     const q = qs[at];
     box.innerHTML = `<p class="who">A test</p>
       <p class="quiz-q">${q.q}</p>
-      <div class="quiz">${q.opts.map((o) => {
+      <div class="quiz">${[...q.opts, IDK].map((o) => {
         const state = !pick ? '' : o === q.right ? ' right' : o === pick ? ' wrong' : ' dim';
-        return `<button class="quiz-a${state}">${esc(o)}</button>`;
+        return `<button class="quiz-a${o === IDK ? ' idk' : ''}${state}">${esc(o)}</button>`;
       }).join('')}</div>
-      <p class="on">${pick ? 'tap to go on' : `${at + 1} of ${qs.length}`}</p>`;
+      <p class="on">${pick ? 'tap to go on' : `${at + 1} of ${qs.length}`}
+        <button class="skip">Skip the test</button></p>`;
+    // Out of the whole thing, not just this question.  Nobody should be held on
+    // a screen answering ten times to get on with the story - and a test she
+    // did not sit says nothing about her, so it is scored as nothing and the
+    // level that comes out is the lowest one, hers to raise in Settings.
+    box.querySelector('.skip').addEventListener('click', (e) => {
+      e.stopPropagation();
+      finish(0, qs.length);
+    });
     for (const b of box.querySelectorAll('.quiz-a')) {
       b.addEventListener('click', (e) => {
         e.stopPropagation();                  // the screen is a way on; this is not
@@ -134,21 +152,28 @@ export function startQuiz(box, name, words, done) {
     if (pick) box.addEventListener('click', next, { once: true });
   };
 
+  // Written down where the story can read it later: which scene, how it went,
+  // and what it makes of her.  The level is hers to change afterwards.  Both
+  // ways out of the test land here - answered to the end, or skipped at the
+  // first question - because a skipped test is a score of nothing, not a
+  // different kind of ending.
+  function finish(got, of) {
+    (settings.scenes ??= {})[name] = { right: got, of };
+    saveSettings();
+    const id = levelOf(got, of);
+    setLevel(id);
+    box.innerHTML = `<p class="who">A test</p>
+      <p class="quiz-q"><b>${got} of ${of}</b></p>
+      <p>${esc(levelName(id))}.</p>
+      <p class="on">You can change this in Settings · tap to go on</p>`;
+    box.addEventListener('click', done, { once: true });
+  }
+
   const next = () => {
     at++;
     pick = null;
     if (at < qs.length) return draw();
-    // Written down where the story can read it later: which scene, how it went,
-    // and what it makes of her.  The level is hers to change afterwards.
-    (settings.scenes ??= {})[name] = { right, of: qs.length };
-    saveSettings();
-    const id = levelOf(right, qs.length);
-    setLevel(id);
-    box.innerHTML = `<p class="who">A test</p>
-      <p class="quiz-q"><b>${right} of ${qs.length}</b></p>
-      <p>${esc(levelName(id))}.</p>
-      <p class="on">You can change this in Settings · tap to go on</p>`;
-    box.addEventListener('click', done, { once: true });
+    finish(right, qs.length);
   };
 
   draw();

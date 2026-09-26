@@ -455,10 +455,17 @@ main.dash.talking .top .story{display:none}
 /* The island has something for her: a "!" down at her feet, where she drew it.
    It nods, because a mark that never moves is scenery - and it is gone while
    the story is running, like everything else in this row. */
+/* The quest mark is a button, so it is painted with the picture every other
+   button in the app is painted with - her pink capsule - and not with a shape
+   CSS invented. Square with rounded corners, which takes a narrower slice than
+   a pill does: her cap is half a pill's height, and at that width on a square
+   box the two caps meet in the middle and it comes out a circle. */
 main.dash .top .quest{position:absolute;left:8px;bottom:9%;z-index:4;
-  width:36px;height:36px;padding:0;border-radius:50%;display:grid;place-items:center;
-  font-size:20px;font-weight:800;line-height:1;color:#fff;background:var(--pink);
-  border:2px solid #fff;box-shadow:0 4px 10px #0b142c55;animation:nod 1.7s ease-in-out infinite}
+  width:38px;height:38px;padding:0;display:grid;place-items:center;
+  font-size:20px;font-weight:800;line-height:1;color:#fff;
+  border:0 solid transparent;background:none;
+  border-image:url(img/chip-on.webp) 0 36 fill / 0 12px / 0 stretch;
+  filter:drop-shadow(0 4px 9px #0b142c77);animation:nod 1.7s ease-in-out infinite}
 @keyframes nod{0%,100%{translate:0 0}50%{translate:0 -3px}}
 main.dash.talking .top .quest{display:none}
 /* A note laid over the island rather than a screen of its own: she asked for
@@ -541,11 +548,21 @@ main.dash.talking>.talk{display:flex;margin-top:auto;position:relative;z-index:2
 .quiz-a.right{border-color:var(--good);color:var(--good);font-weight:700}
 .quiz-a.wrong{border-color:var(--again);color:var(--again)}
 .quiz-a.dim{opacity:.45}
+/* "I don't know" is on every question and is never the answer, so it is drawn
+   as the way out rather than as a fourth guess: no card behind it, quieter
+   type.  A test with three guesses and no way to say "no idea" cannot tell
+   knowing from luck, which is the one thing it is for. */
+.quiz-a.idk{background:none;border-style:dashed;color:var(--dim);font-weight:600;font-size:15px}
 /* The hard end of the test: a whole sentence with one word taken out of it.
    It is the thing being read, so it is given the size of a thing being read
    rather than the size of a label. */
 .cloze{display:block;margin-top:7px;font-size:17px;line-height:1.55}
 .speech .on{font-size:12px;color:var(--dim)}
+/* Out of the test altogether, next to the counter that says how far in she is.
+   Small and dashed on purpose: it is a way past the test, not a fifth answer. */
+.speech .skip{margin-left:9px;padding:2px 8px;border:1px dashed var(--line);border-radius:9px;
+  background:none;color:var(--dim);font-size:11px;font-weight:600}
+.speech .skip:active{background:var(--warm)}
 .speech .end{color:var(--dim);text-align:center}
 
 /* What a -word- on its own does.  Two of them so far, and both are over in
