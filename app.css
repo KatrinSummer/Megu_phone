@@ -392,6 +392,16 @@ main.dash.talking .char{width:100%;max-width:none;height:100%;overflow:visible;
    edge of the screen and draws no line down her. */
 main.dash.talking .char img{display:block;flex:none;width:auto;height:120vh;
   max-width:none;max-height:none;margin-left:0}
+/* Taro alone, and by eye rather than by arithmetic.  He is not framed in his own
+   file the way she is in hers: he is drawn holding a staff out to his left, so
+   centring the PICTURE puts the man right of centre and runs the staff off the
+   edge of the screen, with the sea left empty on his other side.  Rendered at 0,
+   4, 8 and 12 percent against a red line down the middle of the screen, 8 is the
+   one where the whole staff is on screen, his beard stands on the line and the
+   hut in the background stops sitting inside the curl of the staff.
+   Five attempts to find this number by measuring the drawing gave five different
+   answers and each made it worse; this one was looked at. */
+main.dash.talking .char img[data-who="TARO"]{translate:8% 0}
 /* And no shadow on the stage.  A hard shadow behind a big figure draws a line
    round it, which is the other half of "why do they stand out". */
 main.dash.talking .char img{filter:none}
@@ -410,7 +420,7 @@ main.dash.talking .char img{filter:none}
    while she only occupies what is left of it after the ring's 175px, so
    left:50% put the button out over the sea with its edge on the number.  The
    same expression as her box above, halved. */
-/* Smaller than it was, and orange rather than pink: she asked for both.  The
+/* Smaller than it was, and yellow rather than pink: she asked for both.  The
    picture it is painted with is her pink one, so the colour is turned rather
    than repainted - the white of the label has no hue to turn and stays white.
    Its border slices shrink with it, or the label walks onto the play mark that
@@ -419,7 +429,12 @@ main.dash .top .story{position:absolute;left:calc(min(72%, 100% - 175px) / 2);
   translate:-50% 0;bottom:26%;z-index:3;
   width:min(48%,170px);height:42px;padding:0 10px 0 50px;
   border-image-width:14px 19px 14px 50px;
-  filter:hue-rotate(50deg) saturate(.82) brightness(1.12)}
+/* Yellow is not the next number along from orange.  Her button is painted a
+   dark saturated pink, and turning that hue alone lands in olive - it has to be
+   lightened by the same hand.  Six candidates rendered and looked at: the two
+   that forced a single hue (sepia) turned the white label and the white play
+   triangle yellow as well, which is the readable part of the button gone. */
+  filter:hue-rotate(72deg) saturate(1.25) brightness(1.55)}
 .story .t{font-size:12px}
 main.dash.talking .top .story{display:none}
 
@@ -465,14 +480,17 @@ main.dash.talking>.talk{display:flex;margin-top:auto;position:relative;z-index:2
    the one thing she must never have to guess. */
 .speech .who{font-size:13px;font-weight:700;color:var(--pink);
   letter-spacing:.02em;margin:0 0 3px}
-/* The noise she can turn over, and it says so: pink, with a dotted line under
-   it, the same way one of her own words is marked inside an example sentence.
-   It used to look exactly like the rest of the line, on the grounds that a word
-   which advertises itself is a hint - but there is nothing to give away here,
-   she cannot read any of it, and a line that can be turned over and never says
-   so is a button nobody presses. */
-   The pink is the whole mark: a dotted line under it as well was too much, and
-   it is her line to draw. */
+/* The noise she can turn over, and it says so: pink.  It used to look exactly
+   like the rest of the line, on the grounds that a word which advertises itself
+   is a hint - but there is nothing to give away here, she cannot read any of it,
+   and a line that can be turned over and never says so is a button nobody
+   presses.  The pink is the whole mark: a dotted line under it as well was too
+   much, and it is her line to draw.
+   This comment was closed twice, and the stray half-sentence left standing
+   between the two ends read to the parser as a broken selector - which swallows
+   the rule underneath it as part of the wreckage.  That is why the noise turned
+   pink only once she had tapped it: the rule that paints it BEFORE the tap is
+   this one, and it never survived parsing. */
 .line .noise{cursor:pointer;color:var(--pink)}
 /* Turned over, the real words stand in the same pink. */
 .line.open .noise{color:var(--pink)}
@@ -764,6 +782,21 @@ main.fx-dark::after{content:"";position:fixed;inset:0;z-index:5;pointer-events:n
 .wd .un svg{width:19px;height:19px;display:block;fill:none;stroke:currentColor;
   stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .wd .un:active{background:var(--warm)}
+/* The switch on the word's own row, on the two boards that exist to set one
+   thing each: the level on Priorities, learned-or-still-going on Learned.  It
+   runs the full width UNDER the word rather than beside it - three words of
+   English in the right-hand cell squeeze the Japanese into an ellipsis, and the
+   Japanese is the word. */
+.wd .rowset{grid-column:1/-1;display:flex;gap:5px;margin-top:6px}
+.wd .rowset .p{padding:4px 10px;border-radius:999px;border:1px solid var(--line);
+  font-size:11px;font-weight:600;color:var(--dim);background:var(--card)}
+.wd .rowset .p.on{color:#fff;background:var(--pink);border-color:transparent;font-weight:700}
+.wd .rowset .p:active{background:var(--warm)}
+.wd .rowset .p.on:active{background:var(--pink)}
+/* On Learned the switch underneath says everything the tick above used to, so
+   the tick is gone there - and the cell it stood in paints a plate of its own,
+   which would otherwise be left standing empty beside every learned word. */
+.wd .st:empty{display:none}
 
 /* The two bars and the round number, over the top of whatever screen she is on. */
 .stats{display:flex;align-items:center;gap:10px;padding:9px 14px;

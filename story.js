@@ -93,20 +93,26 @@ const named = (who) => (UNMET.has(who.toUpperCase()) ? '???'
 // is talking - a story that keeps showing her while somebody else speaks is
 // telling the wrong thing.  A name with no picture leaves whoever is there.
 const FACES = { MEGU: 'img/char.webp', TARO: 'img/taro.webp' };
-// Nobody is nudged sideways any more.  Five different ways of measuring "where
-// the person is" pointed five different ways on the same drawing - the middle
-// of the picture, the middle of each row (which is the middle of "staff ...
-// hair"), the widest run (the robe), a band of rows over the top (the staff and
-// a mass of hair) and skin colour (his staff is brown, so the wood counted as
-// skin) - and each nudge built on one of them moved him further off than he
-// started.  Rendered at the size the stage uses, with a line down the middle of
-// the screen to judge against, the drawings stand centred on their own.  If one
-// ever does need moving, move it against that line and not against a number.
-
+// Nobody is nudged by a MEASUREMENT any more.  Five different ways of measuring
+// "where the person is" pointed five different ways on the same drawing - the
+// middle of the picture, the middle of each row (which is the middle of "staff
+// ... hair"), the widest run (the robe), a band of rows over the top (the staff
+// and a mass of hair) and skin colour (his staff is brown, so the wood counted
+// as skin) - and each nudge built on one of them moved him further off than he
+// started.  The instrument is the drawing rendered at the size the stage
+// actually uses, with a red line down the middle of the screen to judge it
+// against, and the eye.
+// Judged that way, Megu stands centred on her own and Taro does not: his staff
+// runs off the left edge of the screen and leaves the sea empty on the right.
+// So the stylesheet moves him, and it knows which of them is standing there
+// because of the line below.
 function show(who) {
-  const face = FACES[who?.toUpperCase()];
+  const name = who?.toUpperCase();
+  const face = FACES[name];
   const img = $('d-char')?.querySelector('img');
-  if (face && img && !img.src.endsWith(face)) img.src = face;
+  if (!face || !img) return;
+  if (!img.src.endsWith(face)) img.src = face;
+  img.dataset.who = name;
 }
 
 let beats = [], at = 0, running = false, scene = '';

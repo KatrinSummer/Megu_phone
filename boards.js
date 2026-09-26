@@ -23,12 +23,14 @@ export const boardCards = (id) => id === 'star' ? deck.cards.filter((c) => progr
   // A copy, not the deck itself: a caller that sorted what it was handed would
   // otherwise scramble the order of the whole library.
   : id === 'pri' ? [...deck.cards]
-  // Everything she has learned, however she learned it: the ones she ticked off
-  // herself AND the ones the schedule parked as memorized.  Home counts both
-  // under "learned", so a board that held only the ticked ones said 0 words
+  // Everything she has touched, learned and learning alike, because she asked
+  // for both under one heading with tabs between them.  Learned is the ones she
+  // ticked off herself AND the ones the schedule parked as memorized: Home counts
+  // both under "learned", so a board that held only the ticked ones said 0 words
   // while the tile beside it said 2 - the same two words, in two places, with
   // two different answers.
-  : id === 'known' ? deck.cards.filter((c) => progress[c.f]?.known || isMemorized(c))
+  : id === 'known' ? deck.cards.filter((c) =>
+      progress[c.f]?.known || isMemorized(c) || started(progress[c.f]))
   : id === 'hidden' ? deck.cards.filter((c) => progress[c.f]?.hide)
   // Review: every word she has started, from every deck.
   : id === 'learning' ? deck.cards.filter((c) => started(progress[c.f]))
@@ -41,6 +43,13 @@ export const isOut = (c) => !!(progress[c.f]?.known || progress[c.f]?.hide);
 /** The Known and Hidden boards are the way back, not a lesson: the box of a
  *  word on their page puts it back into rotation. */
 export const isOutBoard = (id) => id === 'known' || id === 'hidden';
+
+/** Boards that deal no lesson. The two above, and Priorities - which is where a
+ *  level is SET, not a pile to drill. A lesson button and a shelf of lesson
+ *  settings on a board that never deals one is a control answering a question
+ *  nobody asked: she found "Mixed" sitting at the top of Priorities and asked
+ *  what on earth it was for. Nothing, is the honest answer. */
+export const noLesson = (id) => isOutBoard(id) || id === 'pri';
 
 // What she will actually be shown.
 export const poolOf = (id) => isOutBoard(id) ? boardCards(id)

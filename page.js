@@ -3,16 +3,19 @@
 // ones - and every word on it.
 import { $, esc } from './dom.js';
 import { progress, settings, saveSettings, today } from './store.js';
-import { deck, boardCards, learnable, reviewable, isDue, isOutBoard, flipMark, putBack } from './boards.js';
+import { deck, boardCards, learnable, reviewable, isDue, isOutBoard, noLesson,
+         flipMark, putBack } from './boards.js';
 import { stats, leave, begin } from './screens.js';
 import { openWord, stateOf } from './word.js';
+import { isMemorized } from './schedule.js';
+import { priRow, learnRow, bindRowset } from './rowset.js';
 import { ic, COG } from './icons.js';
 import { boardIcon, canPick, artRow, bindArt } from './boardart.js';
 import { boardSetRow, bindBoardSet, boardModeName } from './boardset.js';
 import { markTab } from './nav.js';
 
 const NAMES = { learning: 'Review', star: 'Bookmarks', pri: 'Priorities',
-                known: 'Marked as known', hidden: 'Hidden' };
+                known: 'Learned', hidden: 'Hidden' };
 export const boardName = (id) => NAMES[id] ?? deck.decks.find((d) => d.id === id)?.name ?? id;
 
 /** The filter a word falls under: hidden, know (memorized or ticked), learn, new. */
@@ -20,9 +23,21 @@ const kindOf = (c) => (progress[c.f]?.hide ? 'hidden' : stateOf(c));
 const KINDS = [['all', 'All'], ['new', 'New'], ['learn', 'Learning'], ['know', 'Memorized'], ['hidden', 'Hidden']];
 
 /** On Priorities the question is not how far along a word is but how often she
- *  wants it, so that board filters by the level itself. */
+ *  wants it, so that board filters by the level itself.  Low to High, in that
+ *  order: the row reads as a scale, and it was running backwards. */
 const priOf = (c) => ({ 1: 'high', '-1': 'low' })[progress[c.f]?.pri] ?? 'normal';
-const PRIS = [['all', 'All'], ['high', 'High'], ['normal', 'Normal'], ['low', 'Low']];
+const PRIS = [['all', 'All'], ['low', 'Low'], ['normal', 'Normal'], ['high', 'High']];
+
+/** Learned holds everything she has touched, so its tabs split it the one way
+ *  that matters there: done with, or still going. */
+const learnOf = (c) => (progress[c.f]?.known || isMemorized(c) ? 'learned' : 'learning');
+const LEARNS = [['learned', 'Learned'], ['learning', 'Learning'], ['all', 'All']];
+
+/** What a board that deals no lesson is for, said once where its button would
+ *  otherwise have stood. */
+const NOTE = { hidden: 'Tap a word to put it back into the round.',
+               known: 'Learned, or still going: set it on the word itself.',
+               pri: 'How often a word comes round: set it on the word itself.' };
 
 /** The way back into the round, on the word's own row: the crossed eye on one
  *  she hid, the tick on one she ticked off.  It stands where the word "hidden"
@@ -33,13 +48,15 @@ const undo = (k, svg) => `<span class="un" data-k="${k}" role="button" tabindex=
   aria-label="Put it back into the round">${svg}</span>`;
 
 /** The right-hand side of a word's row. */
-function when(c, kind) {
+function when(c, kind, board) {
   const p = progress[c.f] ?? {};
   if (p.hide) return undo('hide', EYE);
   // Every word she has learned wears the same tick, whether she ticked it off
   // herself or the schedule parked it: two rows of one board carrying two
   // different marks for the same thing is the board contradicting itself.
-  if (kind === 'know') return undo('known', TICK);
+  // Except on Learned, where the row now carries the Learned/Learning switch
+  // underneath and a tick above it is the same press offered twice.
+  if (kind === 'know') return board === 'known' ? '' : undo('known', TICK);
   if (kind !== 'learn') return { new: 'new' }[kind];
   const d = p.due - today();
   return d <= 0 ? 'due' : d === 1 ? 'tomorrow' : `in ${d} d`;
@@ -72,18 +89,19 @@ export function openBoard(id, where = from) {
   const cards = boardCards(id), kinds = cards.map(kindOf), n = settings.perDay;
   const learn = learnable(id).length, rev = reviewable(id), due = rev.filter(isDue).length;
   // What the row SAYS about a word is always how far along it is; what the chips
-  // divide it by is the board's own question - the level, on Priorities.
-  const byPri = id === 'pri';
-  const tags = byPri ? cards.map(priOf) : kinds;
-  // Known and Hidden get no filter row at all: every word on either is there for
-  // the one same reason, so the chips could only ever read "All 8 · Hidden 8" -
-  // two buttons for one pile.
-  const chips = isOutBoard(id) ? []
-    : byPri ? PRIS : KINDS.filter(([k]) => k === 'all' || tags.filter((x) => x === k).length);
+  // divide it by is the board's own question - the level on Priorities, done-or-
+  // still-going on Learned.
+  const byPri = id === 'pri', byLearn = id === 'known';
+  const tags = byPri ? cards.map(priOf) : byLearn ? cards.map(learnOf) : kinds;
+  // Hidden gets no filter row at all: every word on it is there for the one same
+  // reason, so the chips could only ever read "All 8 · Hidden 8" - two buttons
+  // for one pile.
+  const chips = byPri ? PRIS : byLearn ? LEARNS : isOutBoard(id) ? []
+    : KINDS.filter(([k]) => k === 'all' || tags.filter((x) => x === k).length);
   const count = (k) => (k === 'all' ? cards.length : tags.filter((x) => x === k).length);
-  // Known and Hidden are where a word sits out; no lesson is dealt from either,
-  // so there is nothing for lesson settings to set and no bars to offer them.
-  const set = !isOutBoard(id);
+  // No lesson is dealt from Hidden, from Learned or from Priorities, so there is
+  // nothing for lesson settings to set and no bars to offer them.
+  const set = !noLesson(id);
   // The board's row goes up into the header, above the two bars, where she put
   // it: its picture, its name, how many words it holds, and the way into its
   // settings.  It was the first row of the page, under the bars, and the page
@@ -96,7 +114,7 @@ export function openBoard(id, where = from) {
   $('counts').title = boardName(id);
   // One button, and it says which of the three lessons it starts - the choice
   // lives on the shelf under the board's name, not in a second button here.
-  const go = isOutBoard(id) ? '<div class="note">Tap a word to put it back into the round.</div>'
+  const go = noLesson(id) ? `<div class="note">${NOTE[id]}</div>`
     : (rev.length || learn) ? `
     <button class="wide" id="go-lesson">${ic('learning')} <span id="go-what">${boardModeName(id)}</span>${
       settings.rand ? '' : ` ${n}`}
@@ -113,11 +131,14 @@ export function openBoard(id, where = from) {
     <div class="words">${cards.map((c, i) => filter !== 'all' && tags[i] !== filter ? '' :
       `<button class="wd ${kinds[i]}" data-f="${esc(c.f)}">
         <span class="jp"><b>${esc(c.f)}</b>${c.k ? ` <span class="k">${esc(c.k)}</span>` : ''}</span>
-        <span class="st">${when(c, kinds[i])}</span><span class="e">${esc(c.e)}</span>${
-        // On Known and Hidden the words come from every board at once, so the
+        <span class="st">${when(c, kinds[i], id)}</span><span class="e">${esc(c.e)}</span>${
+        // On Learned and Hidden the words come from every board at once, so the
         // row has to say which one it will go back to.  On a board's own page
         // that would be the board's name printed against every word on it.
-        isOutBoard(id) ? `<span class="from">${esc(boardName(c.d))}</span>` : ''}</button>`).join('')}</div>`;
+        isOutBoard(id) ? `<span class="from">${esc(boardName(c.d))}</span>` : ''}${
+        // The one thing the board is for, on the word's own row: she asked to
+        // set it where she can see it, not through a box she has to open first.
+        byPri ? priRow(c.f) : byLearn ? learnRow(c.f, tags[i]) : ''}</button>`).join('')}</div>`;
 
   // The board's own kind decides what the lesson holds, so the button only has
   // to say "a lesson on this board" - buildQueue reads the rest.
@@ -167,4 +188,7 @@ export function openBoard(id, where = from) {
       openWord(b, again);
     });
   }
+  // The switches on the rows themselves, bound last: they sit inside those rows
+  // and have to stop the tap before it reaches the row and opens the word.
+  bindRowset(again);
 }
