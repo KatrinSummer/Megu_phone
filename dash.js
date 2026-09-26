@@ -17,6 +17,12 @@ import { countRow, bindCount } from './perday.js';
 import { markTab } from './nav.js';
 import { talkPanel, startStory } from './talk.js';
 import { advance } from './story.js';
+import { questMark, bindQuest, noteAfterStory } from './quest.js';
+
+/** The scene is over.  She lands back on the island - which is this screen -
+ *  with her note laid over it.  The story does not know about Home and should
+ *  not: it is handed this on the way in. */
+const backFromStory = () => { dash(); noteAfterStory(); };
 
 /** The board the big button starts.  Her last one while it still has new words
  *  in it, otherwise the newest lesson, which is the one she is usually after. */
@@ -56,6 +62,7 @@ export function dash() {
           <span class="l">words</span>${done ? `<span class="l today">${done} today</span>` : ''}</div>`)}
       </div>
       <button class="big story" id="d-story"><span class="t">Start Adventure</span></button>
+      ${questMark()}
     </div>
     ${talkPanel()}
     <div class="duo">
@@ -102,13 +109,15 @@ export function dash() {
   $('d-char').addEventListener('click', (e) => {
     if ($('main').classList.contains('talking')) return;
     e.stopPropagation();
-    startStory();
+    startStory(backFromStory);
   });
+  // The "!" at her feet: what the island has for her now the first scene is done.
+  bindQuest();
   // The same door with a handle on it: she wanted the way in written down, not
   // only guessable from the drawing.
   $('d-story').addEventListener('click', (e) => {
     e.stopPropagation();
-    startStory();
+    startStory(backFromStory);
   });
   // In the story a tap anywhere is the next line - her, the sand, the plate:
   // a game is read by tapping the screen, not by finding the box.  The tap that

@@ -6,6 +6,7 @@ import { settings, saveSettings, applyTheme } from './store.js';
 import { deck, buildQueue } from './boards.js';
 import { saveFile, loadFile } from './backup.js';
 import { ic } from './icons.js';
+import { LEVELS, level, setLevel } from './level.js';
 import { leave, render } from './screens.js';
 import { markTab, buildNav } from './nav.js';
 import { dash } from './dash.js';
@@ -33,6 +34,14 @@ export function settingsPage() {
       <div class="set">${ic('pronunciation')}<span class="n">Say the word on its own</span>
         <button class="sw${settings.autoPlay ? ' on' : ''}" id="auto"
           role="switch" aria-checked="${!!settings.autoPlay}" aria-label="Say the word on its own"></button></div>
+    </div>
+
+    <div class="grp">Her Japanese</div>
+    <div class="pane">
+      <div class="set">${ic('learning')}<span class="n">How much she understands</span>
+        <div class="chips lv">${LEVELS.map(([k, n]) =>
+          `<button class="${k === level() ? 'on' : ''}" data-l="${k}">${n}</button>`).join('')}</div>
+      </div>
     </div>
 
     <div class="grp">Look</div>
@@ -69,6 +78,12 @@ export function settingsPage() {
     buildNav();                           // the bar wears a day icon she drew for it
     settingsPage();                       // her icons and her island change with it
   });
+  // The test sets this; she overrules it.  Her number for "new words at a time"
+  // is read before the screen is drawn again, or typing one and then touching a
+  // level would throw it away.
+  for (const b of document.querySelectorAll('.lv button')) {
+    b.addEventListener('click', () => { keepPerDay(); setLevel(b.dataset.l); settingsPage(); });
+  }
   $('auto').addEventListener('click', () => {
     settings.autoPlay = !settings.autoPlay;
     saveSettings();

@@ -11,4 +11,5 @@
  "statsview.js", "calendar.js", "settings.js", "jungle.js", "pick.js", "perday.js",
  "boardart.js", "boardset.js",
  "word.js", "priority.js", "rowset.js", "swipe.js", "backup.js", "talk.js", "story.js", "quiz.js",
+ "level.js", "quest.js",
  "story/01-beach.txt"]

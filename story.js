@@ -115,7 +115,7 @@ function show(who) {
   img.dataset.who = name;
 }
 
-let beats = [], at = 0, running = false, scene = '';
+let beats = [], at = 0, running = false, scene = '', ends = null;
 
 let back;                               // the timer that puts the noise back
 
@@ -153,8 +153,13 @@ function step() {
     // The test comes before the curtain, where she put it: she has just been
     // spoken to in a language she is learning, and this asks what she caught of
     // it.  It runs the plate itself until it is done, then hands it back.
+    // And what happens after it is not this file's business: the scene ends,
+    // and whoever opened it decides where she lands.  It used to print "to be
+    // continued" and leave her standing on the sand with no way on but the
+    // arrow.
     return startQuiz(box, scene, [...said], () => {
       box.innerHTML = '<p class="end">— to be continued —</p>';
+      ends?.();
     });
   }
   const b = beats[at++];
@@ -165,9 +170,10 @@ function step() {
     <p class="line">${jp ? heard(b.text) : esc(b.text)}</p><p class="on">tap to go on</p>`;
 }
 
-export async function startScene(name) {
+export async function startScene(name, onEnd) {
   const box = $('d-say');
   box.hidden = false;
+  ends = onEnd;
   try {
     beats = parseScene(await (await fetch(`story/${name}.txt`)).text());
   } catch {

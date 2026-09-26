@@ -16,11 +16,14 @@ export const talkPanel = () => `<div class="talk">
 
 /** Open the story.  Pressing Megu herself is the way in - the button laid over
  *  her is the lesson's, and she asked for one button, not two. */
-export function startStory() {
+export function startStory(onEnd) {
   $('main').classList.add('talking');
   // The way out, in the place every other screen keeps it.  Home hides the
   // arrow, so it is only ever here while the story is on, and dash() hides it
   // again on the way back.
   $('back').hidden = false;
-  startScene(FIRST);
+  // Where she lands when the scene is over is Home's business, not the story's
+  // - and passing it down rather than importing Home here keeps the two files
+  // pointing one way.
+  startScene(FIRST, onEnd);
 }
