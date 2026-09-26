@@ -15,9 +15,14 @@ export const cardOf = (f) => (byFront ??= new Map(deck.cards.map((c) => [c.f, c]
 // count against this, or marking a word known would shrink the goalpost too.
 // There is no board of every word: she splits them into decks on purpose.
 export const boardCards = (id) => id === 'star' ? deck.cards.filter((c) => progress[c.f]?.star)
-  // The words she asked to see more often, gathered in one place - her concept
-  // calls them Priorities.
-  : id === 'pri' ? deck.cards.filter((c) => progress[c.f]?.pri === 1)
+  // Priorities is where the priority is SET, so it holds every word.  It used to
+  // hold only the ones she had asked for more often, and then it could not offer
+  // High / Normal / Low at all: on a board of high words, Normal and Low are
+  // empty by construction.  Her choice, and it turns the board into the one
+  // place where any word can be given a level.
+  // A copy, not the deck itself: a caller that sorted what it was handed would
+  // otherwise scramble the order of the whole library.
+  : id === 'pri' ? [...deck.cards]
   // Everything she has learned, however she learned it: the ones she ticked off
   // herself AND the ones the schedule parked as memorized.  Home counts both
   // under "learned", so a board that held only the ticked ones said 0 words

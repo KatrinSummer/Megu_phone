@@ -19,6 +19,11 @@ export const boardName = (id) => NAMES[id] ?? deck.decks.find((d) => d.id === id
 const kindOf = (c) => (progress[c.f]?.hide ? 'hidden' : stateOf(c));
 const KINDS = [['all', 'All'], ['new', 'New'], ['learn', 'Learning'], ['know', 'Memorized'], ['hidden', 'Hidden']];
 
+/** On Priorities the question is not how far along a word is but how often she
+ *  wants it, so that board filters by the level itself. */
+const priOf = (c) => ({ 1: 'high', '-1': 'low' })[progress[c.f]?.pri] ?? 'normal';
+const PRIS = [['all', 'All'], ['high', 'High'], ['normal', 'Normal'], ['low', 'Low']];
+
 /** The way back into the round, on the word's own row: the crossed eye on one
  *  she hid, the tick on one she ticked off.  It stands where the word "hidden"
  *  used to - a label that named her own doing and gave her nothing to press. */
@@ -66,7 +71,16 @@ export function openBoard(id, where = from) {
 
   const cards = boardCards(id), kinds = cards.map(kindOf), n = settings.perDay;
   const learn = learnable(id).length, rev = reviewable(id), due = rev.filter(isDue).length;
-  const count = (k) => (k === 'all' ? cards.length : kinds.filter((x) => x === k).length);
+  // What the row SAYS about a word is always how far along it is; what the chips
+  // divide it by is the board's own question - the level, on Priorities.
+  const byPri = id === 'pri';
+  const tags = byPri ? cards.map(priOf) : kinds;
+  // Known and Hidden get no filter row at all: every word on either is there for
+  // the one same reason, so the chips could only ever read "All 8 · Hidden 8" -
+  // two buttons for one pile.
+  const chips = isOutBoard(id) ? []
+    : byPri ? PRIS : KINDS.filter(([k]) => k === 'all' || tags.filter((x) => x === k).length);
+  const count = (k) => (k === 'all' ? cards.length : tags.filter((x) => x === k).length);
   // Known and Hidden are where a word sits out; no lesson is dealt from either,
   // so there is nothing for lesson settings to set and no bars to offer them.
   const set = !isOutBoard(id);
@@ -94,9 +108,9 @@ export function openBoard(id, where = from) {
     ${canPick(id) ? artRow(id) : ''}
     ${set ? boardSetRow(id) : ''}
     <div class="go">${go}</div>
-    <div class="chips filters">${KINDS.filter(([k]) => k === 'all' || count(k)).map(([k, name]) =>
-      `<button data-k="${k}"${k === filter ? ' class="on"' : ''}>${name} ${count(k)}</button>`).join('')}</div>
-    <div class="words">${cards.map((c, i) => filter !== 'all' && kinds[i] !== filter ? '' :
+    ${chips.length ? `<div class="chips filters">${chips.map(([k, name]) =>
+      `<button data-k="${k}"${k === filter ? ' class="on"' : ''}>${name} ${count(k)}</button>`).join('')}</div>` : ''}
+    <div class="words">${cards.map((c, i) => filter !== 'all' && tags[i] !== filter ? '' :
       `<button class="wd ${kinds[i]}" data-f="${esc(c.f)}">
         <span class="jp"><b>${esc(c.f)}</b>${c.k ? ` <span class="k">${esc(c.k)}</span>` : ''}</span>
         <span class="st">${when(c, kinds[i])}</span><span class="e">${esc(c.e)}</span>${

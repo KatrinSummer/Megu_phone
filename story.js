@@ -93,22 +93,20 @@ const named = (who) => (UNMET.has(who.toUpperCase()) ? '???'
 // is talking - a story that keeps showing her while somebody else speaks is
 // telling the wrong thing.  A name with no picture leaves whoever is there.
 const FACES = { MEGU: 'img/char.webp', TARO: 'img/taro.webp' };
-// Centred on the PERSON, which is not the middle of the picture.  His staff is
-// held out to his left and her hair sweeps to her right, so the drawing's own
-// centre sits away from the body and a picture centred on screen stands the
-// person off to one side of it.  Measured on the files themselves: the middle
-// of the torso, row by row over the middle of the figure, is 2.6% right of
-// centre in his and 4.3% right of centre in hers - so each is moved back by
-// that much.  Re-measure if a drawing is ever recut.
-const OFFSET = { MEGU: '-4.3%', TARO: '-2.6%' };
+// Nobody is nudged sideways any more.  Five different ways of measuring "where
+// the person is" pointed five different ways on the same drawing - the middle
+// of the picture, the middle of each row (which is the middle of "staff ...
+// hair"), the widest run (the robe), a band of rows over the top (the staff and
+// a mass of hair) and skin colour (his staff is brown, so the wood counted as
+// skin) - and each nudge built on one of them moved him further off than he
+// started.  Rendered at the size the stage uses, with a line down the middle of
+// the screen to judge against, the drawings stand centred on their own.  If one
+// ever does need moving, move it against that line and not against a number.
 
 function show(who) {
-  const name = who?.toUpperCase();
-  const face = FACES[name];
+  const face = FACES[who?.toUpperCase()];
   const img = $('d-char')?.querySelector('img');
-  if (!face || !img) return;
-  if (!img.src.endsWith(face)) img.src = face;
-  img.style.translate = `${OFFSET[name] ?? '0'} 0`;
+  if (face && img && !img.src.endsWith(face)) img.src = face;
 }
 
 let beats = [], at = 0, running = false, scene = '';

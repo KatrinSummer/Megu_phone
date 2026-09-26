@@ -39,11 +39,13 @@ const note = (n) => (n.total ? `${n.total} words` : 'empty');
 export function home() {
   leave();
   markTab('decks');
-  const some = (k) => Object.values(progress).some((p) => p[k]);
-  const ids = ['learning', 'star',
-    ...(Object.values(progress).some((p) => p.pri === 1) ? ['pri'] : []),
-    ...deck.decks.map((d) => d.id),
-    ...(some('known') ? ['known'] : []), ...(some('hide') ? ['hidden'] : [])];
+  // Her decks, and Review with them - her call: Review is the repeat, and the
+  // repeat is a thing she starts, so a row here is a fair place for it.
+  // Bookmarks, Priorities, Known and Hidden are gone from this list: none of
+  // them is a deck, each is a way of looking at words that live in the decks,
+  // and every one already has its own way in from Home.  With all five in here
+  // the screen said "4 boards" at the top and then showed seven rows.
+  const ids = ['learning', ...deck.decks.map((d) => d.id)];
   $('star').hidden = $('back').hidden = true;
   $('stats').hidden = true;
   // The name of the screen is on the screen now, in her big heading, so the
@@ -55,7 +57,7 @@ export function home() {
   $('main').className = 'home';
   $('main').innerHTML = `
     <div class="head">${ic('decks')}<h1>Decks</h1>
-      <span class="s">${deck.decks.length} boards</span></div>
+      <span class="s">${ids.length} boards</span></div>
     <div class="chips">${FILTERS.map(([k, name]) =>
       `<button data-k="${k}"${k === filter ? ' class="on"' : ''}>${name}</button>`).join('')}</div>
     ${rows.map(([id, n]) => `<button class="deck" data-id="${esc(id)}" ${n.total ? '' : 'disabled'}>

@@ -315,7 +315,13 @@ main.dash:not(.talking) .top::after{content:"";position:absolute;z-index:1;
    158px across and carries 4px either side, so what is left of the row after
    175px is hers and the two can never reach each other.  A percentage alone
    cannot promise that - it holds at one window width and breaks at the next. */
-.char{flex:none;width:min(72%,calc(100% - 175px));max-width:290px;
+/* Out to the edge of the screen, past the padding the page carries.  Her body
+   sits 4.3% right of the middle of her own drawing - her hair sweeps that way -
+   so in a box that starts at the padding she reads as standing off to the
+   right.  The box moves rather than the picture inside it: moving the picture
+   would push her hair out of a box that clips, and her hair is not mine to
+   trim. 14px is the padding, and on a phone it is very near that same 4.3%. */
+.char{flex:none;width:min(72%,calc(100% - 175px));max-width:290px;margin-left:-14px;
   height:100%;overflow:hidden;padding:0;border:0;background:none;line-height:0}
 /* On Home she is grey: the colour belongs to the story, and she takes it back
    when the story starts. */
@@ -413,7 +419,7 @@ main.dash .top .story{position:absolute;left:calc(min(72%, 100% - 175px) / 2);
   translate:-50% 0;bottom:26%;z-index:3;
   width:min(48%,170px);height:42px;padding:0 10px 0 50px;
   border-image-width:14px 19px 14px 50px;
-  filter:hue-rotate(55deg) saturate(1.2) brightness(1.06)}
+  filter:hue-rotate(50deg) saturate(.82) brightness(1.12)}
 .story .t{font-size:12px}
 main.dash.talking .top .story{display:none}
 
@@ -465,11 +471,11 @@ main.dash.talking>.talk{display:flex;margin-top:auto;position:relative;z-index:2
    which advertises itself is a hint - but there is nothing to give away here,
    she cannot read any of it, and a line that can be turned over and never says
    so is a button nobody presses. */
-.line .noise{cursor:pointer;color:var(--pink);border-bottom:1.5px dotted currentColor;
-  padding-bottom:1px}
-/* Turned over, the real words stand in the same pink with the dots gone: the
-   line has been answered, so there is nothing left to press. */
-.line.open .noise{color:var(--pink);border-bottom:0}
+   The pink is the whole mark: a dotted line under it as well was too much, and
+   it is her line to draw. */
+.line .noise{cursor:pointer;color:var(--pink)}
+/* Turned over, the real words stand in the same pink. */
+.line.open .noise{color:var(--pink)}
 /* The test at the end of a scene, on the same plate the talking happened on:
    it is the last beat of the conversation, not a screen of its own. */
 .quiz-q{margin:0 0 9px}

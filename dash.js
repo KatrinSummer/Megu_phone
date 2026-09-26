@@ -74,8 +74,8 @@ export function dash() {
     <button class="tile" id="d-star">${ic('favorite')}
       <span class="n">My favourites</span><span class="v">${stars}</span><span class="go">›</span></button>
     <button class="tile" id="d-pri">${ic('streak')}
-      <span class="n">Priorities<span class="s">the ones she asked for more often</span></span>
-      <span class="v">${pri}</span><span class="go">›</span></button>`;
+      <span class="n">Priorities<span class="s">${pri} asked for more often · set it on any word</span></span>
+      <span class="go">›</span></button>`;
 
   // Her one pink button, and it reads the day: anything due is a repeat and
   // needs no button of its own; otherwise it is a lesson where she was last; and
