@@ -449,7 +449,7 @@ main.dash .top .story{position:absolute;left:calc(min(72%, 100% - 175px) / 2);
    between the two, and this time the candidates were rendered on the NIGHT
    theme, which is the one she looks at: the island behind the button is darker
    there, and half of how loud a colour reads is what it is standing on. */
-  filter:hue-rotate(74deg) saturate(.95) brightness(1.52)}
+  filter:hue-rotate(74deg) saturate(.9) brightness(1.40)}
 .story .t{font-size:12px}
 main.dash.talking .top .story{display:none}
 /* The island has something for her: a "!" down at her feet, where she drew it.
@@ -558,6 +558,10 @@ main.dash.talking>.talk{display:flex;margin-top:auto;position:relative;z-index:2
    rather than the size of a label. */
 .cloze{display:block;margin-top:7px;font-size:17px;line-height:1.55}
 .speech .on{font-size:12px;color:var(--dim)}
+/* The four levels on the plate, when she has skipped the test and is asked
+   instead. Her painted pills, the same ones Settings holds - they are wider
+   than a row of four fits, so they wrap. */
+.speech .chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 9px}
 /* Out of the test altogether, next to the counter that says how far in she is.
    Small and dashed on purpose: it is a way past the test, not a fifth answer. */
 .speech .skip{margin-left:9px;padding:2px 8px;border:1px dashed var(--line);border-radius:9px;

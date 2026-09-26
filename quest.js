@@ -7,10 +7,16 @@
 import { $, esc } from './dom.js';
 import { settings } from './store.js';
 
-/** The quests open the moment the first scene is behind her - the test at the
- *  end of it is what opens them, so what is being asked here is "has that
- *  scene been played", not "how well did it go". */
-export const questsOpen = () => !!settings.scenes?.['01-beach'];
+/** The quests open when the first scene is FINISHED - the test at the end of
+ *  it seen through to its last plate and the island come back to.  Not "the
+ *  scene was opened", not "a record exists": she has no quest until she has
+ *  earned one, and a mark standing on Home before that is the app promising
+ *  her something that has not happened.
+ *  It asks for `done` and not merely for the record, because a record written
+ *  by any older version of this app was written under the looser rule - and an
+ *  app that keeps showing the mark because of what some earlier build saved is
+ *  telling her exactly the thing she said was wrong. */
+export const questsOpen = () => settings.scenes?.['01-beach']?.done === true;
 
 // Her note on the way back to the island.
 const NOTE = `Learn the language together with Megu and get to know the
