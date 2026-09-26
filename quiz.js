@@ -24,18 +24,35 @@
 import { $, esc } from './dom.js';
 import { deck, cardOf } from './boards.js';
 import { settings, saveSettings } from './store.js';
-import { LEVELS, levelOf, levelName, setLevel } from './level.js';
+import { levelOf, setLevel } from './level.js';
 
 const shuffle = (list) => list.sort(() => Math.random() - 0.5);
 
-/** Answers that could pass for the right one: the same sort of length, where
- *  the deck allows it, or the right answer is the odd one out and she can pick
- *  it without reading a word. `key` is the side being answered in. */
+/** The other words of this scene - the first place a wrong answer should come
+ *  from, and the reason the test is a test.  He said three things to her; being
+ *  asked which of those three she just heard is the question.  Being asked
+ *  whether "feel bad" means feel bad, an edible chrysanthemum, or seven of
+ *  something is not a question at all, it is a word she has never met standing
+ *  next to the answer with a sign on it. */
+let mates = [];
+
+/** Answers that could pass for the right one.  The rest of this conversation
+ *  first, whatever length they are - inside a scene of three words the length
+ *  is not a clue, because the right answer is a different length in every
+ *  question.  Failing that the same board, so a wrong answer is at least the
+ *  same sort of word; and only then the whole deck, where the guard is length,
+ *  or the right answer is the odd one out and she can pick it without reading
+ *  a word.  `key` is the side being answered in. */
 function decoys(card, n, key) {
   const len = [...card[key]].length;
-  const others = deck.cards.filter((c) => c.f !== card.f && c.e !== card.e);
-  const near = others.filter((c) => Math.abs([...c[key]].length - len) <= 2);
-  return shuffle([...(near.length >= n ? near : others)]).slice(0, n);
+  const apart = (c) => c.f !== card.f && c.e !== card.e;
+  const near = (list) => list.filter((c) => apart(c) && Math.abs([...c[key]].length - len) <= 2);
+  const rest = deck.cards.filter(apart);
+  const pick = mates.filter(apart);
+  if (pick.length < n) pick.push(...near(deck.cards.filter((c) => c.d === card.d)));
+  if (pick.length < n) pick.push(...near(rest));
+  if (pick.length < n) pick.push(...rest);
+  return shuffle([...new Set(pick)]).slice(0, n);
 }
 
 /** Three to choose from and a fourth that is not a choice at all. */
@@ -102,6 +119,7 @@ function toSpeak(c, nth = 0) {
 function build(words) {
   const cards = shuffle([...new Set(words)].map(cardOf).filter(Boolean));
   if (!cards.length) return [];
+  mates = cards;                          // where the wrong answers come from
   const qs = [...cards.slice(0, 3).map((c) => toHear(c)),
               ...cards.slice(0, 3).map((c) => toSay(c))];
 
@@ -176,40 +194,16 @@ export function startQuiz(box, name, words, done) {
     setLevel(id);
   }
 
-  /** Answered to the end: the score says what it says. */
-  function finish(got, of) {
-    const id = levelOf(got, of);
-    land(id, got, of, false);
-    box.innerHTML = `<p class="who">A test</p>
-      <p class="quiz-q"><b>${got} of ${of}</b></p>
-      <p>${esc(levelName(id))}.</p>
-      <p class="on">You can change this in Settings · tap to go on</p>`;
-    box.addEventListener('click', done, { once: true });
-  }
+  /** Answered to the end: the score says what it says - and it says it on the
+   *  island, not here.  The last question is the last of the conversation, and
+   *  what the test made of her belongs on the plate that meets her when she
+   *  gets home, where the four levels stand under it. */
+  const finish = (got, of) => { land(levelOf(got, of), got, of, false); done(); };
 
   /** Pressed past it.  A test she did not sit cannot say a thing about her, so
-   *  she is asked rather than sentenced - handing her a verdict off a test she
-   *  refused is the app making something up about her.
-   *  The same four levels the test itself hands out, and the same four
-   *  Settings holds: one ladder, so a level set here and a level set there
-   *  mean the same thing. */
-  function skipped() {
-    box.innerHTML = `<p class="who">A test</p>
-      <p class="quiz-q">You skipped the test. How much of their language do you have?</p>
-      <div class="chips lv">${LEVELS.map(([id, title]) =>
-        `<button data-lv="${esc(id)}">${esc(title)}</button>`).join('')}</div>
-      <p class="on">You can change this in Settings</p>`;
-    for (const b of box.querySelectorAll('[data-lv]')) {
-      b.addEventListener('click', (e) => {
-        e.stopPropagation();                  // the plate is a way on; this is not
-        land(b.dataset.lv, 0, qs.length, true);
-        box.innerHTML = `<p class="who">A test</p>
-          <p>${esc(levelName(b.dataset.lv))}.</p>
-          <p class="on">You can change this in Settings · tap to go on</p>`;
-        box.addEventListener('click', done, { once: true });
-      });
-    }
-  }
+   *  it scores nothing and leaves her at the bottom of the ladder - and the
+   *  island asks her straight away what she would rather it said. */
+  const skipped = () => { land('none', 0, qs.length, true); done(); };
 
   const next = () => {
     at++;

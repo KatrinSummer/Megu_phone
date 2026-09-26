@@ -1,6 +1,11 @@
-// Settings: a screen of its own now, not a sheet that slides up.  It holds what
-// it always held - how many new words at a time, the theme, the sound, and the
-// way in and out of a backup file.
+// Settings: a screen of its own now, not a sheet that slides up.  It holds the
+// theme, the sound, how much of their language she has, and the way in and out
+// of a backup file.
+//
+// "New words at a time" is NOT here.  It rides on the big button on Home,
+// under the gear beside it, which is where she put it and where it is used -
+// two boxes for one number meant typing 20 in one place and reading 30 in the
+// other, and she asked what it was doing on this screen.
 import { $ } from './dom.js';
 import { settings, saveSettings, applyTheme } from './store.js';
 import { deck, buildQueue } from './boards.js';
@@ -29,8 +34,6 @@ export function settingsPage() {
     <div class="head">${ic('gear')}<h1>Settings</h1></div>
     <div class="grp">Learning</div>
     <div class="pane">
-      <div class="set">${ic('goal')}<span class="n">New words at a time</span>
-        <input id="per" type="number" min="0" max="100" value="${settings.perDay}"></div>
       <div class="set">${ic('pronunciation')}<span class="n">Say the word on its own</span>
         <button class="sw${settings.autoPlay ? ' on' : ''}" id="auto"
           role="switch" aria-checked="${!!settings.autoPlay}" aria-label="Say the word on its own"></button></div>
@@ -78,11 +81,9 @@ export function settingsPage() {
     buildNav();                           // the bar wears a day icon she drew for it
     settingsPage();                       // her icons and her island change with it
   });
-  // The test sets this; she overrules it.  Her number for "new words at a time"
-  // is read before the screen is drawn again, or typing one and then touching a
-  // level would throw it away.
+  // The test sets this; she overrules it.
   for (const b of document.querySelectorAll('.lv button')) {
-    b.addEventListener('click', () => { keepPerDay(); setLevel(b.dataset.l); settingsPage(); });
+    b.addEventListener('click', () => { setLevel(b.dataset.l); settingsPage(); });
   }
   $('auto').addEventListener('click', () => {
     settings.autoPlay = !settings.autoPlay;
@@ -112,17 +113,5 @@ export function settingsPage() {
   $('hidden').addEventListener('change', (e) =>
     e.target.files[0] && loadFile(e.target.files[0], say, () => { buildQueue(); render(); }));
 
-  // The number only shapes the next queue, so it is read when she leaves.
-  $('close').addEventListener('click', () => { keepPerDay(); markTab('home'); dash(); });
-}
-
-/** What she typed into "new words at a time", saved on the way out. */
-export function keepPerDay() {
-  const box = $('per');
-  if (!box) return;
-  const per = Math.max(0, Number(box.value) || 0);
-  if (per === settings.perDay) return;
-  settings.perDay = per;
-  saveSettings();
-  buildQueue();
+  $('close').addEventListener('click', () => { markTab('home'); dash(); });
 }

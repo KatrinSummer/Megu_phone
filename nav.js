@@ -8,7 +8,7 @@ import { ic } from './icons.js';
 import { home } from './decks.js';
 import { dash } from './dash.js';
 import { statsPage } from './statsview.js';
-import { settingsPage, keepPerDay } from './settings.js';
+import { settingsPage } from './settings.js';
 
 const TABS = [
   ['home', 'Home', 'home', () => dash()],
@@ -30,9 +30,7 @@ export function buildNav() {
   $('tabs').innerHTML = TABS.map(([id, name, icon]) =>
     `<button data-tab="${id}" aria-label="${name}">${ic(icon)}<span>${name}</span></button>`).join('');
   for (const [id, , , go] of TABS) {
-    // Leaving Settings by the bar must keep what she typed there, the same as
-    // leaving it by its own button.
     document.querySelector(`#tabs [data-tab="${id}"]`)
-      .addEventListener('click', () => { keepPerDay(); markTab(id); go(); });
+      .addEventListener('click', () => { markTab(id); go(); });
   }
 }

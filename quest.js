@@ -6,6 +6,11 @@
 // is public.
 import { $, esc } from './dom.js';
 import { settings } from './store.js';
+import { LEVELS, level, setLevel } from './level.js';
+
+/** The scene the island is waiting on. One name, used by both the mark and the
+ *  plate that comes back with her, so they can never disagree about it. */
+const FIRST = '01-beach';
 
 /** The quests open when the first scene is FINISHED - the test at the end of
  *  it seen through to its last plate and the island come back to.  Not "the
@@ -16,7 +21,7 @@ import { settings } from './store.js';
  *  by any older version of this app was written under the looser rule - and an
  *  app that keeps showing the mark because of what some earlier build saved is
  *  telling her exactly the thing she said was wrong. */
-export const questsOpen = () => settings.scenes?.['01-beach']?.done === true;
+export const questsOpen = () => settings.scenes?.[FIRST]?.done === true;
 
 // Her note on the way back to the island.
 const NOTE = `Learn the language together with Megu and get to know the
@@ -48,8 +53,29 @@ function over(html) {
   document.body.append(box);
 }
 
-/** The island's welcome, shown once she comes back out of the story. */
-export const noteAfterStory = () => over(`<p>${esc(NOTE)}</p>`);
+/** The island's welcome, and what the test made of her, on one plate over the
+ *  island once the story has let her go.
+ *  The verdict is read here rather than on the last plate of the test because
+ *  this is where she is by then: the scene is over and she is home.  The four
+ *  levels stand under it so that disagreeing with it is one tap and not a trip
+ *  to Settings - a test is one bad morning away from being wrong about her -
+ *  and that tap is also the way out, back to the island. */
+export function noteAfterStory() {
+  const r = settings.scenes?.[FIRST];
+  const score = !r ? ''
+    : r.skipped ? '<p>You skipped the test.</p>'
+    : `<p><b>${r.right} of ${r.of}</b></p>`;
+  const ask = !r ? '' : `<p>How much of their language do you have?</p>
+    <div class="chips lv">${LEVELS.map(([id, title]) =>
+      `<button class="${id === level() ? 'on' : ''}" data-lv="${esc(id)}">${esc(title)}</button>`)
+      .join('')}</div>`;
+  over(`<p>${esc(NOTE)}</p>${score}${ask}`);
+  // The plate is tapped away anywhere, so a tap on a level sets it and leaves
+  // in the same motion: she picks one and she is back on the island.
+  for (const b of document.querySelectorAll('#over [data-lv]')) {
+    b.addEventListener('click', () => setLevel(b.dataset.lv));
+  }
+}
 
 /** The mark on Home: a "!" at her feet, where she drew it. */
 export const questMark = () => (questsOpen()

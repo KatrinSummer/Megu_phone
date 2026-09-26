@@ -558,10 +558,12 @@ main.dash.talking>.talk{display:flex;margin-top:auto;position:relative;z-index:2
    rather than the size of a label. */
 .cloze{display:block;margin-top:7px;font-size:17px;line-height:1.55}
 .speech .on{font-size:12px;color:var(--dim)}
-/* The four levels on the plate, when she has skipped the test and is asked
-   instead. Her painted pills, the same ones Settings holds - they are wider
-   than a row of four fits, so they wrap. */
-.speech .chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 9px}
+/* The four levels on the plate over the island, once the test is behind her.
+   Her painted pills, the same ones Settings holds. Two by two rather than a
+   wrapping row: four of them are wider than the card, and a row that wraps
+   leaves "Most of it" standing alone on the last line, which reads as
+   something gone wrong rather than as the fourth of four. */
+.over .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0 9px;overflow:visible}
 /* Out of the test altogether, next to the counter that says how far in she is.
    Small and dashed on purpose: it is a way past the test, not a fifth answer. */
 .speech .skip{margin-left:9px;padding:2px 8px;border:1px dashed var(--line);border-radius:9px;
