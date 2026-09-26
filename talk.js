@@ -3,11 +3,7 @@
 // Kept apart from dash.js: that file is about how today stands, this one about
 // the story, and they will not grow into each other.
 import { $ } from './dom.js';
-import { startScene } from './story.js';
-
-// The scene she opens on.  Its text lives in story/01-beach.txt, not here: she
-// writes the story, and a line of it should never mean editing code.
-const FIRST = '01-beach';
+import { startScene, FIRST } from './story.js';
 
 /** What stands in place of the island's rows while she is on the screen. */
 export const talkPanel = () => `<div class="talk">

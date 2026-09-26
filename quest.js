@@ -7,10 +7,9 @@
 import { $, esc } from './dom.js';
 import { settings } from './store.js';
 import { LEVELS, level, setLevel } from './level.js';
-
-/** The scene the island is waiting on. One name, used by both the mark and the
- *  plate that comes back with her, so they can never disagree about it. */
-const FIRST = '01-beach';
+// The scene the island is waiting on - the same name the story opens with, so
+// the mark and the plate can never disagree about it.
+import { FIRST } from './story.js';
 
 /** The quests open when the first scene is FINISHED - the test at the end of
  *  it seen through to its last plate and the island come back to.  Not "the

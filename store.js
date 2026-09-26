@@ -111,6 +111,10 @@ export const fresh = () => ({ due: today(), iv: 0, ease: 2.5, reps: 0, total: 0,
 export const lifetime = (p) => p.total ?? p.reps ?? 0;
 /** She has answered it at least once. A star or a priority alone is not a start. */
 export const started = (p) => !!p && (lifetime(p) > 0 || (p.lapses ?? 0) > 0);
+/** How often she asked to see this word: 1 more, -1 less, 0 as it comes.
+ *  It takes the card rather than the record, because every caller holds a card
+ *  and a word with no record yet is simply a word she never asked about. */
+export const pri = (c) => progress[c.f]?.pri ?? 0;
 
 /** The bookmark, on this card or a word tapped in a sentence. It is not
  *  progress, so it leaves `seen` alone: a star must not win a backup merge. */

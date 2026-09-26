@@ -8,6 +8,13 @@ import { isMemorized } from './schedule.js';
 import { stateOf } from './word.js';
 import { startQuiz } from './quiz.js';
 
+/** The scene she opens on, named once for the whole app: Home opens it, and
+ *  the island waits on it to hand out quests.  It was written down in both of
+ *  those places, which is two files free to disagree about which scene the
+ *  story begins with.  Its text lives in story/01-beach.txt - she writes the
+ *  story, and a line of it should never mean editing code. */
+export const FIRST = '01-beach';
+
 // The village speaks Japanese and she does not, so a word she has not learned
 // reaches her as noise.  The noise is kana rather than invented symbols: she is
 // hearing Japanese, she simply cannot understand it - and kana is certain to

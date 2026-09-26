@@ -25,8 +25,7 @@ import { $, esc } from './dom.js';
 import { deck, cardOf } from './boards.js';
 import { settings, saveSettings } from './store.js';
 import { levelOf, setLevel } from './level.js';
-
-const shuffle = (list) => list.sort(() => Math.random() - 0.5);
+import { shuffle } from './rand.js';
 
 /** The other words of this scene - the first place a wrong answer should come
  *  from, and the reason the test is a test.  He said three things to her; being

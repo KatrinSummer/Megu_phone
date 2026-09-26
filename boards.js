@@ -1,5 +1,6 @@
 // Which words she is shown, and in what order.
-import { progress, settings, today, fresh, saveProgress, started } from './store.js';
+import { progress, settings, today, fresh, saveProgress, started, pri } from './store.js';
+import { shuffle } from './rand.js';
 import { startLesson, drop } from './lesson.js';
 import { jungleRun } from './jungle.js';
 import { boardWords, boardMode } from './boardset.js';
@@ -67,11 +68,9 @@ export const reviewable = (id) => poolOf(id).filter((c) => !isNew(c));
 // Every new list of cards is a new lesson.
 const refill = startLesson;
 
-const pri = (c) => progress[c.f]?.pri ?? 0;
 /** "More often" first and "less often" last; within that the newest lesson
  *  first, so what she just learned is what she sees first. */
 const byTurn = (a, b) => pri(b) - pri(a) || (b.when || '').localeCompare(a.when || '');
-const shuffle = (list) => list.sort(() => Math.random() - 0.5);
 
 /** The words she wants more often turn up in every review, at random, due or
  *  not and whether or not they belong to it: her share is five of twenty, seven

@@ -1,7 +1,8 @@
 // Her jungle: a run of words from every board at once, mostly ones she has
 // never seen.  It is not a board - nothing lives in it - only a way of dealing
 // a handful of cards, so it takes the words it may use and gives back a list.
-import { progress, started } from './store.js';
+import { progress, started, pri } from './store.js';
+import { shuffle } from './rand.js';
 
 /** How long a run is: she asked for a different number every time. */
 const LOW = 15, HIGH = 30;
@@ -9,8 +10,6 @@ const LOW = 15, HIGH = 30;
  *  handful of ordinary ones she has already started. */
 const MIX = { fresh: 0.8, fav: 0.15, seen: 0.05 };
 
-const shuffle = (list) => list.sort(() => Math.random() - 0.5);
-const pri = (c) => progress[c.f]?.pri ?? 0;
 
 /** One run, out of the words she is still being shown (`cards`): hidden ones and
  *  ones she has ticked off are not in it.  A pile that is too small is made up
