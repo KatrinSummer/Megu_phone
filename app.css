@@ -443,9 +443,13 @@ main.dash .top .story{position:absolute;left:calc(min(72%, 100% - 175px) / 2);
    triangle yellow as well, which is the readable part of the button gone.
    Round two, because the first yellow was nuclear: the hue was right and the
    volume was not.  Saturation is what makes it shout and brightness is what
-   bleaches it, so both came down and the hue stayed - six more rendered, and
-   this is the one that is yellow without being a warning sign. */
-  filter:hue-rotate(74deg) saturate(.6) brightness(1.34)}
+   bleaches it, so both came down and the hue stayed.
+   Round three, because that one came out washed out - brighter and lighter,
+   she said, and she is right: it had gone past quiet into weak.  Back up
+   between the two, and this time the candidates were rendered on the NIGHT
+   theme, which is the one she looks at: the island behind the button is darker
+   there, and half of how loud a colour reads is what it is standing on. */
+  filter:hue-rotate(74deg) saturate(.95) brightness(1.52)}
 .story .t{font-size:12px}
 main.dash.talking .top .story{display:none}
 /* The island has something for her: a "!" down at her feet, where she drew it.
