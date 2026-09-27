@@ -37,7 +37,7 @@ const HINT = `New quests are open to you. Learn words to open new ones ~ Do
 
 const QUESTS = [
   ['Thank Lily', 'I must thank Lily for all her help!!! But what does she like???'],
-  ['Thank Henry', 'Mr Henry helps me so much! I must thank him for all his help!!! '
+  ['Thank Hanry', 'Mr Hanry helps me so much! I must thank him for all his help!!! '
     + 'But what does he like???'],
 ];
 
