@@ -70,12 +70,19 @@ export function noteAfterStory() {
 export const questMark = () => (questsOpen()
   ? `<button class="quest" id="d-quest" aria-label="Quests">!</button>` : '');
 
+/** What the island has for her now.  Behind the "!" at her feet, and behind
+ *  Megu herself once the intro is played - she is the way to what is happening
+ *  now, and what is happening now is these. */
+export function openQuests() {
+  over(`<h2>Megu</h2><p>${esc(MEGU)}</p>
+    ${QUESTS.map(([name, text]) =>
+      `<div class="q"><b>${esc(name)}</b>${esc(text)}</div>`).join('')}
+    <p class="hint">${esc(HINT)}</p>`);
+}
+
 export function bindQuest() {
   $('d-quest')?.addEventListener('click', (e) => {
     e.stopPropagation();                        // it stands on her, and she opens the story
-    over(`<h2>Megu</h2><p>${esc(MEGU)}</p>
-      ${QUESTS.map(([name, text]) =>
-        `<div class="q"><b>${esc(name)}</b>${esc(text)}</div>`).join('')}
-      <p class="hint">${esc(HINT)}</p>`);
+    openQuests();
   });
 }

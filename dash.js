@@ -14,15 +14,19 @@ import { home } from './decks.js';
 import { openBoard, cameIn } from './page.js';
 import { pickBoard } from './pick.js';
 import { countRow, bindCount } from './perday.js';
-import { markTab } from './nav.js';
+import { markTab, buildNav } from './nav.js';
 import { talkPanel, startStory } from './talk.js';
 import { advance } from './story.js';
-import { questMark, bindQuest, noteAfterStory, questsOpen } from './quest.js';
+import { questMark, bindQuest, noteAfterStory, questsOpen, openQuests } from './quest.js';
 
 /** The scene is over.  She lands back on the island - which is this screen -
  *  with her note laid over it.  The story does not know about Home and should
- *  not: it is handed this on the way in. */
-const backFromStory = () => { dash(); noteAfterStory(); };
+ *  not: it is handed this on the way in.
+ *  The bar is rebuilt on the way back because the island she just earned is a
+ *  tab in it: built once at launch, the World tab turned up only after a
+ *  reload, which reads as the story having promised her something it did not
+ *  hand over. */
+const backFromStory = () => { buildNav(); dash(); noteAfterStory(); };
 
 /** The board the big button starts.  Her last one while it still has new words
  *  in it, otherwise the newest lesson, which is the one she is usually after. */
@@ -107,9 +111,16 @@ export function dash() {
   // so the tap is left to bubble to the listener below; the tap that OPENS the
   // story is stopped here, or that same tap would arrive down there as the
   // first tap on and eat the opening line.
+  // Once the intro is behind her, pressing her is NOT the intro again: the
+  // story ended, she landed on the island, and the one thing to press played
+  // the same opening back at her - a loop with no way further in.  She is the
+  // way to what the island has for her NOW, which is what the "!" holds.
+  // Playing the opening again is in Settings, where something done on purpose
+  // belongs.
   $('d-char').addEventListener('click', (e) => {
     if ($('main').classList.contains('talking')) return;
     e.stopPropagation();
+    if (questsOpen()) return openQuests();
     startStory(backFromStory);
   });
   // The "!" at her feet: what the island has for her now the first scene is done.

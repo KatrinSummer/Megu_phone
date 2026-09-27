@@ -65,6 +65,11 @@ header:has(#finish:not([hidden])) .grow{max-width:calc(50% - 90px)}
    off: what is above the sign stays put and what is below it is pushed. */
 main{flex:1;display:flex;flex-direction:column;justify-content:center;
   padding:14px;gap:12px;overflow-y:auto;overflow-anchor:none;position:relative}
+/* No bar down the side.  A phone draws one that fades out; a window keeps it
+   there, and it stood as a grey stripe over the sea on her drawing.  The screen
+   is read with a finger and the lists say how long they are by themselves. */
+main{scrollbar-width:none}
+main::-webkit-scrollbar{display:none}
 /* A long list has to start at the top, not sit centred and clipped. */
 main.home,main.board,main.dash,main.page{justify-content:flex-start;gap:10px}
 main>*{flex-shrink:0}
