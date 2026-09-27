@@ -9,7 +9,7 @@ import { settings } from './store.js';
 import { LEVELS, level, setLevel } from './level.js';
 // The scene the island is waiting on - the same name the story opens with, so
 // the mark and the plate can never disagree about it.
-import { FIRST } from './story.js';
+import { FIRST, FIRST_V } from './story.js';
 
 /** The quests open when the first scene is FINISHED - the test at the end of
  *  it seen through to its last plate and the island come back to.  Not "the
@@ -20,7 +20,13 @@ import { FIRST } from './story.js';
  *  by any older version of this app was written under the looser rule - and an
  *  app that keeps showing the mark because of what some earlier build saved is
  *  telling her exactly the thing she said was wrong. */
-export const questsOpen = () => settings.scenes?.[FIRST]?.done === true;
+/*  And it asks for the version as well, because the scene she finished is not
+ *  the scene that is there now: she rewrote the intro, and the mark went on
+ *  standing on Home for a beach nobody had played.  A record from the older
+ *  text counts as not played, so the mark waits without her having to clear
+ *  anything by hand. */
+export const questsOpen = () => settings.scenes?.[FIRST]?.done === true
+  && settings.scenes[FIRST].v === FIRST_V;
 
 // Her note on the way back to the island.
 const NOTE = `Learn the language together with Megu and get to know the

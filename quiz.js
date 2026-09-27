@@ -26,6 +26,10 @@ import { deck, cardOf } from './boards.js';
 import { settings, saveSettings } from './store.js';
 import { levelOf, setLevel } from './level.js';
 import { shuffle } from './rand.js';
+// Which version of the scene this run was, so a rewritten scene is not still
+// counted as played.  It comes from the story rather than from here: the story
+// is what she rewrites.
+import { FIRST_V } from './story.js';
 
 /** The other words of this scene - the first place a wrong answer should come
  *  from, and the reason the test is a test.  He said three things to her; being
@@ -188,7 +192,9 @@ export function startQuiz(box, name, words, done) {
    *  one, and a mark on Home before that promises her something that has not
    *  happened. */
   function land(id, got, of, skip) {
-    (settings.scenes ??= {})[name] = { right: got, of, done: true, ...(skip && { skipped: true }) };
+    (settings.scenes ??= {})[name] = {
+      right: got, of, done: true, v: FIRST_V, ...(skip && { skipped: true }),
+    };
     saveSettings();
     setLevel(id);
   }

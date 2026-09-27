@@ -15,6 +15,14 @@ import { startQuiz } from './quiz.js';
  *  story, and a line of it should never mean editing code. */
 export const FIRST = '01-beach';
 
+/** Which version of it she has played.  A scene finished once is remembered for
+ *  good - that memory is what puts the "!" on Home - but the scene itself is
+ *  hers and she rewrites it, and then the mark stands on Home for a scene
+ *  nobody has seen.  A record carries the number the scene had when it was
+ *  earned; this goes up whenever the text of it changes, and the mark waits to
+ *  be earned again with nothing for her to press. */
+export const FIRST_V = 2;
+
 // The village speaks Japanese and she does not, so a word she has not learned
 // reaches her as noise.  The noise is kana rather than invented symbols: she is
 // hearing Japanese, she simply cannot understand it - and kana is certain to
