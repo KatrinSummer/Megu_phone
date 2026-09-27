@@ -66,6 +66,12 @@ export function settingsPage() {
     <input id="hidden" type="file" accept="application/json" style="display:none">
     <div id="note"></div>
 
+    <div class="grp">The story</div>
+    <div class="pane">
+      <button class="set" id="again" style="width:100%;text-align:left">${ic('jungle')}
+        <span class="n">Play the intro again</span><span class="go">›</span></button>
+    </div>
+
     <div class="grp">About</div>
     <div class="pane rows">
       <div>${ic('deck')}words on the phone<b>${deck.cards.length}</b></div>
@@ -106,6 +112,16 @@ export function settingsPage() {
       if (++n % 25 === 0) say(`downloaded ${n} of ${files.length}`);
     }
     say(`sound is on the phone: ${files.length} files, words and sentences, no internet needed`);
+  });
+
+  // The intro is hers and she rewrites it.  A scene she finished once is
+  // remembered for good - that is what opens her quests - so a rewritten intro
+  // left the "!" standing on Home for a scene she has never seen.  This forgets
+  // the scene: the mark goes with it, and the story opens from the top again.
+  $('again').addEventListener('click', () => {
+    delete settings.scenes;
+    saveSettings();
+    say('The story starts from the beginning. Press Megu on Home.');
   });
 
   $('file').addEventListener('click', () => saveFile(say));

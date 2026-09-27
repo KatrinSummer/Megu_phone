@@ -12,6 +12,10 @@
 # a laugh is not language - it needs no card, the same way clearing your throat
 # needs none - so the laugh stands and his substitute was dropped.
 #
+# His last line is hers too: ちょっと まって, the word she picked herself.  She cut
+# Megu's "…Maybe I can understand him?" - she does not think that - and the
+# scene now ends the way her draft ends, on her not understanding him at all.
+#
 # A line is "NAME: text", or "NAME -word-: text" to make the screen do
 # something as the line lands.  A "-word-" on a line of its own does it between
 # two lines.  A "#" line is a note and is never shown.
@@ -28,4 +32,5 @@ MEGU: …
 MEGU: ???
 MEGU -shock-: !!! I DON'T UNDERSTAND A WORD HE SAYS!!! AAAAAAH
 TORO: …Oh ho ho…
-MEGU: …Maybe I can understand him?
+TORO: ちょっと まって
+MEGU: ???
