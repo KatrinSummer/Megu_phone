@@ -1,20 +1,24 @@
 # 01-beach
-# Megu wakes on the shore.  She is on her own until somebody behind her clears
-# his throat - that is Toro, the village elder, and from there he does all the
-# talking.  She understands none of it.
+# Her intro, whole, in the order her draft has it: she wakes on the shore, the
+# village elder speaks to her and she understands none of it, a girl turns up
+# who has some English, and the girl takes her to the church and to the one
+# other man on the island who speaks it.
 #
-# Toro's Japanese was written by ChatGPT out of words already in the deck, and
-# every one of them was checked against deck.json before it was put here:
-# どうしたの, いたい, きぶんがわるい - all three are cards she has.
+# Toro's first two lines were written by ChatGPT out of words already in the
+# deck, and every one of them was checked against deck.json: どうしたの, いたい,
+# きぶんがわるい are all cards she has.
 #
-# His third line is hers, not ChatGPT's.  She wrote a soft old-man laugh; he
-# could find no laugh in the deck and offered "it can't be helped" instead.  But
-# a laugh is not language - it needs no card, the same way clearing your throat
-# needs none - so the laugh stands and his substitute was dropped.
+# His third line is hers, not ChatGPT's - she wrote a soft old-man laugh, and a
+# laugh is not language: it needs no card, the same way clearing your throat
+# needs none.  His last line is hers too: ちょっと まって, the word she picked.
 #
-# His last line is hers too: ちょっと まって, the word she picked herself.  She cut
-# Megu's "…Maybe I can understand him?" - she does not think that - and the
-# scene now ends the way her draft ends, on her not understanding him at all.
+# Only Toro speaks Japanese.  Megu is American, Lily has a little English and
+# speaks it badly, Hanry has lived here twenty years and speaks it fluently -
+# so nothing of theirs is translated, it is written as she wrote it.
+#
+# There is no test in here.  There was one at the end of the beach; she took it
+# out.  The intro ends on her own question about how much of the language she
+# has, and the three answers she wrote for it.
 #
 # A line is "NAME: text", or "NAME -word-: text" to make the screen do
 # something as the line lands.  A "-word-" on a line of its own does it between
@@ -34,3 +38,23 @@ MEGU -shock-: !!! I DON'T UNDERSTAND A WORD HE SAYS!!! AAAAAAH
 TORO: …Oh ho ho…
 TORO: ちょっと まって
 MEGU: ???
+
+# A girl turns up and says a couple of things to her.
+LILY: H-Hello! I am Lilia…D-daughter of um....the chief??? … How are you?
+MEGU -shake-: !!!Khhhhh!!! English!!! You speak English??? Where am I???
+LILY: …English…!..A…Yes…yes…A l-little… I - help you…A-are you okay? D-does it hurt?
+MEGU: ! N-no! I'm all right!
+MEGU: Hmmm...Seeing how nervous she is is making me nervous too!
+MEGU: Wwhere am I?! Hey! R-right! My cellphone!
+LILY: ..... Oh R-right! Come with me!
+MEGU: ???
+
+# They move to the church.
+-dark-
+MEGU: ???A-a church???
+HANRY: ! Oh Hello! How are you? You are that girl from beyond the island Lilia was talking about!? And who was unconscious for 2 days?
+MEGU -shake-: T-two days!?...!
+MEGU: !
+HANRY: !Oh! How rude of me! I am Hanry! Sorry…Ha-ha life on the island all these years without a single soul who spoke English…made me unpatient. Ha-ha. How are you? Does your head hurt? All in order, I suppose?
+MEGU: …
+MEGU: I am not the only one who speaks English here!!!I am so happy!!!

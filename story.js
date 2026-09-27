@@ -6,7 +6,8 @@ import { $, esc } from './dom.js';
 import { cardOf } from './boards.js';
 import { isMemorized } from './schedule.js';
 import { stateOf } from './word.js';
-import { startQuiz } from './quiz.js';
+import { settings, saveSettings } from './store.js';
+import { LEVELS, setLevel } from './level.js';
 
 /** The scene she opens on, named once for the whole app: Home opens it, and
  *  the island waits on it to hand out quests.  It was written down in both of
@@ -21,7 +22,7 @@ export const FIRST = '01-beach';
  *  nobody has seen.  A record carries the number the scene had when it was
  *  earned; this goes up whenever the text of it changes, and the mark waits to
  *  be earned again with nothing for her to press. */
-export const FIRST_V = 2;
+export const FIRST_V = 3;
 
 // The village speaks Japanese and she does not, so a word she has not learned
 // reaches her as noise.  The noise is kana rather than invented symbols: she is
@@ -107,7 +108,12 @@ const named = (who) => (UNMET.has(who.toUpperCase()) ? '???'
 // Who the screen shows.  There is one place to stand, so it belongs to whoever
 // is talking - a story that keeps showing her while somebody else speaks is
 // telling the wrong thing.  A name with no picture leaves whoever is there.
-const FACES = { MEGU: 'img/char.webp', TORO: 'img/taro.webp' };
+const FACES = {
+  MEGU: 'img/char.webp',
+  TORO: 'img/taro.webp',
+  LILY: 'img/lily.webp',
+  HANRY: 'img/hanry.webp',
+};
 // Nobody is nudged by a MEASUREMENT any more.  Five different ways of measuring
 // "where the person is" pointed five different ways on the same drawing - the
 // middle of the picture, the middle of each row (which is the middle of "staff
@@ -158,6 +164,31 @@ export const advance = (e) => {
   if (running) step();
 };
 
+/** The last beat of the intro is hers, and it is a question: how much of their
+ *  language does she have?  A test of nine questions used to stand here - she
+ *  took it out of the story, and this is what she wrote in its place.
+ *  Answering it is what writes the scene down as played, because it is the
+ *  last thing the intro asks of her: the mark on Home hangs on that, and a
+ *  scene left half way through has not been played. */
+const LEVEL_Q = 'Megu is having trouble with the local accent! '
+  + 'What is your lvl of the language?';
+
+function askLevel(box) {
+  box.innerHTML = `<p class="line">${esc(LEVEL_Q)}</p>
+    <div class="chips lv">${LEVELS.map(([id, title]) =>
+    `<button data-lv="${esc(id)}">${esc(title)}</button>`).join('')}</div>`;
+  for (const b of box.querySelectorAll('[data-lv]')) {
+    b.addEventListener('click', (e) => {
+      e.stopPropagation();              // the screen is a way on; this is not
+      setLevel(b.dataset.lv);
+      (settings.scenes ??= {})[scene] = { done: true, v: FIRST_V };
+      saveSettings();
+      box.innerHTML = '<p class="end">— to be continued —</p>';
+      ends?.();
+    });
+  }
+}
+
 /** Effects run on the way past; the next line she reads stops the walk. */
 function step() {
   const box = $('d-say');
@@ -165,17 +196,7 @@ function step() {
   while (at < beats.length && beats[at].effect) runEffect(beats[at++].effect);
   if (at >= beats.length) {
     running = false;                    // and the screen stops being a way on
-    // The test comes before the curtain, where she put it: she has just been
-    // spoken to in a language she is learning, and this asks what she caught of
-    // it.  It runs the plate itself until it is done, then hands it back.
-    // And what happens after it is not this file's business: the scene ends,
-    // and whoever opened it decides where she lands.  It used to print "to be
-    // continued" and leave her standing on the sand with no way on but the
-    // arrow.
-    return startQuiz(box, scene, [...said], () => {
-      box.innerHTML = '<p class="end">— to be continued —</p>';
-      ends?.();
-    });
+    return askLevel(box);
   }
   const b = beats[at++];
   show(b.who);                          // the screen belongs to whoever is talking
