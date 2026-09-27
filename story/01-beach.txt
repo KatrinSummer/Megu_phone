@@ -1,9 +1,9 @@
 # 01-beach
 # Megu wakes on the shore.  She is on her own until somebody behind her clears
-# his throat - that is Taro, the village elder, and from there he does all the
+# his throat - that is Toro, the village elder, and from there he does all the
 # talking.  She understands none of it.
 #
-# Taro's Japanese was written by ChatGPT out of words already in the deck, and
+# Toro's Japanese was written by ChatGPT out of words already in the deck, and
 # every one of them was checked against deck.json before it was put here:
 # どうしたの, いたい, きぶんがわるい - all three are cards she has.
 #
@@ -18,14 +18,14 @@
 
 MEGU -shock-: Haaaaah!!! WHERE AM I!!??? Oh no!!
 MEGU: It wasn't a dream! I really did fall off that liner yesterday!
-TARO: Ahem… ahem…
+TORO: Ahem… ahem…
 -scared-
-TARO: どうしたの ？ いたい ？
+TORO: どうしたの ？ いたい ？
 MEGU: …
 MEGU: ???
-TARO: きぶんがわるい ？
+TORO: きぶんがわるい ？
 MEGU: …
 MEGU: ???
 MEGU -shock-: !!! I DON'T UNDERSTAND A WORD HE SAYS!!! AAAAAAH
-TARO: …Oh ho ho…
+TORO: …Oh ho ho…
 MEGU: …Maybe I can understand him?

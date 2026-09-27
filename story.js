@@ -86,20 +86,20 @@ function runEffect(name) {
   setTimeout(() => main.classList.remove(`fx-${name}`), ms);
 }
 
-/** A scene is written with the speaker in capitals - MEGU, TARO - because that
+/** A scene is written with the speaker in capitals - MEGU, TORO - because that
  *  is how a script reads on the page.  On screen it is a name, not shouting. */
 // Nobody has introduced him.  She washes up on a beach and a stranger speaks to
 // her in a language she does not have a word of - she cannot know his name, and
 // a plate that prints it is the story telling her something she was never told.
 // He leaves this set on the day the story says who he is.
-const UNMET = new Set(['TARO']);
+const UNMET = new Set(['TORO']);
 const named = (who) => (UNMET.has(who.toUpperCase()) ? '???'
   : who[0] + who.slice(1).toLowerCase());
 
 // Who the screen shows.  There is one place to stand, so it belongs to whoever
 // is talking - a story that keeps showing her while somebody else speaks is
 // telling the wrong thing.  A name with no picture leaves whoever is there.
-const FACES = { MEGU: 'img/char.webp', TARO: 'img/taro.webp' };
+const FACES = { MEGU: 'img/char.webp', TORO: 'img/taro.webp' };
 // Nobody is nudged by a MEASUREMENT any more.  Five different ways of measuring
 // "where the person is" pointed five different ways on the same drawing - the
 // middle of the picture, the middle of each row (which is the middle of "staff
@@ -109,7 +109,7 @@ const FACES = { MEGU: 'img/char.webp', TARO: 'img/taro.webp' };
 // started.  The instrument is the drawing rendered at the size the stage
 // actually uses, with a red line down the middle of the screen to judge it
 // against, and the eye.
-// Judged that way, Megu stands centred on her own and Taro does not: his staff
+// Judged that way, Megu stands centred on her own and Toro does not: his staff
 // runs off the left edge of the screen and leaves the sea empty on the right.
 // So the stylesheet moves him, and it knows which of them is standing there
 // because of the line below.

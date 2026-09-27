@@ -144,7 +144,7 @@ main.dash.talking .char{width:100%;max-width:none;height:100%;overflow:visible;
    object-fit keeps her proportions while the box takes the whole stage. */
 main.dash.talking .char img{display:block;flex:none;width:100%;height:120vh;
   object-fit:cover;object-position:50% 0;max-width:none;max-height:none;margin-left:0}
-/* Taro alone, and by eye rather than by arithmetic.  He is not framed in his own
+/* Toro alone, and by eye rather than by arithmetic.  He is not framed in his own
    file the way she is in hers: he is drawn holding a staff out to his left, so
    centring the PICTURE puts the man right of centre and runs the staff off the
    edge of the screen, with the sea left empty on his other side.
@@ -154,7 +154,7 @@ main.dash.talking .char img{display:block;flex:none;width:100%;height:120vh;
    It moves the PICTURE inside the stage, not the stage: sliding the whole box
    sideways - which is what translate did - is what left bare island down the
    left edge in a wide window, because the box is now exactly the stage. */
-main.dash.talking .char img[data-who="TARO"]{object-position:36% 0}
+main.dash.talking .char img[data-who="TORO"]{object-position:36% 0}
 /* And no shadow on the stage.  A hard shadow behind a big figure draws a line
    round it, which is the other half of "why do they stand out". */
 main.dash.talking .char img{filter:none}
