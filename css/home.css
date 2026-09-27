@@ -92,7 +92,10 @@ main.dash:not(.talking) .top::after{content:"";position:absolute;z-index:1;
    altogether.  It used to share the row with her, and once she grew to most of
    its width there was nothing left for it: "843" was pushed off the screen with
    only the 8 showing. */
-main.dash .top .ring{position:absolute;right:0;top:26px;z-index:2;width:auto;padding:12px 4px 10px}
+/* Lower than it was, by the height of her corner row: the three icons in the
+   right corner are above it now, and at 26px the number was drawn through
+   them. */
+main.dash .top .ring{position:absolute;right:0;top:44px;z-index:2;width:auto;padding:12px 4px 10px}
 /* While she has the screen the island's rows are folded away.  Only the rows
    themselves go: what is inside her own panel is not one of them, which is why
    this reaches for the children of the screen and not for the classes. */
@@ -209,7 +212,12 @@ main.dash.talking .top .story{display:none}
    CSS invented. Square with rounded corners, which takes a narrower slice than
    a pill does: her cap is half a pill's height, and at that width on a square
    box the two caps meet in the middle and it comes out a circle. */
-main.dash .top .quest{position:absolute;left:8px;bottom:9%;z-index:4;
+/* Over her, in the middle of her and down at the bottom, where she moved it:
+   it used to stand off at the left edge of the row, beside her rather than on
+   her.  The middle is the middle of HER box, not of the row - the row's right
+   half belongs to the number - so it is measured the same way her button is. */
+main.dash .top .quest{position:absolute;left:calc(min(72%, 100% - 175px) / 2);
+  translate:-50% 0;bottom:9%;z-index:4;
   width:38px;height:38px;padding:0;display:grid;place-items:center;
   font-size:20px;font-weight:800;line-height:1;color:#fff;
   border:0 solid transparent;background:none;
@@ -217,6 +225,23 @@ main.dash .top .quest{position:absolute;left:8px;bottom:9%;z-index:4;
   filter:drop-shadow(0 4px 9px #0b142c77);animation:nod 1.7s ease-in-out infinite}
 @keyframes nod{0%,100%{translate:0 0}50%{translate:0 -3px}}
 main.dash.talking .top .quest{display:none}
+
+/* Her four corners, along the top of the drawing: the diary alone on the left,
+   the island's three on the right with the map outermost, the way she numbered
+   them.  They stand ON the picture, so they carry a dark pane behind them -
+   a line drawing alone is unreadable over both the sky and the palms.
+   Placeholders until her own icons arrive; only the pictures inside change. */
+main.dash .top .hud{position:absolute;top:0;z-index:4;display:flex;gap:6px}
+main.dash .top .hud.left{left:0}
+main.dash .top .hud.right{right:0}
+.hud button{width:34px;height:34px;display:grid;place-items:center;padding:0;border:0;
+  border-radius:11px;color:#fff;background:#0b142c55;
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.hud button:active{background:#0b142c88}
+.hud svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.9;
+  stroke-linecap:round;stroke-linejoin:round}
+/* Gone while the story runs, like everything else in this row. */
+main.dash.talking .top .hud{display:none}
 /* A note laid over the island rather than a screen of its own: she asked for
    it over the screen, and it is tapped away anywhere. */
 .over{position:fixed;inset:0;z-index:6;display:grid;place-items:center;padding:18px;

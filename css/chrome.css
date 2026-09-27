@@ -87,6 +87,8 @@ main.study ~ #tabs{display:none}
   padding:7px 0 5px;font-size:13px;letter-spacing:.02em;color:var(--dim)}
 #tabs .ic{--s:46px}
 #tabs .on{color:var(--pink);font-weight:700}
+/* A place the story has not taken her yet: on the bar, and dim. */
+#tabs button[disabled]{opacity:.38}
 #tabs button:active{background:var(--warm)}
 
 /* The name of the screen, the way she drew it: her icon, the word in big

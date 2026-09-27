@@ -48,7 +48,7 @@ const QUESTS = [
 
 /** One plate over the island, tapped away.  Not a screen of its own: she is
  *  back home and this is a note laid on top of it, which is where she put it. */
-function over(html) {
+export function over(html) {
   const box = document.createElement('div');
   box.className = 'over';
   box.id = 'over';
