@@ -1,4 +1,4 @@
-[".", "index.html", "css/theme.css", "css/chrome.css", "css/stats.css", "css/home.css", "css/story.css", "css/buttons.css", "css/boards.css", "css/lesson.css",
+[".", "index.html", "css/theme.css", "css/chrome.css", "css/stats.css", "css/home.css", "css/story.css", "css/world.css", "css/buttons.css", "css/boards.css", "css/lesson.css",
  "manifest.webmanifest", "icon.png", "deck.json",
  "img/sprite-day.webp", "img/sprite-night.webp", "img/bg-day.jpg", "img/bg-night.jpg",
  "img/bg-sky.jpg", "img/bg-sky-night.jpg",
@@ -7,10 +7,11 @@
  "img/btn-go.webp", "img/btn-soft.webp", "img/chip-on.webp", "img/chip-off.webp",
  "img/sw-on.webp", "img/sw-off.webp", "img/tag-pink.webp", "img/tag-cream.webp",
  "img/char.webp", "img/taro.webp", "img/lily.webp", "img/hanry.webp",
+ "img/world.webp", "img/world-ic.webp",
  "app.js", "dom.js", "rand.js", "store.js", "schedule.js", "boards.js", "lesson.js", "sound.js",
  "icons.js", "ring.js", "nav.js", "dash.js", "decks.js", "screens.js", "page.js",
  "statsview.js", "calendar.js", "settings.js", "jungle.js", "pick.js", "perday.js",
  "boardart.js", "boardset.js",
- "word.js", "priority.js", "rowset.js", "swipe.js", "backup.js", "talk.js", "story.js", "quiz.js",
+ "word.js", "priority.js", "rowset.js", "swipe.js", "backup.js", "talk.js", "story.js", "quiz.js", "world.js",
  "level.js", "quest.js",
  "story/01-beach.txt"]

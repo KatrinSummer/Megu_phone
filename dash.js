@@ -17,7 +17,7 @@ import { countRow, bindCount } from './perday.js';
 import { markTab } from './nav.js';
 import { talkPanel, startStory } from './talk.js';
 import { advance } from './story.js';
-import { questMark, bindQuest, noteAfterStory } from './quest.js';
+import { questMark, bindQuest, noteAfterStory, questsOpen } from './quest.js';
 
 /** The scene is over.  She lands back on the island - which is this screen -
  *  with her note laid over it.  The story does not know about Home and should
@@ -61,7 +61,8 @@ export function dash() {
         ${ring(deck.cards, '158px', `<div class="mid"><span class="n">${deck.cards.length}</span>
           <span class="l">words</span>${done ? `<span class="l today">${done} today</span>` : ''}</div>`)}
       </div>
-      <button class="big story" id="d-story"><span class="t">Start Adventure</span></button>
+      ${questsOpen() ? ''
+    : '<button class="big story" id="d-story"><span class="t">Start Adventure</span></button>'}
       ${questMark()}
     </div>
     ${talkPanel()}
@@ -115,7 +116,10 @@ export function dash() {
   bindQuest();
   // The same door with a handle on it: she wanted the way in written down, not
   // only guessable from the drawing.
-  $('d-story').addEventListener('click', (e) => {
+  // It is gone once the intro has been played - she has started it, and a
+  // button that says "start" on a story she has finished is the app forgetting
+  // where she is.  She herself is still the way back into it.
+  $('d-story')?.addEventListener('click', (e) => {
     e.stopPropagation();
     startStory(backFromStory);
   });

@@ -76,9 +76,12 @@ main.dash:not(.talking) .top::after{content:"";position:absolute;z-index:1;
    curls of her hair on both sides - and her hair is not mine to trim.  She is
    smaller by that much; the box is what keeps her clear of the number, so it
    cannot be widened to give the size back. */
+/* Not grey to the bone: she asked for some of the colour back.  Most of it
+   still belongs to the story - she stands in full colour the moment it starts
+   - but a figure with no hue at all on the island read as switched off. */
 .char img{width:100%;height:auto;display:block;
-  filter:grayscale(1) drop-shadow(0 5px 9px rgba(6,12,28,.28))}
-:root[data-theme="dark"] .char img{filter:grayscale(1) var(--dim-art)
+  filter:grayscale(.55) drop-shadow(0 5px 9px rgba(6,12,28,.28))}
+:root[data-theme="dark"] .char img{filter:grayscale(.55) var(--dim-art)
   drop-shadow(0 5px 9px rgba(6,12,28,.55))}
 .char:active img{transform:translateY(1px)}
 .char{transition:translate .35s ease}

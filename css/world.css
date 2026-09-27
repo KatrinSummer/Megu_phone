@@ -1,0 +1,7 @@
+/* The island: her map, whole, and a line under it.  One picture is the screen,
+   so it is given the width and left alone - a map cropped to a tidy rectangle
+   is a map with places missing off the edges. */
+.page.world .map{border-radius:18px;overflow:hidden;border:1px solid var(--line);
+  box-shadow:var(--shade);line-height:0}
+.page.world .map img{width:100%;height:auto;display:block}
+.page.world .note{margin:11px 2px 0;color:var(--dim);font-size:13px;line-height:1.5}

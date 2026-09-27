@@ -35,7 +35,12 @@ const bat = new Map(BOARD_ART.map((n, i) => [n, [i % COLS, (i / COLS) | 0]]));
  *  gear is one: her sheet draws Settings as a flower, but the phone she drew has
  *  a gear down in the bar.  The books for the boards and the jungle for the
  *  random run she drew later, on a sheet of their own. */
-const OWN = { gear: 'img/gear.webp', decks: 'img/decks.webp', jungle: 'img/jungle.webp' };
+const OWN = {
+  gear: 'img/gear.webp', decks: 'img/decks.webp', jungle: 'img/jungle.webp',
+  // The island itself, cut square out of her map: the World tab wears the
+  // place it opens rather than a symbol for it.
+  world: 'img/world-ic.webp',
+};
 /** Her night sheet draws these worse than her day sheet, so
  *  after dark they are taken off the day one and turned down to suit the night. */
 const DAYLIT = new Set(['hidden']);

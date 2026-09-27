@@ -71,6 +71,23 @@ main.dash.talking>.talk{display:flex;margin-top:auto;position:relative;z-index:2
 .speech .skip:active{background:var(--warm)}
 .speech .end{color:var(--dim);text-align:center}
 
+/* Whoever is speaking arrives a moment before their line, and fades in rather
+   than being swapped: a hard cut between two people reads as a glitch. */
+main.dash.talking .char img{transition:opacity .18s ease}
+
+/* A change of place - "-black-" in a scene.  Not a flash: the ground goes dark
+   and the stage stays empty until somebody new is standing on it.  There is no
+   drawing of the church yet, and the beach behind a church is worse than
+   black. */
+main.dash.talking.blackout,
+main.dash.talking.blackout .top{background:#05080f}
+
+/* The question the intro ends on: the screen goes dark and it stands in the
+   middle of it, the way she drew it - not on the plate at the foot of the
+   screen, which is where the conversation was. */
+.over.dark{background:#05080fe6}
+.over.dark .chips{grid-template-columns:1fr 1fr 1fr}
+
 /* What a -word- on its own does.  Two of them so far, and both are over in
    under a second: a screen that shakes for longer reads as a fault. */
 /* Shock is the camera flinching once, hard and short - what a person does when

@@ -84,7 +84,18 @@ export function parseScene(text) {
 // instead of doing nothing and leaving her wondering.
 const EFFECTS = { shock: 400, scared: 700, shake: 500, dark: 900 };
 
+/** A change of place, not a flash: the ground goes dark and the stage empties,
+ *  and it stays that way until somebody new is standing on it.  She has no
+ *  drawing of the church yet, so black is what the church is. */
+function blackout() {
+  $('main')?.classList.add('blackout');
+  blank = true;
+  const img = $('d-char')?.querySelector('img');
+  if (img) img.hidden = true;
+}
+
 function runEffect(name) {
+  if (name === 'black') return blackout();
   const ms = EFFECTS[name];
   if (!ms) {
     console.warn(`story: no effect called "${name}". There is: ${Object.keys(EFFECTS).join(', ')}`);
@@ -102,14 +113,18 @@ function runEffect(name) {
 // a plate that prints it is the story telling her something she was never told.
 // He leaves this set on the day the story says who he is.
 const UNMET = new Set(['TORO']);
+/** A name the screen spells its own way.  Her thoughts are not her speaking,
+ *  and the plate says so: she asked for "Megu Thought" over them. */
+const SHOWN = { 'MEGU THOUGHT': 'Megu Thought' };
 const named = (who) => (UNMET.has(who.toUpperCase()) ? '???'
-  : who[0] + who.slice(1).toLowerCase());
+  : SHOWN[who.toUpperCase()] ?? who[0] + who.slice(1).toLowerCase());
 
 // Who the screen shows.  There is one place to stand, so it belongs to whoever
 // is talking - a story that keeps showing her while somebody else speaks is
 // telling the wrong thing.  A name with no picture leaves whoever is there.
 const FACES = {
   MEGU: 'img/char.webp',
+  'MEGU THOUGHT': 'img/char.webp',
   TORO: 'img/taro.webp',
   LILY: 'img/lily.webp',
   HANRY: 'img/hanry.webp',
@@ -128,15 +143,27 @@ const FACES = {
 // So the stylesheet moves him, and it knows which of them is standing there
 // because of the line below.
 function show(who) {
+  const img = $('d-char')?.querySelector('img');
+  if (!img) return;
   const name = who?.toUpperCase();
   const face = FACES[name];
-  const img = $('d-char')?.querySelector('img');
-  if (!face || !img) return;
+  // Nobody to show: the stage is left empty rather than leaving the last
+  // person standing there while somebody else does the talking.
+  if (!face) { img.hidden = true; return; }
+  // After a change of place the stage stays empty until somebody new walks on
+  // to it.  The line straight after the change is hers, and standing her on
+  // the new ground before the story has shown it is telling the wrong thing.
+  if (blank && name === img.dataset.who) { img.hidden = true; return; }
+  blank = false;
+  img.hidden = false;
   if (!img.src.endsWith(face)) img.src = face;
   img.dataset.who = name;
 }
 
 let beats = [], at = 0, running = false, scene = '', ends = null;
+// Who spoke last, whether the stage is dark and empty, and whether the screen
+// is between two lines - a tap in that gap must not eat the next one.
+let lastWho = '', blank = false, hold = false;
 
 let back;                               // the timer that puts the noise back
 
@@ -161,7 +188,7 @@ function flip(line) {
 export const advance = (e) => {
   const noise = e?.target?.closest?.('.noise');
   if (noise) return flip(noise.closest('.line'));
-  if (running) step();
+  if (running && !hold) step();
 };
 
 /** The last beat of the intro is hers, and it is a question: how much of their
@@ -174,15 +201,23 @@ const LEVEL_Q = 'Megu is having trouble with the local accent! '
   + 'What is your lvl of the language?';
 
 function askLevel(box) {
-  box.innerHTML = `<p class="line">${esc(LEVEL_Q)}</p>
+  // The screen goes dark and the question stands in the middle of it, the way
+  // she drew it - not on the plate at the foot of the screen, which is where
+  // the conversation happened and this is not part of the conversation.
+  const over = document.createElement('div');
+  over.className = 'over dark';
+  over.id = 'over';
+  over.innerHTML = `<div class="card"><p>${esc(LEVEL_Q)}</p>
     <div class="chips lv">${LEVELS.map(([id, title]) =>
-    `<button data-lv="${esc(id)}">${esc(title)}</button>`).join('')}</div>`;
-  for (const b of box.querySelectorAll('[data-lv]')) {
+    `<button data-lv="${esc(id)}">${esc(title)}</button>`).join('')}</div></div>`;
+  document.body.append(over);
+  for (const b of over.querySelectorAll('[data-lv]')) {
     b.addEventListener('click', (e) => {
       e.stopPropagation();              // the screen is a way on; this is not
       setLevel(b.dataset.lv);
       (settings.scenes ??= {})[scene] = { done: true, v: FIRST_V };
       saveSettings();
+      over.remove();
       box.innerHTML = '<p class="end">— to be continued —</p>';
       ends?.();
     });
@@ -199,11 +234,21 @@ function step() {
     return askLevel(box);
   }
   const b = beats[at++];
+  const changed = (b.who ?? '') !== lastWho;
+  lastWho = b.who ?? '';
   show(b.who);                          // the screen belongs to whoever is talking
   if (b.fx) runEffect(b.fx);            // the screen flinches as the line lands
   const jp = JAPANESE.test(b.text);
-  box.innerHTML = `${b.who ? `<p class="who">${esc(named(b.who))}</p>` : ''}
+  const html = `${b.who ? `<p class="who">${esc(named(b.who))}</p>` : ''}
     <p class="line">${jp ? heard(b.text) : esc(b.text)}</p><p class="on">tap to go on</p>`;
+  // The person arrives before their line does.  Both landing in the same
+  // instant reads as the one who was already standing there saying it, which
+  // is what she saw every time the speaker changed.  The plate is empty for
+  // that moment, and a tap in it is ignored rather than eating the line.
+  if (!changed) { box.innerHTML = html; return; }
+  box.innerHTML = '';
+  hold = true;
+  setTimeout(() => { hold = false; box.innerHTML = html; }, 220);
 }
 
 export async function startScene(name, onEnd) {
@@ -221,6 +266,12 @@ export async function startScene(name, onEnd) {
   at = 0;
   scene = name;
   said.clear();                         // the test asks about THIS run of it
+  // A second time through starts on the same ground as the first: nobody left
+  // standing from last time, no change of place still in force.
+  lastWho = ''; blank = false; hold = false;
+  $('main')?.classList.remove('blackout');
+  const img = $('d-char')?.querySelector('img');
+  if (img) img.hidden = false;
   running = true;                       // the screen carries the taps from here
   step();
 }

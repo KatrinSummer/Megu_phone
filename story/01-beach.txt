@@ -44,17 +44,18 @@ LILY: H-Hello! I am Lilia…D-daughter of um....the chief??? … How are you?
 MEGU -shake-: !!!Khhhhh!!! English!!! You speak English??? Where am I???
 LILY: …English…!..A…Yes…yes…A l-little… I - help you…A-are you okay? D-does it hurt?
 MEGU: ! N-no! I'm all right!
-MEGU: Hmmm...Seeing how nervous she is is making me nervous too!
+MEGU THOUGHT: Hmmm...Seeing how nervous she is is making me nervous too!
 MEGU: Wwhere am I?! Hey! R-right! My cellphone!
 LILY: ..... Oh R-right! Come with me!
 MEGU: ???
 
-# They move to the church.
--dark-
+# They move to the church.  No drawing of it yet, so the stage goes black and
+# empty and stays that way until Hanry is standing in it.
+-black-
 MEGU: ???A-a church???
 HANRY: ! Oh Hello! How are you? You are that girl from beyond the island Lilia was talking about!? And who was unconscious for 2 days?
 MEGU -shake-: T-two days!?...!
 MEGU: !
 HANRY: !Oh! How rude of me! I am Hanry! Sorry…Ha-ha life on the island all these years without a single soul who spoke English…made me unpatient. Ha-ha. How are you? Does your head hurt? All in order, I suppose?
 MEGU: …
-MEGU: I am not the only one who speaks English here!!!I am so happy!!!
+MEGU THOUGHT: I am not the only one who speaks English here!!!I am so happy!!!
