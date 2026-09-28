@@ -234,12 +234,14 @@ main.dash.talking .top .quest{display:none}
 main.dash .top .hud{position:absolute;top:0;z-index:4;display:flex;gap:6px}
 main.dash .top .hud.left{left:0}
 main.dash .top .hud.right{right:0}
-.hud button{width:34px;height:34px;display:grid;place-items:center;padding:0;border:0;
-  border-radius:11px;color:#fff;background:#0b142c55;
-  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-.hud button:active{background:#0b142c88}
-.hud svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.9;
-  stroke-linecap:round;stroke-linejoin:round}
+/* Her own pictures now, one file each.  They are painted with their own frame
+   - a scroll, a book - so they carry no pane behind them: a dark box under a
+   drawn scroll is a second frame round the first.  A shadow is what holds them
+   off the sky instead. */
+.hud button{width:42px;height:42px;padding:0;border:0;background:none;line-height:0}
+.hud button:active{transform:translateY(1px)}
+.hud img{width:100%;height:100%;object-fit:contain;
+  filter:drop-shadow(0 2px 5px rgba(6,12,28,.55))}
 /* Gone while the story runs, like everything else in this row. */
 main.dash.talking .top .hud{display:none}
 /* A note laid over the island rather than a screen of its own: she asked for

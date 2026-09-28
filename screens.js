@@ -1,18 +1,19 @@
 // What is on the screen: the list of boards, the two bars, and the card.
 import { $, esc } from './dom.js';
 import { progress, settings, lifetime, doneToday, countDone, uncountDone, countTime,
-         saveProgress, flipStar, today } from './store.js';
+         saveProgress, flipStar } from './store.js';
 import { answer, nextIn, isMemorized } from './schedule.js';
-import { deck, boardCards, pool, buildQueue, flipMark, learnable, reviewable, isOut } from './boards.js';
+import { deck, boardCards, pool, buildQueue, flipMark } from './boards.js';
 import { queue, again, first, lesson, nextCard, keep, forget } from './lesson.js';
 import { play, SPEAKER } from './sound.js';
 import { yomi, glosses, openWord } from './word.js';
 import { boardBack } from './boardset.js';
 import { priButtons, bindPri } from './priority.js';
-import { openBoard, cameFromHome } from './page.js';
-// Home, for the end of a jungle run.  Home leads here and this leads back; both
-// only ever call the other from a button, so neither waits on the other to load.
-import { dash } from './dash.js';
+// The page after the last card: its own screen, in its own file.  It leads
+// back here for another lesson and this leads there when the cards run out;
+// both only ever call the other from a button, so neither waits on the other
+// to load.
+import { summary } from './summary.js';
 import { ic } from './icons.js';
 
 let current = null, shown = false, revealed = false;
@@ -90,43 +91,11 @@ export function render() {
   revealed = false;
   shownAt = Date.now();                   // a flip does not restart it
   draw();
-  if (settings.autoPlay) play(current);   // the word speaks as soon as it is shown
-}
-
-// The end of the lesson: how it went, what she forgot, and the way back.
-function summary() {
-  const how = [...first.values()];
-  const n = (k) => how.filter((v) => v === k).length;
-  const rows = [['Words', how.length], ['Normal', n('good')], ['Easy', n('easy')],
-    ['Hard', n('again')], ['Skipped', n('skip')]].filter(([, v], i) => !i || v);
-  const missed = [...first].filter(([, v]) => v === 'again').map(([f]) => f);
-  // What is left: a review has the words not seen today, a lesson its new words.
-  const rev = settings.mode === 'review', wild = settings.mode === 'jungle', id = settings.deck;
-  // Where the way back leads: a jungle run belongs to no board, and a lesson
-  // started at Home never came through a board's page.
-  const toHome = wild || cameFromHome();
-  const left = wild ? deck.cards.filter((c) => !isOut(c)).length
-    : (rev ? reviewable(id).filter((c) => progress[c.f]?.seen !== today()) : learnable(id)).length;
-  const more = wild ? Number(left > 0) : Math.min(settings.perDay, left);
-  // The lesson is over, so the bar along the bottom comes back with the summary -
-  // and with it the arrow, in place of the Finish that has nothing left to end.
-  $('finish').hidden = true;
-  $('back').hidden = false;
-  $('main').className = 'page';
-  $('main').innerHTML = `<div class="done"><h2>${how.length ? 'Lesson done' : 'Done for today'}</h2>
-    ${how.length ? `<table>${rows.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('')}</table>` : ''}
-    ${missed.length ? `<div class="note">Hard: ${missed.map(esc).join(' · ')}</div>` : ''}
-    <div>${wild ? `${left} words are out there in the jungle.`
-      : rev ? `${left} more to review today.` : left ? `${left} new words left on this board.`
-      : 'Every word of this board has been started: review them from its page.'}</div>
-    <button class="wide" id="boards">${toHome ? 'Back home' : 'Back to the board'}</button>
-    ${more ? `<button class="wide" id="more">${wild ? 'Into the jungle again'
-      : settings.rand ? (rev ? 'Review more' : 'Show more new words')
-      : rev ? `Review ${more} more` : `Show ${more} more new words`}</button>` : ''}</div>`;
-  // Back the way she came in: the jungle belongs to no board, and a lesson
-  // started at Home never came through a board's page either.
-  $('boards').addEventListener('click', () => (toHome ? dash() : openBoard(id)));
-  $('more')?.addEventListener('click', begin);
+  // The word speaks as soon as it is shown - unless the card is standing
+  // English-first, where the Japanese IS the answer: saying it here is the
+  // answer read out loud before she has guessed.  There it waits for the flip,
+  // which is where draw() plays it.
+  if (settings.autoPlay && !boardBack(settings.deck)) play(current);
 }
 
 /** Her Finish in the header: the lesson stops on this card, and the end of it is
@@ -184,7 +153,8 @@ function draw() {
     </div>
     <div class="row">
       ${revealed ? `
-        <button id="again">${ic('again')}Hard<span class="s">again</span></button>
+        <button id="again">${ic('again')}Again<span class="s">this lesson</span></button>
+        <button id="hard">${ic('missed')}Hard<span class="s">${nextIn(c, 'hard')}</span></button>
         <button id="good">${ic('gotit')}Normal<span class="s">${nextIn(c, 'good')}</span></button>
         <button id="easy">${ic('hint')}Easy<span class="s">${nextIn(c, 'easy')}</span></button>`
       : `<button id="reveal">${ic('start')}Show</button>`}
@@ -225,7 +195,7 @@ function draw() {
       moveOn(c, before, flipMark(c.f, key) ? on : off);
     });
   }
-  for (const g of ['again', 'good', 'easy']) {
+  for (const g of ['again', 'hard', 'good', 'easy']) {
     $(g)?.addEventListener('click', () => {
       const before = snap(c);
       answer(c, g);
@@ -241,8 +211,9 @@ function draw() {
 const past = [];
 const snap = (c) => progress[c.f] && { ...progress[c.f] };
 /** What adds to "done today": a word she knew, or ticked as known. Hiding one
- *  as not important is not learning it. */
-const counted = (how) => how === 'good' || how === 'easy' || how === 'known';
+ *  as not important is not learning it - and neither is Again, which is not
+ *  having the word.  Hard counts: she had it, slowly. */
+const counted = (how) => how === 'good' || how === 'easy' || how === 'hard' || how === 'known';
 const MARKS = new Set(['known', 'unknown', 'hidden', 'shown']);
 
 /** `how`: her answer (again, good, easy), a skip, the tick (known, unknown) or

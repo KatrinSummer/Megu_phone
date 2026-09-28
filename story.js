@@ -3,11 +3,11 @@
 // The scene lives in a text file she writes herself - names, lines, and
 // -effects- between dashes - so the story can grow without this file changing.
 import { $, esc } from './dom.js';
-import { cardOf } from './boards.js';
-import { isMemorized } from './schedule.js';
-import { stateOf } from './word.js';
 import { settings, saveSettings } from './store.js';
 import { LEVELS, setLevel } from './level.js';
+// What a line of theirs sounds like to her - a subject of its own, and the
+// only part of a scene that is about the language rather than about the play.
+import { heard, JAPANESE, clearHeard } from './heard.js';
 
 /** The scene she opens on, named once for the whole app: Home opens it, and
  *  the island waits on it to hand out quests.  It was written down in both of
@@ -16,51 +16,26 @@ import { LEVELS, setLevel } from './level.js';
  *  story, and a line of it should never mean editing code. */
 export const FIRST = '01-beach';
 
-/** Which version of it she has played.  A scene finished once is remembered for
- *  good - that memory is what puts the "!" on Home - but the scene itself is
- *  hers and she rewrites it, and then the mark stands on Home for a scene
- *  nobody has seen.  A record carries the number the scene had when it was
- *  earned; this goes up whenever the text of it changes, and the mark waits to
- *  be earned again with nothing for her to press. */
-export const FIRST_V = 3;
+/** The scene that hands her her first quests: her two lines about the
+ *  islanders, played the first time she presses Megu on the island.  She drew
+ *  it as a conversation and not as one crowded plate - press her, she talks,
+ *  and THEN the quests exist. */
+export const QUESTS = '02-quests';
 
-// The village speaks Japanese and she does not, so a word she has not learned
-// reaches her as noise.  The noise is kana rather than invented symbols: she is
-// hearing Japanese, she simply cannot understand it - and kana is certain to
-// draw on her phone, which a rare glyph is not.
-// Writing she cannot read, not a line struck out.  It was kana first, which read
-// as Japanese she simply had not learned; then blocks, which read as a censored
-// document rather than as a village speaking.  What she asked for is a script of
-// their own - so this is one: letters, clearly letters, and not one of them hers.
-// These are real Unicode syllabics rather than invented pictures because a made-
-// up glyph has no font behind it and arrives on her phone as an empty box, which
-// is unreadable for the wrong reason.  This block ships with iOS, Android and
-// Windows alike.
-const SCRIPT = 'ᐊᐃᐅᑎᑭᒥᓇᔭᕐᖏᐸᒐᓗᑦᔅ';
-/** Same word in, same noise out - so an unheard word is recognisably the same
- *  one each time it comes round, and the day she learns it, it resolves. */
-const deafen = (t) => [...t].map((ch, i) => (/[぀-ヿ]/.test(ch)
-  ? SCRIPT[(ch.codePointAt(0) * 7 + i * 13) % SCRIPT.length] : ch)).join('');
+/** Which version of each scene she has played.  A scene finished once is
+ *  remembered for good - that memory is what puts the "!" on Home - but the
+ *  scenes are hers and she rewrites them, and then the mark stands on Home for
+ *  a scene nobody has seen.  A record carries the number the scene had when it
+ *  was earned; bump the one whose text changed, and it waits to be earned
+ *  again with nothing for her to clear by hand. */
+export const V = { [FIRST]: 4, [QUESTS]: 1 };
+export const FIRST_V = V[FIRST];
 
-// A line is Japanese if there is kana in it; Megu's own English never is.
-const JAPANESE = /[぀-ヿ]/;
-
-/** A line as she hears it.  Scenes space their kana word by word, the same way
- *  her example sentences do, so each piece is one word to look up.  Learned
- *  words stand as themselves and wear their colour; the rest is noise. */
-const known = (t) => { const c = cardOf(t); return !!c && isMemorized(c); };
-/** A word she has not learned carries both of its faces: the noise she hears,
- *  and what was really said underneath.  A tap turns the line over. */
-/** Every word of theirs the scene put in front of her, in the order it came.
- *  The test at the end asks about these and nothing else: it is a test on the
- *  conversation she just had, not on the deck. */
-const said = new Set();
-const heard = (text) => text.split(' ').map((t) => {
-  if (cardOf(t)) said.add(t);
-  return known(t)
-    ? `<span class="w ${stateOf(cardOf(t))}">${esc(t)}</span>`
-    : `<span class="noise" data-said="${esc(t)}" data-noise="${esc(deafen(t))}">${esc(deafen(t))}</span>`;
-}).join(' ');
+/** Played to the end, in the text that is there now.  It asks for `done` and
+ *  not merely for a record, because a record written by an older build was
+ *  written under a looser rule: opening a scene is not finishing one. */
+export const played = (name) => settings.scenes?.[name]?.done === true
+  && settings.scenes[name].v === V[name];
 
 /** One line of the file -> one beat.
  *  "NAME: text" is somebody speaking, "NAME -word-: text" is speaking while the
@@ -200,6 +175,22 @@ export const advance = (e) => {
 const LEVEL_Q = 'Megu is having trouble with the local accent! '
   + 'What is your lvl of the language?';
 
+/** Written down as played, in the version that is on disk now. */
+const mark = () => {
+  (settings.scenes ??= {})[scene] = { done: true, v: V[scene] ?? 1 };
+  saveSettings();
+};
+
+/** The end of a scene.  The intro - and only the intro - ends on her own
+ *  question about how much of the language she has; every other scene simply
+ *  closes and hands her back to whatever opened it. */
+function finishScene(box) {
+  if (scene === FIRST) return askLevel(box);
+  mark();
+  box.innerHTML = '<p class="end">— to be continued —</p>';
+  ends?.();
+}
+
 function askLevel(box) {
   // The screen goes dark and the question stands in the middle of it, the way
   // she drew it - not on the plate at the foot of the screen, which is where
@@ -215,8 +206,7 @@ function askLevel(box) {
     b.addEventListener('click', (e) => {
       e.stopPropagation();              // the screen is a way on; this is not
       setLevel(b.dataset.lv);
-      (settings.scenes ??= {})[scene] = { done: true, v: FIRST_V };
-      saveSettings();
+      mark();
       over.remove();
       box.innerHTML = '<p class="end">— to be continued —</p>';
       ends?.();
@@ -231,7 +221,7 @@ function step() {
   while (at < beats.length && beats[at].effect) runEffect(beats[at++].effect);
   if (at >= beats.length) {
     running = false;                    // and the screen stops being a way on
-    return askLevel(box);
+    return finishScene(box);
   }
   const b = beats[at++];
   const changed = (b.who ?? '') !== lastWho;
@@ -251,21 +241,32 @@ function step() {
   setTimeout(() => { hold = false; box.innerHTML = html; }, 220);
 }
 
+// Which scene was asked for last.  A scene is fetched, so two of them asked
+// for in quick succession are a race, and the one that lands LAST wins however
+// long ago it was asked for: pressing her, leaving, and pressing her again put
+// the intro on screen in place of the scene she had just asked for.  The older
+// load is dropped instead.
+let load = 0;
+
 export async function startScene(name, onEnd) {
   const box = $('d-say');
   box.hidden = false;
   ends = onEnd;
+  const mine = ++load;
+  let text;
   try {
-    beats = parseScene(await (await fetch(`story/${name}.txt`)).text());
+    text = await (await fetch(`story/${name}.txt`)).text();
   } catch {
     // Offline and never cached, or the file was renamed: say so rather than
     // sit there with an empty plate.
     box.innerHTML = `<p>The scene "${esc(name)}" could not be read.</p>`;
     return;
   }
+  if (mine !== load) return;            // she asked for another scene while this loaded
+  beats = parseScene(text);
   at = 0;
   scene = name;
-  said.clear();                         // the test asks about THIS run of it
+  clearHeard();                         // a test asks about THIS run of it
   // A second time through starts on the same ground as the first: nobody left
   // standing from last time, no change of place still in force.
   lastWho = ''; blank = false; hold = false;

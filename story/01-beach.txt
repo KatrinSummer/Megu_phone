@@ -53,7 +53,7 @@ MEGU: ???
 # empty and stays that way until Hanry is standing in it.
 -black-
 MEGU: ???A-a church???
-HANRY: ! Oh Hello! How are you? You are that girl from beyond the island Lilia was talking about!? And who was unconscious for 2 days?
+HANRY: ! Oh Hello! How are you? You are that girl from beyond the island Lilia was talking about!? Are you alright? You were unconscious for almost 2 days!
 MEGU -shake-: T-two days!?...!
 MEGU: !
 HANRY: !Oh! How rude of me! I am Hanry! Sorry…Ha-ha life on the island all these years without a single soul who spoke English…made me unpatient. Ha-ha. How are you? Does your head hurt? All in order, I suppose?

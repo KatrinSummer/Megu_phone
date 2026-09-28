@@ -16,8 +16,9 @@ import { pickBoard } from './pick.js';
 import { countRow, bindCount } from './perday.js';
 import { markTab, buildNav } from './nav.js';
 import { talkPanel, startStory } from './talk.js';
-import { advance } from './story.js';
-import { questMark, bindQuest, noteAfterStory, questsOpen, openQuests } from './quest.js';
+import { advance, QUESTS } from './story.js';
+import { questMark, bindQuest, noteAfterStory, noteQuests,
+         questsOpen, questsGot, openQuests } from './quest.js';
 import { hudCorners, bindHud } from './hud.js';
 
 /** The scene is over.  She lands back on the island - which is this screen -
@@ -28,6 +29,21 @@ import { hudCorners, bindHud } from './hud.js';
  *  reload, which reads as the story having promised her something it did not
  *  hand over. */
 const backFromStory = () => { buildNav(); dash(); noteAfterStory(); };
+
+/** The end of her two lines about the islanders: back to the island, and the
+ *  island says what they earned her.  The quests exist from this moment. */
+const backFromQuests = () => { dash(); noteQuests(); };
+
+/** One door.  Pressing her is always "what now" and never "start over":
+ *  the intro while it is unplayed; then her two lines about Lily and Hanry,
+ *  which is the scene that hands over the first quests; and after that the
+ *  quests themselves.  Playing the opening again is in Settings, where
+ *  something done on purpose belongs. */
+const pressMegu = () => {
+  if (!questsOpen()) return startStory(backFromStory);
+  if (!questsGot()) return startStory(backFromQuests, QUESTS);
+  openQuests();
+};
 
 /** The board the big button starts.  Her last one while it still has new words
  *  in it, otherwise the newest lesson, which is the one she is usually after. */
@@ -53,6 +69,10 @@ export function dash() {
   const hid = all.filter((p) => p.hide).length;
   const due = poolOf('learning').filter(isDue).length;
   const board = studyBoard();
+  // Which pile the big button will actually deal: her started words when
+  // something is due, this board's new ones otherwise.  The strip under the
+  // button sets that pile, so it has to know which one it is.
+  const deals = due ? 'learning' : board;
   const fresh = learnable(board).length;
   const stars = all.filter((p) => p.star).length;
   const pri = all.filter((p) => p.pri === 1).length;
@@ -78,7 +98,7 @@ export function dash() {
     <button class="big" id="d-start">${due
       ? `<span class="t">Repeat</span><span class="r">${ic('learning')}<span class="v">${due}</span>${COUNT}</span>`
       : `<span class="t">Start Adventure</span><span class="r"><span class="v" id="d-v">${settings.rand ? '?' : settings.perDay}</span>${ic('jungle')}${COUNT}</span>`}</button>
-    ${countRow()}
+    ${countRow(deals)}
     <button class="tile" id="d-jungle">${ic('jungle')}
       <span class="n">Jungle<span class="s">15 to 30 words from every board</span></span>
       <span class="go">›</span></button>
@@ -94,7 +114,7 @@ export function dash() {
   // needs no button of its own; otherwise it is a lesson where she was last; and
   // with nothing new left there, it asks her which board to open.
   $('d-start').addEventListener('click', () => {
-    settings.deck = due ? 'learning' : board;
+    settings.deck = deals;
     settings.mode = due ? 'review' : 'learn';
     saveSettings();
     cameIn('home');                                // she started here, so back is here
@@ -106,7 +126,7 @@ export function dash() {
     e.stopPropagation();
     $('d-count').classList.toggle('on');           // slides out right under the button, where she drew it
   });
-  bindCount();
+  bindCount(deals);
   // Pressing HER is the way into the story - the button laid over her belongs to
   // the lesson.  Inside the story she is a way on like the rest of the screen,
   // so the tap is left to bubble to the listener below; the tap that OPENS the
@@ -121,11 +141,11 @@ export function dash() {
   $('d-char').addEventListener('click', (e) => {
     if ($('main').classList.contains('talking')) return;
     e.stopPropagation();
-    if (questsOpen()) return openQuests();
-    startStory(backFromStory);
+    pressMegu();
   });
-  // The "!" on her: what the island has for her now the first scene is done.
-  bindQuest();
+  // The "!" on her opens the same thing she does: it stands on her, and there
+  // is one door into what is happening now, not two.
+  bindQuest(pressMegu);
   // And her four corners over the top of the drawing.
   bindHud();
   // The same door with a handle on it: she wanted the way in written down, not

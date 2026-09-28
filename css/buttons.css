@@ -64,6 +64,10 @@
    was open long before the clock ran out and shut only in the last of it: it
    hung there and then snapped, which is the jerk she saw. */
 .drop.on>div{max-height:120px}
+/* Two planks now - the count, and which way round the cards stand - so the
+   ceiling is two planks tall.  At one plank's height the second was cut off
+   halfway down. */
+.drop#d-count.on>div{max-height:210px}
 .drop#b-art.on>div{max-height:480px}
 /* Two rows of switches, and they are taller than the wooden sign the count
    rides on: a shelf cut to the sign's height would show one and a half. */
@@ -116,6 +120,14 @@
 /* Not the chips: they are her drawing, and a white plate flashing behind one
    for the length of a tap is a white square on the wood. */
 .cnt button:not(.pick):active{background:#fff}
+/* The way-round switch, on a plank of its own under the count.  It is her
+   painted switch, the same one the boards use - the rule above turns every
+   button on this row into one of the little round minus-and-plus discs, and
+   that is what swallowed it: 28px, round, and no picture on it. */
+.cnt.back{gap:12px}
+.cnt .sw{width:54px;height:30px;flex:none;border:0;border-radius:0;
+  background:url(../img/sw-off.webp) center/100% 100% no-repeat}
+.cnt .sw.on{background-image:url(../img/sw-on.webp)}
 /* The number sits in a little box of its own, like everything else on the line
    she can press - it is the thing the minus and the plus are moving. */
 .cnt b{flex:none;font-size:20px;font-weight:700;min-width:20px;text-align:center;

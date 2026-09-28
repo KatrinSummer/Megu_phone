@@ -15,6 +15,15 @@ const of = (id) => ((settings.boardSet ??= {})[id] ??= {});
  *  is the harder drill she turns on when she wants it. */
 export const boardBack = (id) => !!of(id).back;
 
+/** And setting it, from here or from the strip under Home's big button - that
+ *  button deals a pile with no page of its own, so its switch is there.  One
+ *  function, so two switches can never write it two different ways. */
+export function setBoardBack(id, on) {
+  of(id).back = on ? 1 : 0;
+  saveSettings();
+  return on;
+}
+
 /** How many words this board deals. Falls back to the app's own number, which
  *  is also where Random lives - a board that has never been set follows it. */
 export const boardWords = (id) => of(id).per ?? lessonSize();
@@ -55,9 +64,7 @@ export function bindBoardSet(id, onKind) {
   }
   const sw = document.getElementById('s-back');
   sw?.addEventListener('click', () => {
-    const on = !boardBack(id);
-    of(id).back = on ? 1 : 0;
-    saveSettings();
+    const on = setBoardBack(id, !boardBack(id));
     sw.classList.toggle('on', on);
     sw.setAttribute('aria-checked', String(on));
   });

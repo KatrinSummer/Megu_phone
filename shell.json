@@ -8,10 +8,12 @@
  "img/sw-on.webp", "img/sw-off.webp", "img/tag-pink.webp", "img/tag-cream.webp",
  "img/char.webp", "img/taro.webp", "img/lily.webp", "img/hanry.webp",
  "img/world.webp", "img/world-ic.webp",
+ "img/hud-map.webp", "img/hud-people.webp", "img/hud-quests.webp", "img/hud-diary.webp",
  "app.js", "dom.js", "rand.js", "store.js", "schedule.js", "boards.js", "lesson.js", "sound.js",
  "icons.js", "ring.js", "nav.js", "dash.js", "decks.js", "screens.js", "page.js",
  "statsview.js", "calendar.js", "settings.js", "jungle.js", "pick.js", "perday.js",
  "boardart.js", "boardset.js",
- "word.js", "priority.js", "rowset.js", "swipe.js", "backup.js", "talk.js", "story.js", "quiz.js", "world.js",
+ "word.js", "priority.js", "rowset.js", "swipe.js", "backup.js", "talk.js", "story.js", "heard.js",
+ "summary.js", "quiz.js", "world.js",
  "level.js", "quest.js", "hud.js",
- "story/01-beach.txt"]
+ "story/01-beach.txt", "story/02-quests.txt"]

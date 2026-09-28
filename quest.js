@@ -4,41 +4,40 @@
 // Every word in here is hers, out of STORY.md, carried into English the same
 // way her scenes are - the island speaks Japanese, Megu does not, and this app
 // is public.
+//
+// What Megu SAYS about the quests is not here: it is a scene of its own
+// (story/02-quests.txt), because she drew it as her talking and the island
+// answering afterwards, not as one plate with everything on it.
 import { $, esc } from './dom.js';
-import { settings } from './store.js';
-// The scene the island is waiting on - the same name the story opens with, so
-// the mark and the plate can never disagree about it.
-import { FIRST, FIRST_V } from './story.js';
+// The scenes the island waits on - named where the story names them, so the
+// mark and the plates can never disagree about which scene is which.
+import { FIRST, QUESTS as SCENE, played } from './story.js';
 
-/** The quests open when the first scene is FINISHED - the test at the end of
- *  it seen through to its last plate and the island come back to.  Not "the
- *  scene was opened", not "a record exists": she has no quest until she has
- *  earned one, and a mark standing on Home before that is the app promising
- *  her something that has not happened.
- *  It asks for `done` and not merely for the record, because a record written
- *  by any older version of this app was written under the looser rule - and an
- *  app that keeps showing the mark because of what some earlier build saved is
- *  telling her exactly the thing she said was wrong. */
-/*  And it asks for the version as well, because the scene she finished is not
- *  the scene that is there now: she rewrote the intro, and the mark went on
- *  standing on Home for a beach nobody had played.  A record from the older
- *  text counts as not played, so the mark waits without her having to clear
- *  anything by hand. */
-export const questsOpen = () => settings.scenes?.[FIRST]?.done === true
-  && settings.scenes[FIRST].v === FIRST_V;
+/** The island opens when the first scene is FINISHED - the intro seen through
+ *  to its last plate and the island come back to.  Not "the scene was
+ *  opened", not "a record exists": she has no island until she has earned it,
+ *  and a mark standing on Home before that is the app promising her something
+ *  that has not happened. */
+export const questsOpen = () => played(FIRST);
+
+/** And the quests themselves exist once she has heard her own two lines about
+ *  the islanders.  That scene is what hands them over, so before it the corner
+ *  is there and holds nothing - which is what she asked for: first she talks,
+ *  then there are two quests. */
+export const questsGot = () => played(SCENE);
 
 // Her note on the way back to the island.
 const NOTE = `Learn the language together with Megu and get to know the
   islanders! Do quests and explore the unknown island! Who knows what treasures
   are buried here~`;
 
-// What she says when the mark is pressed.
-const MEGU = `I've settled in a little~ But without their language it is so hard
-  T___T Luckily I have Lily and Mr Henry!!! I don't know what I would do
-  without them!! I have to thank them somehow!`;
+// What the island says once she has said her piece: the quests are open.
+const NEW = 'New quests are open to you';
 
-const HINT = `New quests are open to you. Learn words to open new ones ~ Do
-  quests and get rewards`;
+const HINT = `Learn words to open new quests ~ Do quests and get rewards`;
+
+// Nothing to do yet, and it says whose move it is rather than standing empty.
+const NONE = 'No quests yet - press Megu and hear what she has to say.';
 
 const QUESTS = [
   ['Thank Lily', 'I must thank Lily for all her help!!! But what does she like???'],
@@ -66,23 +65,32 @@ export function noteAfterStory() {
   over(`<p>${esc(NOTE)}</p>`);
 }
 
+/** And the island's answer to her two lines: the quests are open now.  It is
+ *  the "-info-" beat of her sketch - a plate of its own, after she has spoken
+ *  and before the quests are anywhere to be seen. */
+export function noteQuests() {
+  over(`<h2>${esc(NEW)}</h2><p class="hint">${esc(HINT)}</p>`);
+}
+
 /** The mark on Home: a "!" at her feet, where she drew it. */
 export const questMark = () => (questsOpen()
   ? `<button class="quest" id="d-quest" aria-label="Quests">!</button>` : '');
 
-/** What the island has for her now.  Behind the "!" at her feet, and behind
- *  Megu herself once the intro is played - she is the way to what is happening
- *  now, and what is happening now is these. */
+/** What the island has for her now, and nothing else on the plate: her own
+ *  words about it were said in the scene that opened them. */
 export function openQuests() {
-  over(`<h2>Megu</h2><p>${esc(MEGU)}</p>
+  if (!questsGot()) return over(`<p>${esc(NONE)}</p>`);
+  over(`<h2>Quests</h2>
     ${QUESTS.map(([name, text]) =>
       `<div class="q"><b>${esc(name)}</b>${esc(text)}</div>`).join('')}
     <p class="hint">${esc(HINT)}</p>`);
 }
 
-export function bindQuest() {
+/** The "!" opens whatever pressing Megu opens - it stands on her, and there is
+ *  one door, not two.  Home decides what that is and hands it in. */
+export function bindQuest(press) {
   $('d-quest')?.addEventListener('click', (e) => {
     e.stopPropagation();                        // it stands on her, and she opens the story
-    openQuests();
+    press();
   });
 }

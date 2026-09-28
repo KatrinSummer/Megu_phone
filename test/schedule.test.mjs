@@ -32,6 +32,25 @@ test('easy adds half again, and never less than two days', () => {
   assert.deepEqual([p().iv, p().ease, inDays()], [2, 2.65, 2]);
 });
 
+// Hard is not "show it again" - that is Again's job, and the two were one
+// button until she said so.  She HAD the word, slowly: the wait grows by a
+// fifth instead of by the ease, the ease comes down, and it does not come
+// round again today.
+test('hard: she had it slowly, so the wait grows a little and not again today', () => {
+  reset();
+  answer(card, 'good'); answer(card, 'good');     // 1 day, then 3
+  assert.equal(answer(card, 'hard'), false);      // false: not again today
+  assert.deepEqual([p().iv, p().ease, inDays()], [4, 2.35, 4]);
+  answer(card, 'hard');
+  assert.deepEqual([p().iv, p().ease], [5, 2.2]); // and it climbs every time
+});
+
+test('hard on a word she has never answered is still a day, and it counts as a rung', () => {
+  reset();
+  answer(card, 'hard');
+  assert.deepEqual([p().iv, p().reps, p().total, inDays()], [1, 1, 1, 1]);
+});
+
 test('forgot it: back to the bottom, today, and the ease drops', () => {
   reset();
   answer(card, 'good');
@@ -84,6 +103,14 @@ test('the button says what it will cost before she taps it', () => {
   assert.equal(nextIn(card, 'good'), 'in 20 days');   // 8 x 2.5
   progress[card.f].iv = 40;
   assert.equal(nextIn(card, 'good'), 'in 3 months');
+});
+
+test('and it says what Hard will cost, which is less than Normal', () => {
+  reset();
+  assert.equal(nextIn(card, 'hard'), 'tomorrow');
+  answer(card, 'good'); answer(card, 'good'); answer(card, 'good');
+  assert.deepEqual([nextIn(card, 'hard'), nextIn(card, 'good'), nextIn(card, 'easy')],
+    ['in 10 days', 'in 20 days', 'in 1 months']);
 });
 
 test('memorized: parked a month by the schedule, or waved off by her', () => {
