@@ -28,7 +28,7 @@ export const QUESTS = '02-quests';
  *  a scene nobody has seen.  A record carries the number the scene had when it
  *  was earned; bump the one whose text changed, and it waits to be earned
  *  again with nothing for her to clear by hand. */
-export const V = { [FIRST]: 5, [QUESTS]: 1 };
+export const V = { [FIRST]: 6, [QUESTS]: 1 };
 export const FIRST_V = V[FIRST];
 
 /** Played to the end, in the text that is there now.  It asks for `done` and
@@ -140,31 +140,11 @@ let beats = [], at = 0, running = false, scene = '', ends = null;
 // is between two lines - a tap in that gap must not eat the next one.
 let lastWho = '', blank = false, hold = false;
 
-let back;                               // the timer that puts the noise back
-
-/** Turn the line over: the noise becomes what was really said, and a second tap
- *  - or five seconds - turns it back.  It is not a translation she keeps, it is
- *  a glance at the writing on the sign.  Whole line at once, because one word
- *  out of a sentence she cannot read is not worth the tap. */
-function flip(line) {
-  clearTimeout(back);
-  const open = line.classList.toggle('open');
-  for (const s of line.querySelectorAll('.noise')) {
-    s.textContent = open ? s.dataset.said : s.dataset.noise;
-  }
-  if (open) back = setTimeout(() => flip(line), 5000);
-}
-
 /** The next line.  Nothing in here listens for a tap: the screen does, and the
  *  screen calls this - so the story runs the same whatever she pressed.
- *  A tap that landed on the noise is the exception: it turns that line over and
- *  goes no further, or the same tap would show her the words and take them away
- *  in the same instant. */
-export const advance = (e) => {
-  const noise = e?.target?.closest?.('.noise');
-  if (noise) return flip(noise.closest('.line'));
-  if (running && !hold) step();
-};
+ *  There is nothing to turn over any more: what they say stands in plain
+ *  Japanese, so a tap anywhere is simply the way on. */
+export const advance = () => { if (running && !hold) step(); };
 
 /** The last beat of the intro is hers, and it is a question: how much of their
  *  language does she have?  A test of nine questions used to stand here - she
@@ -217,7 +197,6 @@ function askLevel(box) {
 /** Effects run on the way past; the next line she reads stops the walk. */
 function step() {
   const box = $('d-say');
-  clearTimeout(back);                   // the line it would turn back is gone
   while (at < beats.length && beats[at].effect) runEffect(beats[at++].effect);
   if (at >= beats.length) {
     running = false;                    // and the screen stops being a way on
@@ -227,6 +206,10 @@ function step() {
   const changed = (b.who ?? '') !== lastWho;
   lastWho = b.who ?? '';
   show(b.who);                          // the screen belongs to whoever is talking
+  // Her thoughts go over her head, where she put them: a thought is not
+  // something she says, and the plate at her feet is for speaking.
+  box.parentElement.classList.toggle('thought',
+    (b.who ?? '').toUpperCase() === 'MEGU THOUGHT');
   if (b.fx) runEffect(b.fx);            // the screen flinches as the line lands
   const jp = JAPANESE.test(b.text);
   const html = `${b.who ? `<p class="who">${esc(named(b.who))}</p>` : ''}

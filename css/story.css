@@ -10,6 +10,9 @@
    screen behind this plate, so the plate has to be the thing in front - and it
    has a solid background, which is what hides the cut. */
 main.dash.talking>.talk{display:flex;margin-top:auto;position:relative;z-index:2}
+/* Her thoughts stand over her head instead, in the empty sky she pointed at:
+   what she says belongs at her feet, what she thinks does not. */
+main.dash.talking>.talk.thought{margin-top:0;margin-bottom:auto}
 /* What is said, on a plate of its own: the words stand on the beach otherwise
    and the sand reads straight through them.  Not .say - that is the speaker
    button inside a word's box, and two things under one name is how one of them
@@ -24,20 +27,10 @@ main.dash.talking>.talk{display:flex;margin-top:auto;position:relative;z-index:2
    the one thing she must never have to guess. */
 .speech .who{font-size:13px;font-weight:700;color:var(--pink);
   letter-spacing:.02em;margin:0 0 3px}
-/* The noise she can turn over, and it says so: pink.  It used to look exactly
-   like the rest of the line, on the grounds that a word which advertises itself
-   is a hint - but there is nothing to give away here, she cannot read any of it,
-   and a line that can be turned over and never says so is a button nobody
-   presses.  The pink is the whole mark: a dotted line under it as well was too
-   much, and it is her line to draw.
-   This comment was closed twice, and the stray half-sentence left standing
-   between the two ends read to the parser as a broken selector - which swallows
-   the rule underneath it as part of the wreckage.  That is why the noise turned
-   pink only once she had tapped it: the rule that paints it BEFORE the tap is
-   this one, and it never survived parsing. */
-.line .noise{cursor:pointer;color:var(--pink)}
-/* Turned over, the real words stand in the same pink. */
-.line.open .noise{color:var(--pink)}
+/* There is no noise any more, and so no rule for it: what they say stands in
+   plain Japanese. Somebody who cannot read Japanese learns nothing from a
+   scrambled version of it, and turning the line over was one more thing to
+   press - her call, 28.09. */
 /* The test at the end of a scene, on the same plate the talking happened on:
    it is the last beat of the conversation, not a screen of its own. */
 .quiz-q{margin:0 0 9px}

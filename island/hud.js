@@ -7,6 +7,7 @@
 // replaced and nothing else.
 import { $, esc } from '../core/dom.js';
 import { over, openQuests } from './quest.js';
+import { openDiary } from './diary.js';
 import { markTab } from './nav.js';
 import { worldPage } from './world.js';
 
@@ -19,8 +20,7 @@ const RIGHT = [
   ['map', 'The island', () => { markTab('world'); worldPage(); }],
 ];
 const LEFT = [
-  ['diary', 'Her diary', () => over(`<h2>Her diary</h2>
-    <p>${esc('Her pages are written but not in the app yet.')}</p>`)],
+  ['diary', 'Her diary', () => openDiary()],
 ];
 
 const button = ([id, name]) => `<button id="hud-${id}" aria-label="${esc(name)}"

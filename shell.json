@@ -15,5 +15,5 @@
  "boards/boardart.js", "boards/boardset.js",
  "study/word.js", "study/priority.js", "boards/rowset.js", "core/swipe.js", "core/backup.js", "island/talk.js", "island/story.js", "island/heard.js",
  "study/summary.js", "study/quiz.js", "island/world.js",
- "island/level.js", "island/quest.js", "island/hud.js",
+ "island/level.js", "island/quest.js", "island/hud.js", "island/diary.js",
  "story/01-beach.txt", "story/02-quests.txt"]

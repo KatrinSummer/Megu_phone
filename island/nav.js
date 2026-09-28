@@ -6,6 +6,9 @@
 import { $ } from '../core/dom.js';
 import { ic } from '../core/icons.js';
 import { home } from '../boards/decks.js';
+// Only to record how she got to the boards, so their back arrow knows whether
+// there is anywhere to go back to.
+import { cameIn } from '../boards/page.js';
 import { dash } from './dash.js';
 import { statsPage } from '../stats/statsview.js';
 import { settingsPage } from '../core/settings.js';
@@ -21,7 +24,9 @@ import { questsOpen } from './quest.js';
 const TABS = [
   ['world', 'World', 'world', () => worldPage()],
   ['home', 'Home', 'home', () => dash()],
-  ['decks', 'Decks', 'decks', () => home()],
+  // From the bar the boards are a tab she is on, not a place she went to, so
+  // no arrow: that is what `cameIn` records.
+  ['decks', 'Decks', 'decks', () => { cameIn('decks'); home(); }],
   ['stats', 'Stats', 'stats', () => statsPage()],
   ['settings', 'Settings', 'gear', () => settingsPage()],
 ];

@@ -10,7 +10,7 @@ import { isMemorized } from '../study/schedule.js';
 import { ic } from '../core/icons.js';
 import { ring } from './ring.js';
 import { leave } from '../study/screens.js';
-import { openBoard, boardName } from './page.js';
+import { openBoard, boardName, cameFromHome } from './page.js';
 import { boardIcon } from './boardart.js';
 import { markTab } from '../island/nav.js';
 
@@ -46,7 +46,12 @@ export function home() {
   // and every one already has its own way in from Home.  With all five in here
   // the screen said "4 boards" at the top and then showed seven rows.
   const ids = ['learning', ...deck.decks.map((d) => d.id)];
-  $('star').hidden = $('back').hidden = true;
+  $('star').hidden = true;
+  // The way back, but only when there is one: opened from Home, this screen
+  // is somewhere she went, and the arrow takes her back the way every other
+  // screen does.  Reached from the bar it is not a place she came to, it is
+  // the tab she is on, and an arrow there points at nothing.
+  $('back').hidden = !cameFromHome();
   $('stats').hidden = true;
   // The name of the screen is on the screen now, in her big heading, so the
   // header keeps quiet: it said "Decks" twice.

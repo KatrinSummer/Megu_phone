@@ -80,7 +80,10 @@ export function dash() {
   const pri = all.filter((p) => p.pri === 1).length;
   const done = doneToday();
 
-  $('main').className = 'dash';
+  // Her colour says whether the island is waiting on her: greyed while she has
+  // something to say, full colour once there is nothing pending.  Same
+  // condition as the "!", so the two can never disagree.
+  $('main').className = questsOpen() && !questsGot() ? 'dash has-quest' : 'dash';
   $('main').innerHTML = `
     <div class="top">
       <button class="char" id="d-char" aria-label="Megu — open her story"><img src="img/char.webp" alt=""></button>
@@ -185,5 +188,6 @@ export function dash() {
   $('d-hidden').addEventListener('click', () => openBoard('hidden', 'home'));
   $('d-star').addEventListener('click', () => openBoard('star', 'home'));
   $('d-pri').addEventListener('click', () => openBoard('pri', 'home'));
-  $('d-decks').addEventListener('click', () => { markTab('decks'); home(); });
+  // She came from Home, so the boards get a way back to it.
+  $('d-decks').addEventListener('click', () => { cameIn('home'); markTab('decks'); home(); });
 }

@@ -80,9 +80,16 @@ main.dash:not(.talking) .top::after{content:"";position:absolute;z-index:1;
    still belongs to the story - she stands in full colour the moment it starts
    - but a figure with no hue at all on the island read as switched off. */
 .char img{width:100%;height:auto;display:block;
-  filter:grayscale(.55) drop-shadow(0 5px 9px rgba(6,12,28,.28))}
-:root[data-theme="dark"] .char img{filter:grayscale(.55) var(--dim-art)
+  filter:drop-shadow(0 5px 9px rgba(6,12,28,.28))}
+:root[data-theme="dark"] .char img{filter:var(--dim-art)
   drop-shadow(0 5px 9px rgba(6,12,28,.55))}
+/* Greyed only while the island is waiting on her.  A "!" on her means she has
+   something to say; the colour comes back the moment she has said it, and
+   with nothing pending she stands in full colour - her rule, 28.09. */
+main.dash.has-quest .char img{
+  filter:grayscale(.55) drop-shadow(0 5px 9px rgba(6,12,28,.28))}
+:root[data-theme="dark"] main.dash.has-quest .char img{
+  filter:grayscale(.55) var(--dim-art) drop-shadow(0 5px 9px rgba(6,12,28,.55))}
 .char:active img{transform:translateY(1px)}
 .char{transition:translate .35s ease}
 /* The ring rides at the top of the row, up in the sky.  It used to sit at the
@@ -231,7 +238,9 @@ main.dash.talking .top .quest{display:none}
    them.  They stand ON the picture, so they carry a dark pane behind them -
    a line drawing alone is unreadable over both the sky and the palms.
    Placeholders until her own icons arrive; only the pictures inside change. */
-main.dash .top .hud{position:absolute;top:0;z-index:4;display:flex;gap:5px}
+/* Right up against the top, where she drew them: the row itself begins below
+   the page's own padding, so the corners climb back out of it. */
+main.dash .top .hud{position:absolute;top:-12px;z-index:4;display:flex;gap:5px}
 main.dash .top .hud.left{left:0}
 main.dash .top .hud.right{right:0}
 /* Her own pictures now, one file each.  They are painted with their own frame
@@ -260,6 +269,11 @@ main.dash.talking .top .hud{display:none}
 .over h2{margin:0 0 7px;font-size:14px;font-weight:700;color:var(--pink)}
 .over p{margin:0 0 10px}
 .over .q{border-top:1px solid var(--line);padding-top:9px;margin-bottom:9px}
+/* A page of her diary: the number in the margin the way a diary has a date,
+   and her paragraphs kept apart - she writes in bursts, not in one block. */
+.over .page{border-top:1px solid var(--line);padding:9px 0 0 22px;position:relative}
+.over .page b{position:absolute;left:0;top:9px;color:var(--pink)}
+.over .page p:last-child{margin-bottom:9px}
 .over .q b{display:block;font-size:15px;margin-bottom:2px}
 .over .hint{font-size:13px;color:var(--dim)}
 .over .on{margin:0;font-size:12px;color:var(--dim);text-align:center}

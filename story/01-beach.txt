@@ -46,7 +46,7 @@ TORO: ちょっと まって
 MEGU: ???
 
 # A girl turns up and says a couple of things to her.
-LILY: H-Hello! I am Lilia…G-granddaughter of um....the chief??? … How are you?
+LILY: H-Hello! I am Lilia…D-daughter of um....the chief??? No…how was it…G-granddaughter? … How are you?
 MEGU -shake-: !!!Khhhhh!!! English!!! You speak English??? Where am I???
 LILY: …English…!..A…Yes…yes…A l-little… I - help you…A-are you okay? D-does it hurt?
 MEGU: ! N-no! I'm all right!
