@@ -9,22 +9,23 @@ import { isMemorized } from '../study/schedule.js';
 import { stateOf } from '../study/word.js';
 
 // The village speaks Japanese and she does not, so a word she has not learned
-// reaches her as noise.  The noise is kana rather than invented symbols: she is
-// hearing Japanese, she simply cannot understand it - and kana is certain to
-// draw on her phone, which a rare glyph is not.
-// Writing she cannot read, not a line struck out.  It was kana first, which read
-// as Japanese she simply had not learned; then blocks, which read as a censored
-// document rather than as a village speaking.  What she asked for is a script of
-// their own - so this is one: letters, clearly letters, and not one of them hers.
-// These are real Unicode syllabics rather than invented pictures because a made-
-// up glyph has no font behind it and arrives on her phone as an empty box, which
-// is unreadable for the wrong reason.  This block ships with iOS, Android and
-// Windows alike.
-const SCRIPT = 'ᐊᐃᐅᑎᑭᒥᓇᔭᕐᖏᐸᒐᓗᑦᔅ';
+// reaches her as noise.  The noise is KANA, because she asked for kana twice.
+// A "script of their own" was my idea and it was the wrong one: a row of
+// Canadian syllabics is not a language she is failing to understand, it is
+// gibberish on her screen, and she said so. She is hearing Japanese and simply
+// cannot follow it, so that is what it has to look like.
+//
+// Hiragana stays hiragana and katakana stays katakana - a katakana word turned
+// into hiragana would be the wrong kind of Japanese, and she can tell.  The
+// long mark and everything else is left alone: it is punctuation, not a sound
+// she could have learned.
+const HIRA = 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん';
+const KATA = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+const swap = (set, ch, i) => set[(ch.codePointAt(0) * 7 + i * 13) % set.length];
 /** Same word in, same noise out - so an unheard word is recognisably the same
  *  one each time it comes round, and the day she learns it, it resolves. */
-const deafen = (t) => [...t].map((ch, i) => (/[぀-ヿ]/.test(ch)
-  ? SCRIPT[(ch.codePointAt(0) * 7 + i * 13) % SCRIPT.length] : ch)).join('');
+const deafen = (t) => [...t].map((ch, i) => (/[ぁ-ん]/.test(ch) ? swap(HIRA, ch, i)
+  : /[ァ-ヴ]/.test(ch) ? swap(KATA, ch, i) : ch)).join('');
 
 /** A line is Japanese if there is kana in it; Megu's own English never is. */
 export const JAPANESE = /[぀-ヿ]/;

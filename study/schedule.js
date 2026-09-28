@@ -12,31 +12,39 @@ const wait = (p, iv) => Math.max(1, Math.round(iv * (p.pri === 1 ? 0.5 : p.pri =
 //
 //   Again  she did not have it.  It comes back at the end of this lesson, and
 //          keeps coming back until she answers it some other way.
-//   Hard   she had it, slowly.  The wait grows - by a fifth, not by the ease -
-//          and it does NOT come round again today.
+//   Hard   she had it, slowly.  Always a rung below Normal, and it does NOT
+//          come round again today.
 //   Normal she had it: the wait grows by the ease it has earned.
 //   Easy   she had it at once: the ease goes up and the wait grows half again.
 //
-// How many times a word has to be met before it stays is the thing these
-// numbers are for.  The reading on it is consistent: around eight encounters
-// for a word picked up from context, and five to seven SUCCESSFUL recalls,
-// spread out, for one drilled deliberately - each further apart than the last.
-// This ladder is exactly that: 1 day, 3, 8, 20, 50 is five recalls to reach
-// the month at which the app calls a word memorized.  Hard puts extra rungs in
-// (1, 2, 4, 8, ...) for a word she is fighting, and Again takes the ladder
-// away and starts it again the same day.
+// Four answers have to mean four different days, and on a brand new word they
+// did not: Normal's first step was one day, and one day is the shortest thing
+// a schedule counted in days can say, so Hard had nowhere below it to stand
+// and both buttons read "tomorrow".  Normal starts at two days for that
+// reason - Hard needs the day under it.
+//
+// How many times a word has to be met before it stays is what these numbers
+// are for.  The reading on it is consistent: around eight encounters for a
+// word picked up from context, and five to seven SUCCESSFUL recalls, spread
+// out, for one drilled deliberately - each further apart than the last.  The
+// ladder is exactly that: 2 days, 4, 10, 25, 63 - five recalls to pass the
+// month at which the app calls a word memorized.  Hard puts extra rungs in for
+// a word she is fighting, and Again takes the ladder away and starts it again
+// the same day.
 const HARD = 1.2;                          // what a slow recall grows the wait by
 const EASY = 1.5, EASY_UP = 0.15;
+const FIRST = 2, SECOND = 4;               // Normal's two fixed steps, in days
 
 /** The wait this answer would earn, in days. Pure, and the one place the
  *  ladder is written: `answer` writes it down, the buttons say what it costs. */
 function step(p, grade) {
   // A slow one climbs from where it stands rather than jumping to the next
   // rung - but it always climbs, or "hard" twice running would stand still.
-  if (grade === 'hard') return Math.max(p.reps === 0 ? 1 : p.iv + 1, Math.round(p.iv * HARD));
-  const iv = p.reps === 0 ? 1 : p.reps === 1 ? 3
+  if (grade === 'hard') return p.reps === 0 ? 1 : Math.max(p.iv + 1, Math.round(p.iv * HARD));
+  const iv = p.reps === 0 ? FIRST : p.reps === 1 ? SECOND
     : Math.round(p.iv * (p.ease + (grade === 'easy' ? EASY_UP : 0)));
-  return grade === 'easy' ? Math.max(2, Math.round(iv * EASY)) : iv;
+  // Twice Normal's first step on a new word, so the three of them read 1, 2, 4.
+  return grade === 'easy' ? Math.max(p.reps === 0 ? 2 * FIRST : 3, Math.round(iv * EASY)) : iv;
 }
 
 /** Grades the word and saves it. True means it has to come round again today. */

@@ -18,7 +18,7 @@ import { markTab, buildNav } from './nav.js';
 import { talkPanel, startStory } from './talk.js';
 import { advance, QUESTS } from './story.js';
 import { questMark, bindQuest, noteAfterStory, noteQuests,
-         questsOpen, questsGot, openQuests } from './quest.js';
+         questsOpen, questsGot } from './quest.js';
 import { hudCorners, bindHud } from './hud.js';
 
 /** The scene is over.  She lands back on the island - which is this screen -
@@ -34,15 +34,17 @@ const backFromStory = () => { buildNav(); dash(); noteAfterStory(); };
  *  island says what they earned her.  The quests exist from this moment. */
 const backFromQuests = () => { dash(); noteQuests(); };
 
-/** One door.  Pressing her is always "what now" and never "start over":
- *  the intro while it is unplayed; then her two lines about Lily and Hanry,
- *  which is the scene that hands over the first quests; and after that the
- *  quests themselves.  Playing the opening again is in Settings, where
- *  something done on purpose belongs. */
+/** One door, and it only ever leads forward: the intro while it is unplayed,
+ *  then her two lines about Lily and Hanry, which is the scene that hands over
+ *  the first quests.  After that she has nothing new until the next scene is
+ *  written, and pressing her does nothing at all - the quests are NOT behind
+ *  her, they are in the corner where she drew them, and opening them here as
+ *  well would be the same thing in two places.
+ *  Playing the opening again is in Settings, where something done on purpose
+ *  belongs. */
 const pressMegu = () => {
   if (!questsOpen()) return startStory(backFromStory);
-  if (!questsGot()) return startStory(backFromQuests, QUESTS);
-  openQuests();
+  if (!questsGot()) startStory(backFromQuests, QUESTS);
 };
 
 /** The board the big button starts.  Her last one while it still has new words

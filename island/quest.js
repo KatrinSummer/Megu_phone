@@ -72,9 +72,14 @@ export function noteQuests() {
   over(`<h2>${esc(NEW)}</h2><p class="hint">${esc(HINT)}</p>`);
 }
 
-/** The mark on Home: a "!" at her feet, where she drew it. */
-export const questMark = () => (questsOpen()
-  ? `<button class="quest" id="d-quest" aria-label="Quests">!</button>` : '');
+/** The mark on her: a "!" where she drew it.  It means SHE HAS SOMETHING TO
+ *  SAY, not "here are your quests" - so it stands only between the intro and
+ *  the scene where she says it, and goes the moment she has been heard.  The
+ *  quests are not behind her at all; they are in the corner, where she put
+ *  them. A mark that stays on after there is nothing new is the app calling
+ *  her over to hear something she has already heard. */
+export const questMark = () => (questsOpen() && !questsGot()
+  ? `<button class="quest" id="d-quest" aria-label="Megu has something to say">!</button>` : '');
 
 /** What the island has for her now, and nothing else on the plate: her own
  *  words about it were said in the scene that opened them. */

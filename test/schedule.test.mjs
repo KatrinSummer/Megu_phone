@@ -14,22 +14,29 @@ const reset = () => { for (const k of Object.keys(progress)) delete progress[k];
 const p = () => progress[card.f];
 const inDays = () => p().due - today();
 
-test('knew it: 1 day, then 3, then the interval times the ease', () => {
+test('knew it: 2 days, then 4, then the interval times the ease', () => {
   reset();
   assert.equal(answer(card, 'good'), false);      // false: not again today
-  assert.deepEqual([p().iv, p().reps, p().total, inDays()], [1, 1, 1, 1]);
+  assert.deepEqual([p().iv, p().reps, p().total, inDays()], [2, 1, 1, 2]);
   answer(card, 'good');
-  assert.deepEqual([p().iv, inDays()], [3, 3]);
+  assert.deepEqual([p().iv, inDays()], [4, 4]);
   answer(card, 'good');
-  assert.deepEqual([p().iv, inDays()], [8, 8]);   // 3 x 2.5, rounded
+  assert.deepEqual([p().iv, inDays()], [10, 10]);  // 4 x 2.5
 });
 
-test('easy adds half again, and never less than two days', () => {
+// The four answers have to mean four different days, and on a new word they
+// did not: Normal used to start at one day, and nothing fits under that.
+test('a new word: the four answers are four different days', () => {
+  reset();
+  assert.deepEqual(
+    [nextIn(card, 'hard'), nextIn(card, 'good'), nextIn(card, 'easy')],
+    ['tomorrow', 'in 2 days', 'in 4 days']);
+});
+
+test('easy on a new word is four days, and the ease goes up', () => {
   reset();
   answer(card, 'easy');
-  // The first step is one day; half again would be 1.5, and a day and a half is
-  // not a day she can be shown a word on.
-  assert.deepEqual([p().iv, p().ease, inDays()], [2, 2.65, 2]);
+  assert.deepEqual([p().iv, p().ease, inDays()], [4, 2.65, 4]);
 });
 
 // Hard is not "show it again" - that is Again's job, and the two were one
@@ -38,14 +45,14 @@ test('easy adds half again, and never less than two days', () => {
 // round again today.
 test('hard: she had it slowly, so the wait grows a little and not again today', () => {
   reset();
-  answer(card, 'good'); answer(card, 'good');     // 1 day, then 3
+  answer(card, 'good'); answer(card, 'good');     // 2 days, then 4
   assert.equal(answer(card, 'hard'), false);      // false: not again today
-  assert.deepEqual([p().iv, p().ease, inDays()], [4, 2.35, 4]);
+  assert.deepEqual([p().iv, p().ease, inDays()], [5, 2.35, 5]);
   answer(card, 'hard');
-  assert.deepEqual([p().iv, p().ease], [5, 2.2]); // and it climbs every time
+  assert.deepEqual([p().iv, p().ease], [6, 2.2]); // and it climbs every time
 });
 
-test('hard on a word she has never answered is still a day, and it counts as a rung', () => {
+test('hard on a word she has never answered is a day, and it counts as a rung', () => {
   reset();
   answer(card, 'hard');
   assert.deepEqual([p().iv, p().reps, p().total, inDays()], [1, 1, 1, 1]);
@@ -79,13 +86,13 @@ test('the ease has a floor: forgetting a word forever cannot pin it to zero', ()
 test('more often halves the wait, less often doubles it', () => {
   reset();
   answer(card, 'good'); answer(card, 'good'); answer(card, 'good');
-  assert.equal(p().iv, 8);
+  assert.equal(p().iv, 10);
   setPri(card.f, 1);
-  assert.deepEqual([p().iv, inDays()], [8, 4]);   // the wait moves, what it earned does not
+  assert.deepEqual([p().iv, inDays()], [10, 5]);  // the wait moves, what it earned does not
   setPri(card.f, -1);
-  assert.deepEqual([p().iv, inDays()], [8, 16]);
+  assert.deepEqual([p().iv, inDays()], [10, 20]);
   setPri(card.f, 0);
-  assert.deepEqual([p().iv, inDays()], [8, 8]);
+  assert.deepEqual([p().iv, inDays()], [10, 10]);
 });
 
 test('a priority on a word she has never answered moves nothing', () => {
@@ -98,19 +105,19 @@ test('a priority on a word she has never answered moves nothing', () => {
 
 test('the button says what it will cost before she taps it', () => {
   reset();
-  assert.equal(nextIn(card, 'good'), 'tomorrow');
+  assert.equal(nextIn(card, 'good'), 'in 2 days');
   answer(card, 'good'); answer(card, 'good'); answer(card, 'good');
-  assert.equal(nextIn(card, 'good'), 'in 20 days');   // 8 x 2.5
+  assert.equal(nextIn(card, 'good'), 'in 25 days');   // 10 x 2.5
   progress[card.f].iv = 40;
   assert.equal(nextIn(card, 'good'), 'in 3 months');
 });
 
-test('and it says what Hard will cost, which is less than Normal', () => {
+test('and it says what Hard will cost, which is always less than Normal', () => {
   reset();
   assert.equal(nextIn(card, 'hard'), 'tomorrow');
   answer(card, 'good'); answer(card, 'good'); answer(card, 'good');
   assert.deepEqual([nextIn(card, 'hard'), nextIn(card, 'good'), nextIn(card, 'easy')],
-    ['in 10 days', 'in 20 days', 'in 1 months']);
+    ['in 12 days', 'in 25 days', 'in 1 months']);
 });
 
 test('memorized: parked a month by the schedule, or waved off by her', () => {

@@ -95,7 +95,7 @@ main.dash:not(.talking) .top::after{content:"";position:absolute;z-index:1;
 /* Lower than it was, by the height of her corner row: the three icons in the
    right corner are above it now, and at 26px the number was drawn through
    them. */
-main.dash .top .ring{position:absolute;right:0;top:44px;z-index:2;width:auto;padding:12px 4px 10px}
+main.dash .top .ring{position:absolute;right:0;top:58px;z-index:2;width:auto;padding:12px 4px 10px}
 /* While she has the screen the island's rows are folded away.  Only the rows
    themselves go: what is inside her own panel is not one of them, which is why
    this reaches for the children of the screen and not for the classes. */
@@ -231,17 +231,23 @@ main.dash.talking .top .quest{display:none}
    them.  They stand ON the picture, so they carry a dark pane behind them -
    a line drawing alone is unreadable over both the sky and the palms.
    Placeholders until her own icons arrive; only the pictures inside change. */
-main.dash .top .hud{position:absolute;top:0;z-index:4;display:flex;gap:6px}
+main.dash .top .hud{position:absolute;top:0;z-index:4;display:flex;gap:5px}
 main.dash .top .hud.left{left:0}
 main.dash .top .hud.right{right:0}
 /* Her own pictures now, one file each.  They are painted with their own frame
    - a scroll, a book - so they carry no pane behind them: a dark box under a
    drawn scroll is a second frame round the first.  A shadow is what holds them
    off the sky instead. */
-.hud button{width:42px;height:42px;padding:0;border:0;background:none;line-height:0}
+.hud button{width:54px;height:54px;padding:0;border:0;background:none;line-height:0}
 .hud button:active{transform:translateY(1px)}
 .hud img{width:100%;height:100%;object-fit:contain;
   filter:drop-shadow(0 2px 5px rgba(6,12,28,.55))}
+/* Turned down after dark, like every other drawing of hers.  The rule is the
+   app's, not this row's: .ic.own, her board pictures and the people on the
+   stage all wear var(--dim-art) at night, and a picture that skips it glares
+   on the theme she actually uses. */
+:root[data-theme="dark"] .hud img{
+  filter:var(--dim-art) drop-shadow(0 2px 5px rgba(6,12,28,.7))}
 /* Gone while the story runs, like everything else in this row. */
 main.dash.talking .top .hud{display:none}
 /* A note laid over the island rather than a screen of its own: she asked for
