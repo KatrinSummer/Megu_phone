@@ -4,9 +4,15 @@
 # who has some English, and the girl takes her to the church and to the one
 # other man on the island who speaks it.
 #
-# Toro's first two lines were written by ChatGPT out of words already in the
-# deck, and every one of them was checked against deck.json: どうしたの, いたい,
-# きぶんがわるい are all cards she has.
+# Toro says what she wrote for him: "Have you come round? How is your head?
+# Does anything hurt?" and then "Are you all right?".  It used to be "What
+# happened? Does it hurt?", because the words for coming round and for a head
+# were not in the deck and the line was bent to fit the deck instead - which is
+# the one thing the story rules forbid (STORY_HOWTO.md).  The missing words -
+# きがついた, あたま, だいじょうぶ, どこか - were added to the Essential board.
+#
+# THIS JAPANESE IS A DRAFT.  She said to fix it myself rather than wait for
+# ChatGPT, so it is mine and it needs checking by her or by him.
 #
 # His third line is hers, not ChatGPT's - she wrote a soft old-man laugh, and a
 # laugh is not language: it needs no card, the same way clearing your throat
@@ -28,10 +34,10 @@ MEGU -shock-: Haaaaah!!! WHERE AM I!!??? Oh no!!
 MEGU: It wasn't a dream! I really did fall off that liner yesterday!
 TORO: Ahem… ahem…
 -scared-
-TORO: どうしたの ？ いたい ？
+TORO: きがついた ？ あたま だいじょうぶ ？ どこか いたい ？
 MEGU: …
 MEGU: ???
-TORO: きぶんがわるい ？
+TORO: だいじょうぶ ？
 MEGU: …
 MEGU: ???
 MEGU -shock-: !!! I DON'T UNDERSTAND A WORD HE SAYS!!! AAAAAAH
@@ -40,7 +46,7 @@ TORO: ちょっと まって
 MEGU: ???
 
 # A girl turns up and says a couple of things to her.
-LILY: H-Hello! I am Lilia…D-daughter of um....the chief??? … How are you?
+LILY: H-Hello! I am Lilia…G-granddaughter of um....the chief??? … How are you?
 MEGU -shake-: !!!Khhhhh!!! English!!! You speak English??? Where am I???
 LILY: …English…!..A…Yes…yes…A l-little… I - help you…A-are you okay? D-does it hurt?
 MEGU: ! N-no! I'm all right!

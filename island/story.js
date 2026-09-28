@@ -28,7 +28,7 @@ export const QUESTS = '02-quests';
  *  a scene nobody has seen.  A record carries the number the scene had when it
  *  was earned; bump the one whose text changed, and it waits to be earned
  *  again with nothing for her to clear by hand. */
-export const V = { [FIRST]: 4, [QUESTS]: 1 };
+export const V = { [FIRST]: 5, [QUESTS]: 1 };
 export const FIRST_V = V[FIRST];
 
 /** Played to the end, in the text that is there now.  It asks for `done` and
