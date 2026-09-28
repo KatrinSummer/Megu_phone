@@ -6,6 +6,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { progress } from '../core/store.js';
 import { shares } from '../boards/ring.js';
+// The wait at which a word counts as learned, taken from the schedule rather
+// than written down again here: it moved from 30 days to 45 and this file was
+// the only thing that disagreed.
+import { MEMORIZED } from '../study/schedule.js';
 
 const reset = () => { for (const k of Object.keys(progress)) delete progress[k]; };
 const cards = (...fronts) => fronts.map((f) => ({ f }));
@@ -27,11 +31,11 @@ test('a slip is a start too: she has met the word', () => {
   assert.deepEqual(shares(cards('a')), { know: 0, learn: 1, fresh: 0, hid: 0 });
 });
 
-test('parked a month by the schedule counts as known, and so does her tick', () => {
+test('parked long enough by the schedule counts as known, and so does her tick', () => {
   reset();
-  progress.a = { iv: 30 };
+  progress.a = { iv: MEMORIZED };
   progress.b = { known: 1 };
-  progress.c = { iv: 29, total: 1 };
+  progress.c = { iv: MEMORIZED - 1, total: 1 };
   assert.deepEqual(shares(cards('a', 'b', 'c')), { know: 2, learn: 1, fresh: 0, hid: 0 });
 });
 
@@ -45,7 +49,7 @@ test('a word she waved off is in its own pile and in no other', () => {
 test('the four piles always add up to the board', () => {
   reset();
   progress.b = { total: 1 };
-  progress.c = { iv: 30 };
+  progress.c = { iv: MEMORIZED };
   progress.d = { hide: 1 };
   const all = cards('a', 'b', 'c', 'd', 'e');
   const s = shares(all);

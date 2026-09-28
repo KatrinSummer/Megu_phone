@@ -13,6 +13,10 @@ const card = { f: 'ねこ' };
 const reset = () => { for (const k of Object.keys(progress)) delete progress[k]; };
 const p = () => progress[card.f];
 const inDays = () => p().due - today();
+// The ease is added to and taken from in steps of 0.15, and 1.85 - 0.15 is
+// 1.7000000000000002 in binary. Two decimals is well past anything the
+// schedule can act on: a day is the smallest thing it can say.
+const ease = () => Math.round(p().ease * 100) / 100;
 
 test('knew it: 2 days, then 4, then the interval times the ease', () => {
   reset();
@@ -21,7 +25,19 @@ test('knew it: 2 days, then 4, then the interval times the ease', () => {
   answer(card, 'good');
   assert.deepEqual([p().iv, inDays()], [4, 4]);
   answer(card, 'good');
-  assert.deepEqual([p().iv, inDays()], [10, 10]);  // 4 x 2.5
+  assert.deepEqual([p().iv, inDays()], [8, 8]);   // 4 x 2.0
+});
+
+// Six recalls before a word is parked, not five: the reading on vocabulary
+// wants eight to twelve spaced meetings, and the old ease got there in five.
+test('the ladder is 2, 4, 8, 16, 32, 64 and the sixth recall parks the word', () => {
+  reset();
+  const rungs = [];
+  for (let i = 0; i < 6; i++) { answer(card, 'good'); rungs.push(p().iv); }
+  assert.deepEqual(rungs, [2, 4, 8, 16, 32, 64]);
+  assert.equal(isMemorized(card), true);
+  progress[card.f].iv = 32;                       // one rung back
+  assert.equal(isMemorized(card), false);
 });
 
 // The four answers have to mean four different days, and on a new word they
@@ -36,7 +52,7 @@ test('a new word: the four answers are four different days', () => {
 test('easy on a new word is four days, and the ease goes up', () => {
   reset();
   answer(card, 'easy');
-  assert.deepEqual([p().iv, p().ease, inDays()], [4, 2.65, 4]);
+  assert.deepEqual([p().iv, ease(), inDays()], [4, 2.15, 4]);
 });
 
 // Hard is not "show it again" - that is Again's job, and the two were one
@@ -47,9 +63,9 @@ test('hard: she had it slowly, so the wait grows a little and not again today', 
   reset();
   answer(card, 'good'); answer(card, 'good');     // 2 days, then 4
   assert.equal(answer(card, 'hard'), false);      // false: not again today
-  assert.deepEqual([p().iv, p().ease, inDays()], [5, 2.35, 5]);
+  assert.deepEqual([p().iv, ease(), inDays()], [5, 1.85, 5]);
   answer(card, 'hard');
-  assert.deepEqual([p().iv, p().ease], [6, 2.2]); // and it climbs every time
+  assert.deepEqual([p().iv, ease()], [6, 1.7]);   // and it climbs every time
 });
 
 test('hard on a word she has never answered is a day, and it counts as a rung', () => {
@@ -63,7 +79,7 @@ test('forgot it: back to the bottom, today, and the ease drops', () => {
   answer(card, 'good');
   answer(card, 'good');
   assert.equal(answer(card, 'again'), true);      // true: it comes round again now
-  assert.deepEqual([p().iv, p().reps, p().lapses, p().ease, inDays()], [0, 0, 1, 2.3, 0]);
+  assert.deepEqual([p().iv, p().reps, p().lapses, p().ease, inDays()], [0, 0, 1, 1.8, 0]);
 });
 
 test('what she has really recalled survives a slip; the rung does not', () => {
@@ -86,13 +102,13 @@ test('the ease has a floor: forgetting a word forever cannot pin it to zero', ()
 test('more often halves the wait, less often doubles it', () => {
   reset();
   answer(card, 'good'); answer(card, 'good'); answer(card, 'good');
-  assert.equal(p().iv, 10);
+  assert.equal(p().iv, 8);
   setPri(card.f, 1);
-  assert.deepEqual([p().iv, inDays()], [10, 5]);  // the wait moves, what it earned does not
+  assert.deepEqual([p().iv, inDays()], [8, 4]);   // the wait moves, what it earned does not
   setPri(card.f, -1);
-  assert.deepEqual([p().iv, inDays()], [10, 20]);
+  assert.deepEqual([p().iv, inDays()], [8, 16]);
   setPri(card.f, 0);
-  assert.deepEqual([p().iv, inDays()], [10, 10]);
+  assert.deepEqual([p().iv, inDays()], [8, 8]);
 });
 
 test('a priority on a word she has never answered moves nothing', () => {
@@ -107,7 +123,7 @@ test('the button says what it will cost before she taps it', () => {
   reset();
   assert.equal(nextIn(card, 'good'), 'in 2 days');
   answer(card, 'good'); answer(card, 'good'); answer(card, 'good');
-  assert.equal(nextIn(card, 'good'), 'in 25 days');   // 10 x 2.5
+  assert.equal(nextIn(card, 'good'), 'in 16 days');   // 8 x 2.0
   progress[card.f].iv = 40;
   assert.equal(nextIn(card, 'good'), 'in 3 months');
 });
@@ -117,15 +133,15 @@ test('and it says what Hard will cost, which is always less than Normal', () => 
   assert.equal(nextIn(card, 'hard'), 'tomorrow');
   answer(card, 'good'); answer(card, 'good'); answer(card, 'good');
   assert.deepEqual([nextIn(card, 'hard'), nextIn(card, 'good'), nextIn(card, 'easy')],
-    ['in 12 days', 'in 25 days', 'in 1 months']);
+    ['in 10 days', 'in 16 days', 'in 26 days']);
 });
 
-test('memorized: parked a month by the schedule, or waved off by her', () => {
+test('memorized: parked a month and a half by the schedule, or waved off by her', () => {
   reset();
   assert.equal(isMemorized(card), false);
-  progress[card.f] = { iv: 29 };
+  progress[card.f] = { iv: 44 };
   assert.equal(isMemorized(card), false);
-  progress[card.f] = { iv: 30 };
+  progress[card.f] = { iv: 45 };
   assert.equal(isMemorized(card), true);
   progress[card.f] = { iv: 0, known: 1 };
   assert.equal(isMemorized(card), true);

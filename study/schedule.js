@@ -24,13 +24,18 @@ const wait = (p, iv) => Math.max(1, Math.round(iv * (p.pri === 1 ? 0.5 : p.pri =
 // reason - Hard needs the day under it.
 //
 // How many times a word has to be met before it stays is what these numbers
-// are for.  The reading on it is consistent: around eight encounters for a
-// word picked up from context, and five to seven SUCCESSFUL recalls, spread
-// out, for one drilled deliberately - each further apart than the last.  The
-// ladder is exactly that: 2 days, 4, 10, 25, 63 - five recalls to pass the
-// month at which the app calls a word memorized.  Hard puts extra rungs in for
-// a word she is fighting, and Again takes the ladder away and starts it again
-// the same day.
+// are for, and she asked for them to come from the reading rather than from
+// habit.  What the reading says: about eight spaced encounters to know a word
+// at all, twelve or more before an adult can recall its meaning to order;
+// under six encounters and less than a third of the words survive a week,
+// while at ten or more it is over four fifths.
+//
+// So the ladder is 2 days, 4, 8, 16, 32, 64, and a word is called memorized
+// at 45 days - six recalls, not five, and each of them further from the last.
+// With the first meeting and the two example sentences that ride on every
+// card, that is comfortably inside the range the studies give.  Hard puts
+// extra rungs in for a word she is fighting; Again takes the ladder away and
+// starts it again the same day.
 const HARD = 1.2;                          // what a slow recall grows the wait by
 const EASY = 1.5, EASY_UP = 0.15;
 const FIRST = 2, SECOND = 4;               // Normal's two fixed steps, in days
@@ -85,8 +90,12 @@ export function setPri(front, v) {
   saveProgress();
 }
 
-/** Parked for over a month by the schedule, or waved off by her. */
+/** Parked for a month and a half by the schedule, or waved off by her.
+ *  It was a month, which the ladder reached on the fifth recall; the reading
+ *  wants more spaced meetings than that before a word is called learned, and
+ *  45 days is the rung after it. */
+export const MEMORIZED = 45;
 export const isMemorized = (c) => {
   const p = progress[c.f];
-  return !!p && (p.known === 1 || p.iv >= 30);
+  return !!p && (p.known === 1 || p.iv >= MEMORIZED);
 };

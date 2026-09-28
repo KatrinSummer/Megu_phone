@@ -106,7 +106,14 @@ export const uncountDone = () => {
 };
 
 /** A word she has never answered. `total` is the count that survives a slip. */
-export const fresh = () => ({ due: today(), iv: 0, ease: 2.5, reps: 0, total: 0, lapses: 0, star: 0 });
+// The ease a word starts on. 2.5 is SM-2's number and it is built for a
+// learner who meets the word elsewhere as well - in reading, in speech. She
+// meets these words here and almost nowhere else, and the reading on
+// vocabulary is consistent that an adult needs around eight encounters to
+// know a word and twelve or more to recall its meaning. At 2.5 a word was
+// parked as memorized after five recalls; at 2.0 the same ladder gives six
+// and the waits stay short enough that she does not forget between them.
+export const fresh = () => ({ due: today(), iv: 0, ease: 2.0, reps: 0, total: 0, lapses: 0, star: 0 });
 /** Older saves have no `total`; back then `reps` was the count, so read it. */
 export const lifetime = (p) => p.total ?? p.reps ?? 0;
 /** She has answered it at least once. A star or a priority alone is not a start. */

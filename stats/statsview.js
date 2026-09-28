@@ -7,7 +7,10 @@
 import { $ } from '../core/dom.js';
 import { progress, doneToday, daysDone, daysTime, started, today } from '../core/store.js';
 import { deck, poolOf, isDue } from '../study/boards.js';
-import { isMemorized } from '../study/schedule.js';
+// MEMORIZED as well as the test for it: this screen counted the same thing
+// with its own copy of the number, and when the number moved it was the one
+// place still saying "a month".
+import { isMemorized, MEMORIZED } from '../study/schedule.js';
 import { ic } from '../core/icons.js';
 import { leave } from '../study/screens.js';
 import { markTab } from '../island/nav.js';
@@ -58,7 +61,7 @@ export function statsPage() {
     ['words in all', cards.length], ['started', all.filter(started).length],
     ['due for review', poolOf('learning').filter(isDue).length],
     ['bookmarked', all.filter((p) => p.star).length],
-    ['known over a month', all.filter((p) => p.iv >= 30).length],
+    [`parked ${MEMORIZED} days or more`, all.filter((p) => p.iv >= MEMORIZED).length],
     ['marked as known', all.filter((p) => p.known).length],
     ['hidden, not important', all.filter((p) => p.hide).length],
     ['more often', all.filter((p) => p.pri === 1).length],
