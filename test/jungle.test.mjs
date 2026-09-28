@@ -4,8 +4,8 @@
 import '../test-support/browser.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { progress } from '../store.js';
-import { jungleRun } from '../jungle.js';
+import { progress } from '../core/store.js';
+import { jungleRun } from '../study/jungle.js';
 
 const reset = () => { for (const k of Object.keys(progress)) delete progress[k]; };
 const cards = (n, prefix = 'w') => Array.from({ length: n }, (_, i) => ({ f: prefix + i }));

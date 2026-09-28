@@ -4,7 +4,7 @@
 import '../test-support/browser.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { LEVELS, levelOf, levelName, level, setLevel } from '../level.js';
+import { LEVELS, levelOf, levelName, level, setLevel } from '../island/level.js';
 
 test('three levels, in the order they are climbed', () => {
   assert.deepEqual(LEVELS.map(([id]) => id), ['none', 'half', 'most']);

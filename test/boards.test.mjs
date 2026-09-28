@@ -5,12 +5,12 @@
 import '../test-support/browser.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { progress, settings, today } from '../store.js';
-import { queue } from '../lesson.js';
+import { progress, settings, today } from '../core/store.js';
+import { queue } from '../study/lesson.js';
 import {
   setDeck, deck, cardOf, boardCards, isOut, isOutBoard, noLesson, poolOf,
   isNew, isDue, learnable, reviewable, buildQueue, flipMark, putBack,
-} from '../boards.js';
+} from '../study/boards.js';
 
 // Two ordinary decks, and one word that also sits in the review deck.
 const cards = [

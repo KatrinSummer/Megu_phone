@@ -6,8 +6,8 @@
 import '../test-support/browser.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { progress, today } from '../store.js';
-import { answer, nextIn, setPri, isMemorized } from '../schedule.js';
+import { progress, today } from '../core/store.js';
+import { answer, nextIn, setPri, isMemorized } from '../study/schedule.js';
 
 const card = { f: 'ねこ' };
 const reset = () => { for (const k of Object.keys(progress)) delete progress[k]; };

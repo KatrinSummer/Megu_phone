@@ -1,0 +1,74 @@
+// The boards, laid out the way she drew them: the name of the screen, a row of
+// filters, and one card per board with an icon of its own.
+//
+// It knows nothing about what a board *is* - that is boards.js - and opens
+// nothing itself: a tap hands the board over to its page.
+import { $, esc } from '../core/dom.js';
+import { progress, started } from '../core/store.js';
+import { deck, poolOf, isOutBoard, isNew, isDue } from '../study/boards.js';
+import { isMemorized } from '../study/schedule.js';
+import { ic } from '../core/icons.js';
+import { ring } from './ring.js';
+import { leave } from '../study/screens.js';
+import { openBoard, boardName } from './page.js';
+import { boardIcon } from './boardart.js';
+import { markTab } from '../island/nav.js';
+
+const FILTERS = [['all', 'All'], ['new', 'New'], ['learn', 'Learning'], ['know', 'Learned'], ['due', 'Due']];
+// The filter is remembered while the app is open, the same as a board's own.
+let filter = 'all';
+
+/** What a board holds.  The Known and Hidden boards are out of the round, so
+ *  nothing on them is new or due - they are where words go to sit. */
+function counts(id) {
+  const cards = poolOf(id), out = isOutBoard(id);
+  return {
+    total: cards.length,
+    new: out ? 0 : cards.filter(isNew).length,
+    due: out ? 0 : cards.filter(isDue).length,
+    learn: cards.filter((c) => started(progress[c.f]) && !isMemorized(c)).length,
+    know: cards.filter((c) => isMemorized(c) || progress[c.f]?.known).length,
+  };
+}
+const passes = (n) => filter === 'all' || n[filter] > 0;
+
+// She drew one line under a board's name and it is the size of the board.  What
+// is new and what is due is what the filters and the ring are for.
+const note = (n) => (n.total ? `${n.total} words` : 'empty');
+
+export function home() {
+  leave();
+  markTab('decks');
+  // Her decks, and Review with them - her call: Review is the repeat, and the
+  // repeat is a thing she starts, so a row here is a fair place for it.
+  // Bookmarks, Priorities, Known and Hidden are gone from this list: none of
+  // them is a deck, each is a way of looking at words that live in the decks,
+  // and every one already has its own way in from Home.  With all five in here
+  // the screen said "4 boards" at the top and then showed seven rows.
+  const ids = ['learning', ...deck.decks.map((d) => d.id)];
+  $('star').hidden = $('back').hidden = true;
+  $('stats').hidden = true;
+  // The name of the screen is on the screen now, in her big heading, so the
+  // header keeps quiet: it said "Decks" twice.
+  $('counts').innerHTML = '';
+  $('counts').title = 'pick a board';
+
+  const rows = ids.map((id) => [id, counts(id)]).filter(([, n]) => passes(n));
+  $('main').className = 'home';
+  $('main').innerHTML = `
+    <div class="head">${ic('decks')}<h1>Decks</h1>
+      <span class="s">${ids.length} boards</span></div>
+    <div class="chips">${FILTERS.map(([k, name]) =>
+      `<button data-k="${k}"${k === filter ? ' class="on"' : ''}>${name}</button>`).join('')}</div>
+    ${rows.map(([id, n]) => `<button class="deck" data-id="${esc(id)}" ${n.total ? '' : 'disabled'}>
+      ${ic(boardIcon(id))}<span class="n">${esc(boardName(id))}<span class="s">${note(n)}</span></span>
+      ${ring(poolOf(id), '42px', '', 18)}<span class="go">›</span></button>`).join('')
+      || '<div class="note">No board has anything under this filter.</div>'}`;
+
+  for (const b of document.querySelectorAll('.chips button')) {
+    b.addEventListener('click', () => { filter = b.dataset.k; home(); });
+  }
+  for (const b of document.querySelectorAll('.deck')) {
+    b.addEventListener('click', () => openBoard(b.dataset.id, 'decks'));
+  }
+}

@@ -4,8 +4,8 @@
 import '../test-support/browser.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { progress } from '../store.js';
-import { shares } from '../ring.js';
+import { progress } from '../core/store.js';
+import { shares } from '../boards/ring.js';
 
 const reset = () => { for (const k of Object.keys(progress)) delete progress[k]; };
 const cards = (...fronts) => fronts.map((f) => ({ f }));

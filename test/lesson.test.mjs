@@ -5,10 +5,10 @@
 import '../test-support/browser.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { today, saveLesson } from '../store.js';
+import { today, saveLesson } from '../core/store.js';
 import {
   queue, again, first, lesson, startLesson, nextCard, drop, keep, forget, resume,
-} from '../lesson.js';
+} from '../study/lesson.js';
 
 const deck = [{ f: 'a' }, { f: 'b' }, { f: 'c' }];
 const cardOf = (f) => deck.find((c) => c.f === f);
