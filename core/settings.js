@@ -75,6 +75,8 @@ export function settingsPage() {
         style="width:100%;text-align:left"${played(id) ? '' : ' disabled'}>${ic('jungle')}
         <span class="n">${i + 1}. ${esc(name)}</span>
         <span class="go">${played(id) ? '›' : 'not reached yet'}</span></button>`).join('')}
+      <button class="set" id="restart" style="width:100%;text-align:left">${ic('again')}
+        <span class="n">Start the story over</span><span class="go">›</span></button>
     </div>
 
     <div class="grp">About</div>
@@ -127,6 +129,15 @@ export function settingsPage() {
   for (const b of document.querySelectorAll('[data-sc]')) {
     b.addEventListener('click', () => playScene(b.dataset.sc));
   }
+  // And the way back to the very beginning, which she asked to keep: every
+  // scene forgotten, the intro first again, the "!" and her colour back with
+  // it. Playing one chapter over is watching it; this is starting the story.
+  $('restart').addEventListener('click', () => {
+    delete settings.scenes;
+    saveSettings();
+    settingsPage();                       // the chapters shut again as she watches
+    say('The story starts from the beginning. Press Megu on Home.');
+  });
 
   $('file').addEventListener('click', () => saveFile(say));
   $('pickfile').addEventListener('click', () => $('hidden').click());
