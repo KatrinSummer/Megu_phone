@@ -51,7 +51,12 @@ export function home() {
   // is somewhere she went, and the arrow takes her back the way every other
   // screen does.  Reached from the bar it is not a place she came to, it is
   // the tab she is on, and an arrow there points at nothing.
-  $('back').hidden = !cameFromHome();
+  //
+  // It stands IN the heading row, beside the name - on a board's page the
+  // arrow and the name of the board are one line, and here the header's own
+  // arrow sat ABOVE the heading, which is a row no other screen has.  Her
+  // rule, 29.09: built by analogy means looking at what it is an analogy to.
+  $('back').hidden = true;
   $('stats').hidden = true;
   // The name of the screen is on the screen now, in her big heading, so the
   // header keeps quiet: it said "Decks" twice.
@@ -61,7 +66,9 @@ export function home() {
   const rows = ids.map((id) => [id, counts(id)]).filter(([, n]) => passes(n));
   $('main').className = 'home';
   $('main').innerHTML = `
-    <div class="head">${ic('decks')}<h1>Decks</h1>
+    <div class="head">${cameFromHome()
+      ? `<button class="icon" id="d-back" aria-label="Back to Home">${ic('back')}</button>` : ''}
+      ${ic('decks')}<h1>Decks</h1>
       <span class="s">${ids.length} boards</span></div>
     <div class="chips">${FILTERS.map(([k, name]) =>
       `<button data-k="${k}"${k === filter ? ' class="on"' : ''}>${name}</button>`).join('')}</div>
@@ -70,6 +77,10 @@ export function home() {
       ${ring(poolOf(id), '42px', '', 18)}<span class="go">›</span></button>`).join('')
       || '<div class="note">No board has anything under this filter.</div>'}`;
 
+  // The same way out as the header's arrow, and written down once: app.js
+  // knows where back is from every screen, and a second copy of that rule here
+  // is two files free to disagree about where Home is.
+  $('d-back')?.addEventListener('click', () => $('back').click());
   for (const b of document.querySelectorAll('.chips button')) {
     b.addEventListener('click', () => { filter = b.dataset.k; home(); });
   }

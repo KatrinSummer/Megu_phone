@@ -1,0 +1,41 @@
+/* The plate laid over a screen: her note when the island lets her go, the
+   quests in the corner, a page of her diary, the question the intro ends on.
+   It belongs to no one screen - the story puts it up, the corners put it up,
+   Home puts it up - so it lives in a file of its own rather than half in
+   home.css and half in story.css, which is where it was. */
+/* A note laid over the island rather than a screen of its own: she asked for
+   it over the screen, and it is tapped away anywhere. */
+.over{position:fixed;inset:0;z-index:6;display:grid;place-items:center;padding:18px;
+  background:#0b142c66}
+.over .card{max-width:330px;max-height:80vh;overflow:auto;background:var(--sheet);
+  border:1px solid var(--line);border-radius:20px;padding:15px 16px 11px;
+  box-shadow:0 12px 34px #0005;line-height:1.45}
+/* Her diary is long enough to scroll, and what scrolled it was the platform's
+   own grey bar with its little arrows - the one thing on the screen not drawn
+   by this app.  Thin, rounded and pink, like everything else she made. */
+.over .card{scrollbar-width:thin;scrollbar-color:var(--pink) transparent}
+.over .card::-webkit-scrollbar{width:6px}
+.over .card::-webkit-scrollbar-track{background:none}
+.over .card::-webkit-scrollbar-thumb{background:var(--pink);border-radius:6px}
+.over h2{margin:0 0 7px;font-size:14px;font-weight:700;color:var(--pink)}
+.over p{margin:0 0 10px}
+.over .q{border-top:1px solid var(--line);padding-top:9px;margin-bottom:9px}
+/* A page of her diary: the number in the margin the way a diary has a date,
+   and her paragraphs kept apart - she writes in bursts, not in one block. */
+.over .page{border-top:1px solid var(--line);padding:9px 0 0 22px;position:relative}
+.over .page b{position:absolute;left:0;top:9px;color:var(--pink)}
+.over .page p:last-child{margin-bottom:9px}
+.over .q b{display:block;font-size:15px;margin-bottom:2px}
+.over .hint{font-size:13px;color:var(--dim)}
+.over .on{margin:0;font-size:12px;color:var(--dim);text-align:center}
+/* The four levels on the plate over the island, once the test is behind her.
+   Her painted pills, the same ones Settings holds. Two by two rather than a
+   wrapping row: four of them are wider than the card, and a row that wraps
+   leaves "Most of it" standing alone on the last line, which reads as
+   something gone wrong rather than as the fourth of four. */
+.over .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0 9px;overflow:visible}
+/* The question the intro ends on: the screen goes dark and it stands in the
+   middle of it, the way she drew it - not on the plate at the foot of the
+   screen, which is where the conversation was. */
+.over.dark{background:#05080fe6}
+.over.dark .chips{grid-template-columns:1fr 1fr 1fr}

@@ -47,6 +47,16 @@ const pressMegu = () => {
   if (!questsGot()) startStory(backFromQuests, QUESTS);
 };
 
+/** A scene opened from somewhere that is not Home - her chapter list in
+ *  Settings.  A scene is played ON Home: the stage is her drawing and the
+ *  plate under it, so the screen has to be standing before the story starts,
+ *  and where she lands when it ends is Home's business either way. */
+export function playScene(name) {
+  markTab('home');
+  dash();
+  startStory(name === QUESTS ? backFromQuests : backFromStory, name);
+}
+
 /** The board the big button starts.  Her last one while it still has new words
  *  in it, otherwise the newest lesson, which is the one she is usually after. */
 const studyBoard = () => (learnable(settings.deck).length ? settings.deck
@@ -80,13 +90,18 @@ export function dash() {
   const pri = all.filter((p) => p.pri === 1).length;
   const done = doneToday();
 
-  // Her colour says whether the island is waiting on her: greyed while she has
-  // something to say, full colour once there is nothing pending.  Same
-  // condition as the "!", so the two can never disagree.
-  $('main').className = questsOpen() && !questsGot() ? 'dash has-quest' : 'dash';
+  $('main').className = 'dash';
+  // Her colour says whether the island is waiting on her: greyed while there is
+  // something for her to press, full colour once there is nothing pending.
+  // The intro counts as one - "Start Adventure" is a quest like any other - so
+  // the whole of it is "has she heard everything there is", her rule, 29.09.
+  // The mark goes on HER and not on the screen: it is her colour, and a class
+  // on the screen made "which screen am I on" and "is anything pending" the
+  // same string - which is a class of bug, not a saving.
+  const dim = questsGot() ? '' : ' has-quest';
   $('main').innerHTML = `
     <div class="top">
-      <button class="char" id="d-char" aria-label="Megu — open her story"><img src="img/char.webp" alt=""></button>
+      <button class="char${dim}" id="d-char" aria-label="Megu — open her story"><img src="img/char.webp" alt=""></button>
       <div class="ring">
         ${ring(deck.cards, '158px', `<div class="mid"><span class="n">${deck.cards.length}</span>
           <span class="l">words</span>${done ? `<span class="l today">${done} today</span>` : ''}</div>`)}

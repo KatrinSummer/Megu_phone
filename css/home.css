@@ -86,9 +86,9 @@ main.dash:not(.talking) .top::after{content:"";position:absolute;z-index:1;
 /* Greyed only while the island is waiting on her.  A "!" on her means she has
    something to say; the colour comes back the moment she has said it, and
    with nothing pending she stands in full colour - her rule, 28.09. */
-main.dash.has-quest .char img{
+.char.has-quest img{
   filter:grayscale(.55) drop-shadow(0 5px 9px rgba(6,12,28,.28))}
-:root[data-theme="dark"] main.dash.has-quest .char img{
+:root[data-theme="dark"] .char.has-quest img{
   filter:grayscale(.55) var(--dim-art) drop-shadow(0 5px 9px rgba(6,12,28,.55))}
 .char:active img{transform:translateY(1px)}
 .char{transition:translate .35s ease}
@@ -103,75 +103,6 @@ main.dash.has-quest .char img{
    right corner are above it now, and at 26px the number was drawn through
    them. */
 main.dash .top .ring{position:absolute;right:0;top:58px;z-index:2;width:auto;padding:12px 4px 10px}
-/* While she has the screen the island's rows are folded away.  Only the rows
-   themselves go: what is inside her own panel is not one of them, which is why
-   this reaches for the children of the screen and not for the classes. */
-main.dash.talking>.duo,main.dash.talking>.big,
-main.dash.talking>.tile,main.dash.talking .drop{display:none}
-/* The whole screen is tapped over and over to read the story, and taps that land
-   close together are a double-click: the browser answers one by selecting what
-   was under it, and drew a box round her.  Nothing here is text to copy. */
-main.dash.talking{user-select:none;-webkit-user-select:none}
-/* A stage, the way a visual novel builds one - not a box with somebody inside
-   it.  The row takes whatever height is left over (flex:1) and the person is
-   fitted INTO it whole: max-width and max-height both 100%, so the picture is
-   made smaller when it must be and is never cut to fit.
-   It used to be asked for at 88vh inside a 52vh box, and the box cropped the
-   difference - which is where the frame she kept seeing came from: a hard edge
-   down both sides of the drawing at the exact width of the box. */
-/* The stage runs to the edges of the SCREEN, not to the edges of the page.
-   Measured: the window is 390 wide and this row was 362 - the 14px of padding
-   main carries on each side.  The drawing overflowed correctly, and then the row
-   clipped it 14 points early, drawing exactly the straight line down her side
-   that kept coming back.  Three times I looked for it in the picture.
-   The negative margin is cancelled by hiding overflow across the screen, or the
-   row would push a horizontal scrollbar out instead. */
-/* Both axes now.  The figure is let out of its row on purpose (below), so the
-   screen itself has to be what stops it - otherwise the overflow hands main a
-   scrollbar and she can scroll the story sideways and down. */
-main.dash.talking{overflow:hidden}
-/* overflow:visible, which is the whole point: the row ends where the plate
-   begins, and a row that clipped its own contents cut the person off along that
-   line with the sand still showing underneath.  A novel does not end the person
-   above the text box - it runs them behind it. */
-main.dash.talking .top{flex:1;min-height:0;height:auto;overflow:visible;
-  margin:0 -14px;align-items:flex-start;justify-content:center}
-main.dash.talking .char{width:100%;max-width:none;height:100%;overflow:visible;
-  translate:0;display:flex;align-items:flex-start;justify-content:center}
-/* Close up, the way a novel stands somebody on screen: as tall as the window,
-   head at the top, and whatever is below the hips runs off the bottom behind
-   what is being said.  That is the screen's edge doing the cutting, not a box
-   inside it - the row is the full width now, so nothing draws a line down her
-   sides the way the old 52vh box did. */
-/* Closer still.  The drawings are narrow and tall - 695x1400 - so asking for a
-   height that fits the window shows the whole person and a lot of beach.  At
-   120vh she is taller than the screen: the head stays at the top, the legs run
-   off the bottom behind what is said, and the sides lose only the outermost
-   curls of hair.  The row is the full width, so that trimming happens at the
-   edge of the screen and draws no line down her. */
-/* Sized to COVER the stage, not merely to be tall.  Height alone was enough on
-   a phone - 120vh of a 390-wide screen overflows it and there is no bare beach
-   to see - but she looks at this in a window twice that wide, where the same
-   drawing is narrower than the stage and the island shows down one side.  That
-   is what "I can still see the background" was: not a bad cut, a short picture.
-   object-fit keeps her proportions while the box takes the whole stage. */
-main.dash.talking .char img{display:block;flex:none;width:100%;height:120vh;
-  object-fit:cover;object-position:50% 0;max-width:none;max-height:none;margin-left:0}
-/* Toro alone, and by eye rather than by arithmetic.  He is not framed in his own
-   file the way she is in hers: he is drawn holding a staff out to his left, so
-   centring the PICTURE puts the man right of centre and runs the staff off the
-   edge of the screen, with the sea left empty on his other side.
-   Five attempts to find this number by measuring the drawing gave five different
-   answers and each made it worse; this one was looked at, against a red line
-   down the middle of the screen, at both widths.
-   It moves the PICTURE inside the stage, not the stage: sliding the whole box
-   sideways - which is what translate did - is what left bare island down the
-   left edge in a wide window, because the box is now exactly the stage. */
-main.dash.talking .char img[data-who="TORO"]{object-position:36% 0}
-/* And no shadow on the stage.  A hard shadow behind a big figure draws a line
-   round it, which is the other half of "why do they stand out". */
-main.dash.talking .char img{filter:none}
-:root[data-theme="dark"] main.dash.talking .char img{filter:var(--dim-art)}
 /* The way into her story, on her: the painted button she drew, narrowed and
    standing at her waist rather than at her feet.
    Her button carries its play triangle INSIDE the picture it is painted with,
@@ -259,24 +190,6 @@ main.dash .top .hud.right{right:0}
   filter:var(--dim-art) drop-shadow(0 2px 5px rgba(6,12,28,.7))}
 /* Gone while the story runs, like everything else in this row. */
 main.dash.talking .top .hud{display:none}
-/* A note laid over the island rather than a screen of its own: she asked for
-   it over the screen, and it is tapped away anywhere. */
-.over{position:fixed;inset:0;z-index:6;display:grid;place-items:center;padding:18px;
-  background:#0b142c66}
-.over .card{max-width:330px;max-height:80vh;overflow:auto;background:var(--sheet);
-  border:1px solid var(--line);border-radius:20px;padding:15px 16px 11px;
-  box-shadow:0 12px 34px #0005;line-height:1.45}
-.over h2{margin:0 0 7px;font-size:14px;font-weight:700;color:var(--pink)}
-.over p{margin:0 0 10px}
-.over .q{border-top:1px solid var(--line);padding-top:9px;margin-bottom:9px}
-/* A page of her diary: the number in the margin the way a diary has a date,
-   and her paragraphs kept apart - she writes in bursts, not in one block. */
-.over .page{border-top:1px solid var(--line);padding:9px 0 0 22px;position:relative}
-.over .page b{position:absolute;left:0;top:9px;color:var(--pink)}
-.over .page p:last-child{margin-bottom:9px}
-.over .q b{display:block;font-size:15px;margin-bottom:2px}
-.over .hint{font-size:13px;color:var(--dim)}
-.over .on{margin:0;font-size:12px;color:var(--dim);text-align:center}
 
 /* Her one pink button stands in the flow of the screen, under the first row of
    tiles, where it has always stood.  It was lifted into the drawing's row and

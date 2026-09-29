@@ -51,12 +51,6 @@ main.dash.talking>.talk.thought{margin-top:0;margin-bottom:auto}
    rather than the size of a label. */
 .cloze{display:block;margin-top:7px;font-size:17px;line-height:1.55}
 .speech .on{font-size:12px;color:var(--dim)}
-/* The four levels on the plate over the island, once the test is behind her.
-   Her painted pills, the same ones Settings holds. Two by two rather than a
-   wrapping row: four of them are wider than the card, and a row that wraps
-   leaves "Most of it" standing alone on the last line, which reads as
-   something gone wrong rather than as the fourth of four. */
-.over .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0 9px;overflow:visible}
 /* Out of the test altogether, next to the counter that says how far in she is.
    Small and dashed on purpose: it is a way past the test, not a fifth answer. */
 .speech .skip{margin-left:9px;padding:2px 8px;border:1px dashed var(--line);border-radius:9px;
@@ -74,12 +68,11 @@ main.dash.talking .char img{transition:opacity .18s ease}
    black. */
 main.dash.talking.blackout,
 main.dash.talking.blackout .top{background:#05080f}
-
-/* The question the intro ends on: the screen goes dark and it stands in the
-   middle of it, the way she drew it - not on the plate at the foot of the
-   screen, which is where the conversation was. */
-.over.dark{background:#05080fe6}
-.over.dark .chips{grid-template-columns:1fr 1fr 1fr}
+/* The window with it, and not only the screen.  Her island is painted on the
+   body, so with main alone gone black the beach went on showing in the strip
+   above the screen and under the bar - the other background she saw sticking
+   out from under this one. */
+body:has(main.dash.talking.blackout){background:#05080f}
 
 /* What a -word- on its own does.  Two of them so far, and both are over in
    under a second: a screen that shakes for longer reads as a fault. */
@@ -101,3 +94,83 @@ main.fx-scared{animation:fx-scared .7s}
    going dark, not one panel of it - and never in the way of a tap. */
 main.fx-dark::after{content:"";position:fixed;inset:0;z-index:5;pointer-events:none;
   background:#06101f;animation:fx-dark .9s}
+
+/* ---------------------------------------------------------------- the stage
+   What Home turns into while a scene runs: the island's rows folded away and
+   one person standing close up in front of what they are saying.  It was in
+   home.css, which had grown past 300 lines with three subjects in it - the
+   island, the stage, and the plate over both.  The stage is the story's. */
+/* While she has the screen the island's rows are folded away.  Only the rows
+   themselves go: what is inside her own panel is not one of them, which is why
+   this reaches for the children of the screen and not for the classes. */
+main.dash.talking>.duo,main.dash.talking>.big,
+main.dash.talking>.tile,main.dash.talking .drop{display:none}
+/* The whole screen is tapped over and over to read the story, and taps that land
+   close together are a double-click: the browser answers one by selecting what
+   was under it, and drew a box round her.  Nothing here is text to copy. */
+main.dash.talking{user-select:none;-webkit-user-select:none}
+/* A stage, the way a visual novel builds one - not a box with somebody inside
+   it.  The row takes whatever height is left over (flex:1) and the person is
+   fitted INTO it whole: max-width and max-height both 100%, so the picture is
+   made smaller when it must be and is never cut to fit.
+   It used to be asked for at 88vh inside a 52vh box, and the box cropped the
+   difference - which is where the frame she kept seeing came from: a hard edge
+   down both sides of the drawing at the exact width of the box. */
+/* The stage runs to the edges of the SCREEN, not to the edges of the page.
+   Measured: the window is 390 wide and this row was 362 - the 14px of padding
+   main carries on each side.  The drawing overflowed correctly, and then the row
+   clipped it 14 points early, drawing exactly the straight line down her side
+   that kept coming back.  Three times I looked for it in the picture.
+   The negative margin is cancelled by hiding overflow across the screen, or the
+   row would push a horizontal scrollbar out instead. */
+/* Both axes now.  The figure is let out of its row on purpose (below), so the
+   screen itself has to be what stops it - otherwise the overflow hands main a
+   scrollbar and she can scroll the story sideways and down. */
+main.dash.talking{overflow:hidden}
+/* overflow:visible, which is the whole point: the row ends where the plate
+   begins, and a row that clipped its own contents cut the person off along that
+   line with the sand still showing underneath.  A novel does not end the person
+   above the text box - it runs them behind it. */
+main.dash.talking .top{flex:1;min-height:0;height:auto;overflow:visible;
+  margin:0 -14px;align-items:flex-start;justify-content:center}
+main.dash.talking .char{width:100%;max-width:none;height:100%;overflow:visible;
+  translate:0;display:flex;align-items:flex-start;justify-content:center}
+/* Close up, the way a novel stands somebody on screen: as tall as the window,
+   head at the top, and whatever is below the hips runs off the bottom behind
+   what is being said.  That is the screen's edge doing the cutting, not a box
+   inside it - the row is the full width now, so nothing draws a line down her
+   sides the way the old 52vh box did. */
+/* Closer still.  The drawings are narrow and tall - 695x1400 - so asking for a
+   height that fits the window shows the whole person and a lot of beach.  At
+   120vh she is taller than the screen: the head stays at the top, the legs run
+   off the bottom behind what is said, and the sides lose only the outermost
+   curls of hair.  The row is the full width, so that trimming happens at the
+   edge of the screen and draws no line down her. */
+/* Sized to COVER the stage, not merely to be tall.  Height alone was enough on
+   a phone - 120vh of a 390-wide screen overflows it and there is no bare beach
+   to see - but she looks at this in a window twice that wide, where the same
+   drawing is narrower than the stage and the island shows down one side.  That
+   is what "I can still see the background" was: not a bad cut, a short picture.
+   object-fit keeps her proportions while the box takes the whole stage. */
+main.dash.talking .char img{display:block;flex:none;width:100%;height:120vh;
+  object-fit:cover;object-position:50% 0;max-width:none;max-height:none;margin-left:0}
+/* An empty stage means empty.  The story hides her with [hidden] - which is
+   display:none - and the rule above is the stronger selector, so it won her
+   back every time: she went on standing in the dark church she had just walked
+   into.  The same trap .icon[hidden] fell into up in the header. */
+main.dash.talking .char img[hidden]{display:none}
+/* Toro alone, and by eye rather than by arithmetic.  He is not framed in his own
+   file the way she is in hers: he is drawn holding a staff out to his left, so
+   centring the PICTURE puts the man right of centre and runs the staff off the
+   edge of the screen, with the sea left empty on his other side.
+   Five attempts to find this number by measuring the drawing gave five different
+   answers and each made it worse; this one was looked at, against a red line
+   down the middle of the screen, at both widths.
+   It moves the PICTURE inside the stage, not the stage: sliding the whole box
+   sideways - which is what translate did - is what left bare island down the
+   left edge in a wide window, because the box is now exactly the stage. */
+main.dash.talking .char img[data-who="TORO"]{object-position:36% 0}
+/* And no shadow on the stage.  A hard shadow behind a big figure draws a line
+   round it, which is the other half of "why do they stand out". */
+main.dash.talking .char img{filter:none}
+:root[data-theme="dark"] main.dash.talking .char img{filter:var(--dim-art)}

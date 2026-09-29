@@ -22,6 +22,12 @@ export const FIRST = '01-beach';
  *  and THEN the quests exist. */
 export const QUESTS = '02-quests';
 
+/** The chapters there are, in the order they are played.  Her list in Settings
+ *  is built from this and from nothing else: a scene she has finished can be
+ *  played again from there, one she has not reached is shown locked.  A new
+ *  scene turns up in that list by being named here. */
+export const SCENES = [[FIRST, 'The beach'], [QUESTS, 'The islanders']];
+
 /** Which version of each scene she has played.  A scene finished once is
  *  remembered for good - that memory is what puts the "!" on Home - but the
  *  scenes are hers and she rewrites them, and then the mark stands on Home for

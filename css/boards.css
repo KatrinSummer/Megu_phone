@@ -5,6 +5,10 @@
    screen but Home and the card, it stands on plain blue - see body.island. */
 .set{display:flex;align-items:center;gap:11px;padding:11px 14px;border-bottom:1px solid var(--line)}
 .set:last-child{border-bottom:0}
+/* A row that is on the list and not open yet - a chapter of the story she has
+   not reached.  Dimmed rather than hidden: what is coming is part of knowing
+   where she is. */
+button.set[disabled]{opacity:.45}
 .set .n{flex:1;min-width:0}
 /* The phone's own little up/down arrows sat inside the box and looked like a
    fault in the drawing; the number is typed, not clicked. */

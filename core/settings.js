@@ -6,7 +6,7 @@
 // under the gear beside it, which is where she put it and where it is used -
 // two boxes for one number meant typing 20 in one place and reading 30 in the
 // other, and she asked what it was doing on this screen.
-import { $ } from './dom.js';
+import { $, esc } from './dom.js';
 import { settings, saveSettings, applyTheme } from './store.js';
 import { deck, buildQueue } from '../study/boards.js';
 import { saveFile, loadFile } from './backup.js';
@@ -14,7 +14,10 @@ import { ic } from './icons.js';
 import { LEVELS, level, setLevel } from '../island/level.js';
 import { leave, render } from '../study/screens.js';
 import { markTab, buildNav } from '../island/nav.js';
-import { dash } from '../island/dash.js';
+import { dash, playScene } from '../island/dash.js';
+// The chapters there are, named where the story names them - this screen only
+// lists what it is given, so a new scene needs no line here.
+import { SCENES, played } from '../island/story.js';
 
 const say = (m) => { $('note').textContent = m; };
 
@@ -68,8 +71,10 @@ export function settingsPage() {
 
     <div class="grp">The story</div>
     <div class="pane">
-      <button class="set" id="again" style="width:100%;text-align:left">${ic('jungle')}
-        <span class="n">Play the intro again</span><span class="go">›</span></button>
+      ${SCENES.map(([id, name], i) => `<button class="set" data-sc="${esc(id)}"
+        style="width:100%;text-align:left"${played(id) ? '' : ' disabled'}>${ic('jungle')}
+        <span class="n">${i + 1}. ${esc(name)}</span>
+        <span class="go">${played(id) ? '›' : 'not reached yet'}</span></button>`).join('')}
     </div>
 
     <div class="grp">About</div>
@@ -114,15 +119,14 @@ export function settingsPage() {
     say(`sound is on the phone: ${files.length} files, words and sentences, no internet needed`);
   });
 
-  // The intro is hers and she rewrites it.  A scene she finished once is
-  // remembered for good - that is what opens her quests - so a rewritten intro
-  // left the "!" standing on Home for a scene she has never seen.  This forgets
-  // the scene: the mark goes with it, and the story opens from the top again.
-  $('again').addEventListener('click', () => {
-    delete settings.scenes;
-    saveSettings();
-    say('The story starts from the beginning. Press Megu on Home.');
-  });
+  // Her chapters, and a way back into any of them she has finished - she asked
+  // for a list to step through the story by, not one button that plays the
+  // opening.  A chapter she has not reached is on the list and shut: what is
+  // coming is part of knowing where she is.  Nothing is forgotten by replaying
+  // one; a rewritten scene comes back on its own, by its version number.
+  for (const b of document.querySelectorAll('[data-sc]')) {
+    b.addEventListener('click', () => playScene(b.dataset.sc));
+  }
 
   $('file').addEventListener('click', () => saveFile(say));
   $('pickfile').addEventListener('click', () => $('hidden').click());
